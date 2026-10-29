@@ -344,7 +344,9 @@ async function fetchBuffer(url) {
     const response = await fetch(url, {
       headers: {
         "User-Agent": "blvckTOP/7.2"
-      }
+      },
+      // a stalled artwork download must never wedge a render-queue slot
+      signal: AbortSignal.timeout(25000)
     });
 
     if (!response.ok) {

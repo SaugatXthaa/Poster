@@ -252,11 +252,16 @@ function enqueueRender(job) {
     pumpRenders();
   });
 }
+const RENDER_DEADLINE_MS = 90000;
 function pumpRenders() {
   while (activeRenders < MAX_CONCURRENT_RENDERS && renderQueue.length) {
     const { job, resolve, reject } = renderQueue.shift();
     activeRenders++;
-    job().then(resolve, reject).finally(() => { activeRenders--; pumpRenders(); });
+    // deadline: a wedged job (upstream stall the timeouts somehow missed)
+    // must free its slot instead of starving the queue
+    const deadline = new Promise((_, rej) =>
+      setTimeout(() => rej(new Error("render deadline exceeded")), RENDER_DEADLINE_MS));
+    Promise.race([job(), deadline]).then(resolve, reject).finally(() => { activeRenders--; pumpRenders(); });
   }
 }
 
@@ -1038,7 +1043,7 @@ app.get(["/logo", "/logo/"], async (req, res) => {
     if (!logoUrl) return res.status(404).send("logo: no logo available for this title.");
 
     // Pass-through fetch — the underlying PNG comes from TMDB's CDN.
-    const r = await fetch(logoUrl, { headers: { "User-Agent": UA } });
+    const r = await fetch(logoUrl, { headers: { "User-Agent": UA }, signal: AbortSignal.timeout(20000) });
     if (!r.ok) return res.status(502).send(`logo: upstream HTTP ${r.status}`);
     const buf = Buffer.from(await r.arrayBuffer());
     res.setHeader("Content-Type", "image/png");
