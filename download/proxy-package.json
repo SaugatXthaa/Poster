@@ -1,0 +1,13 @@
+{
+  "name": "stream-proxy-server",
+  "version": "1.0.0",
+  "description": "Proxy server that resolves direct playable streams from ToonFlix, Re:ANIME, and ToonWorld4All",
+  "main": "proxy-server.js",
+  "scripts": {
+    "start": "node proxy-server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.19.2"
+  }
+}

@@ -1,0 +1,96 @@
+{
+  "name": "ShowBox TV Suite",
+  "version": "2.0.0",
+  "description": "4-provider suite for movies, TV shows, anime, and dramas up to 4K. Pure Node.js — no Playwright.",
+  "author": "D3adlyRocket / Xyr0nX",
+  "scrapers": [
+    {
+      "id": "2peckle-v20",
+      "name": "2Peckle",
+      "description": "Pengu.uk proxy + Febbox auth — 4K/1080p/720p movies, TV, anime, dramas",
+      "version": "2.0.0",
+      "author": "Xyr0nX/Antonio Ante",
+      "supportedTypes": ["movie", "tv", "series", "anime"],
+      "filename": "2peckle.js",
+      "enabled": true,
+      "formats": ["mp4", "mkv", "m3u8"],
+      "maxQuality": "2160p",
+      "logo": "https://i.postimg.cc/8c5XGzsx/showbox.png",
+      "contentLanguage": ["en", "hi", "ja", "ko", "zh", "ta", "te"],
+      "tokenEnvVar": "TWOPACKLE_TOKEN",
+      "settings": [
+        {
+          "name": "token_box",
+          "type": "text",
+          "label": "Enter Febbox Auth Token"
+        }
+      ]
+    },
+    {
+      "id": "showbox-v20-1",
+      "name": "ShowBox",
+      "description": "SuperStream via Febbox account #1 — 4K/1080p/720p movies, TV, anime, dramas",
+      "version": "2.0.0",
+      "author": "Xyr0nX/Antonio Ante",
+      "supportedTypes": ["movie", "tv", "series", "anime"],
+      "filename": "showbox.js",
+      "enabled": true,
+      "formats": ["mp4", "mkv"],
+      "maxQuality": "2160p",
+      "logo": "https://i.postimg.cc/8c5XGzsx/showbox.png",
+      "contentLanguage": ["en"],
+      "tokenEnvVar": "FEBBOX_TOKEN_1",
+      "settings": [
+        {
+          "name": "token_box",
+          "type": "text",
+          "label": "Enter Febbox Cookie Token"
+        }
+      ]
+    },
+    {
+      "id": "showbox-v20-2",
+      "name": "ShowBox 2",
+      "description": "SuperStream via Febbox account #2 (cookie rotation) — 4K/1080p/720p movies, TV, anime, dramas",
+      "version": "2.0.0",
+      "author": "Xyr0nX/Antonio Ante",
+      "supportedTypes": ["movie", "tv", "series", "anime"],
+      "filename": "showbox2.js",
+      "enabled": true,
+      "formats": ["mp4", "mkv"],
+      "maxQuality": "2160p",
+      "logo": "https://i.postimg.cc/8c5XGzsx/showbox.png",
+      "contentLanguage": ["en"],
+      "tokenEnvVar": "FEBBOX_TOKEN_2",
+      "settings": [
+        {
+          "name": "token_box",
+          "type": "text",
+          "label": "Enter Febbox Cookie Token #2"
+        }
+      ]
+    },
+    {
+      "id": "gramcinema-v20",
+      "name": "GramCinema",
+      "description": "Hashhackers API — 4K/1080p/720p movies, TV, anime, K-dramas, Asian dramas",
+      "version": "2.0.0",
+      "author": "Xyr0nX/Antonio Ante",
+      "supportedTypes": ["movie", "tv", "series", "anime"],
+      "filename": "gramcinema.js",
+      "enabled": true,
+      "formats": ["mp4", "mkv"],
+      "maxQuality": "2160p",
+      "logo": "https://i.postimg.cc/WbNPW7Jv/gramcinema.png",
+      "contentLanguage": ["en", "hi", "ja", "ko", "zh", "ta", "te"],
+      "tokenEnvVar": "HASHHACKERS_TOKEN",
+      "settings": [
+        {
+          "name": "token_box",
+          "type": "text",
+          "label": "Enter Hashhackers Bearer Token"
+        }
+      ]
+    }
+  ]
+}

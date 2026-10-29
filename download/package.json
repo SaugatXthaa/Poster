@@ -1,0 +1,21 @@
+{
+  "name": "allinone-nuvio",
+  "version": "1.0.0",
+  "description": "All-in-One Nuvio — multi-source HTTPS stream providers for Stremio/Nuvio. Works on Node.js + Render free tier.",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "node ../scripts/test_all_providers_playability.js"
+  },
+  "dependencies": {
+    "cheerio": "^1.2.0",
+    "cheerio-without-node-native": "^0.20.2",
+    "cors": "^2.8.6",
+    "crypto-js": "^4.2.0",
+    "express": "^5.3.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "license": "MIT"
+}

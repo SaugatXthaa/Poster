@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+		<link rel="icon" type="image/png" href="../ico.png" />
+		<!--12qhfyh--><link rel="icon" href="/ico.png"/><!----><!--1bmuzuj--><meta name="viewport" content="width=device-width, initial-scale=1.0"/> <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script> <!--[--><link rel="preload" href="/artplayer-new/artplayer.js?v=104" as="script" type="text/javascript" crossorigin="anonymous"/><link rel="preload" href="/artplayer-new/hls.js?v=103" as="script" type="text/javascript" crossorigin="anonymous"/><link rel="preload" href="/artplayer-new/artplayer-plugin-libass.legacy.js?v=104" as="script" type="text/javascript" crossorigin="anonymous"/><link rel="preload" href="/artplayer-new/artplayer-plugin-chapter.js" as="script" type="text/javascript" crossorigin="anonymous"/><link rel="preload" href="/artplayer-new/artplayer-plugin-vtt-thumbnail.js" as="script" type="text/javascript" crossorigin="anonymous"/><link rel="preload" href="/artplayer/artplayer-plugin-hls-control.js?v=3" as="script" type="text/javascript" crossorigin="anonymous"/><link rel="preload" href="/artplayer-new/subtitles-octopus-worker.js?v=1" as="worker" type="text/javascript" crossorigin="anonymous"/><link rel="preload" href="/artplayer-new/subtitles-octopus-worker.wasm" as="fetch" type="application/wasm" crossorigin="anonymous"/><!--]--> <!--[0--><!--[--><link rel="preload" href="https://vault-95.atomic4cdn.top/subtitles/5ad3792b-c806-4364-88f0-08b423ddc6f0/5ad3792b-c806-4364-88f0-08b423ddc6f0_eng_3.ass" as="fetch" type="text/x-ass" crossorigin="anonymous"/><link rel="preload" href="https://vault-95.atomic4cdn.top/subtitles/5ad3792b-c806-4364-88f0-08b423ddc6f0/5ad3792b-c806-4364-88f0-08b423ddc6f0_eng_4.ass" as="fetch" type="text/x-ass" crossorigin="anonymous"/><link rel="preload" href="https://vault-95.atomic4cdn.top/subtitles/5ad3792b-c806-4364-88f0-08b423ddc6f0/5ad3792b-c806-4364-88f0-08b423ddc6f0.srt" as="fetch" type="text/srt" crossorigin="anonymous"/><!--]--><!--]--><!----><title>[Anime Time] Haikyuu!! - 09.mkv</title>
+		<link href="../res/immutable/assets/0.DlrOtdoT.css" rel="stylesheet">
+		<link href="../res/immutable/assets/12.Bad3TdGU.css" rel="stylesheet">
+		<!-- Replaced in hooks.server.ts: ad network tag on /d/ pages only, empty elsewhere. -->
+		
+
+		<script>
+		// Polyfills for pre-2022 engines (Safari <15.4, old TV/embedded Chromium):
+		// dependencies in the bundle call Array#at / findLast and crash without them.
+		(function () {
+			function at(n) {
+				n = Math.trunc(n) || 0;
+				if (n < 0) n += this.length;
+				if (n < 0 || n >= this.length) return undefined;
+				return this[n];
+			}
+			if (!Array.prototype.at)
+				Object.defineProperty(Array.prototype, 'at', { value: at, writable: true, configurable: true });
+			if (!String.prototype.at)
+				Object.defineProperty(String.prototype, 'at', { value: at, writable: true, configurable: true });
+			if (!Array.prototype.findLast)
+				Object.defineProperty(Array.prototype, 'findLast', {
+					value: function (fn, thisArg) {
+						for (var i = this.length - 1; i >= 0; i--) {
+							if (fn.call(thisArg, this[i], i, this)) return this[i];
+						}
+						return undefined;
+					},
+					writable: true,
+					configurable: true
+				});
+			if (!Array.prototype.findLastIndex)
+				Object.defineProperty(Array.prototype, 'findLastIndex', {
+					value: function (fn, thisArg) {
+						for (var i = this.length - 1; i >= 0; i--) {
+							if (fn.call(thisArg, this[i], i, this)) return i;
+						}
+						return -1;
+					},
+					writable: true,
+					configurable: true
+				});
+		})();
+		</script>
+
+		<script src="/swetrix.js" defer></script>
+		<script>
+		document.addEventListener('DOMContentLoaded', function() {
+		swetrix.init('ALQSKFSNfpAq', {
+			apiURL: 'https://stats.flixcloud.cc/backend/v1/log',
+		})
+		swetrix.trackViews();
+		swetrix.trackErrors({
+			callback: function (err) {
+				var msg = (err && err.message) || '';
+				// Noise filters — errors thrown by code we don't ship:
+				// - '.data.split': Samsung Tizen TVs inject a message handler that
+				//   throws on every object postMessage from the player bridge
+				//   (~90% of raw error volume).
+				// - cross-origin frame access: the ad tag's injected inline script
+				//   poking its own ad iframes (our code only uses postMessage,
+				//   which never throws this).
+				// - the rest: browser-extension / in-app-browser injections.
+				var noise = [
+					'.data.split is not a function',
+					'Blocked a frame with origin',
+					'Permission denied to access property',
+					'__firefox__',
+					'window.ethereum',
+					'redefine property: ethereum',
+					'_AutofillCallbackHandler',
+					'DarkReader',
+					'window.VSC.',
+					// Benign: fired when a ResizeObserver callback outlasts a frame.
+					// No user impact, and unactionable from application code.
+					'ResizeObserver loop'
+				];
+				for (var i = 0; i < noise.length; i++) {
+					if (msg.indexOf(noise[i]) !== -1) return false;
+				}
+				// Anything thrown from an extension's own script bundle.
+				var file = (err && err.filename) || '';
+				if (file.indexOf('-extension://') !== -1) return false;
+			}
+		});
+		})
+		</script>
+
+		<noscript>
+		<img
+		src="https://stats.flixcloud.cc/backend/log/noscript?pid=ALQSKFSNfpAq"
+		alt=""
+		referrerpolicy="no-referrer-when-downgrade"
+		/>
+		</noscript>
+
+	</head>
+	<body data-preload="hover">
+		<div style="display: contents"><!--[--><!--[0--><!--[--><!--[-1--><!--]--><!----> <!--[0--><!--[--><!--[--><div class="video-player-page app-1bmuzuj"><div class="player-container app-1bmuzuj"><div id="artplayer-app" class="artplayer-app app-1bmuzuj"></div> <!--[0--><div class="decryption-container app-1bmuzuj" style="position: absolute; inset: 0; background-color: black; display: flex; align-items: center; justify-content: center; z-index: 20;"><div class="decryption-content app-1bmuzuj" style="text-align: center; color: white; font-family: 'Inter', sans-serif;"><div class="loading-spinner app-1bmuzuj" style="width: 60px; height: 60px; margin: 0 auto 20px; color: #ffffff;"><svg style="width: 100%; height: 100%;" version="1.1" class="svg-loader app-1bmuzuj" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 80 80" xml:space="preserve"><path fill="currentColor" d="M10,40c0,0,0-0.4,0-1.1c0-0.3,0-0.8,0-1.3c0-0.3,0-0.5,0-0.8c0-0.3,0.1-0.6,0.1-0.9c0.1-0.6,0.1-1.4,0.2-2.1
+						c0.2-0.8,0.3-1.6,0.5-2.5c0.2-0.9,0.6-1.8,0.8-2.8c0.3-1,0.8-1.9,1.2-3c0.5-1,1.1-2,1.7-3.1c0.7-1,1.4-2.1,2.2-3.1
+						c1.6-2.1,3.7-3.9,6-5.6c2.3-1.7,5-3,7.9-4.1c0.7-0.2,1.5-0.4,2.2-0.7c0.7-0.3,1.5-0.3,2.3-0.5c0.8-0.2,1.5-0.3,2.3-0.4l1.2-0.1
+						l0.6-0.1l0.3,0l0.1,0l0.1,0l0,0c0.1,0-0.1,0,0.1,0c1.5,0,2.9-0.1,4.5,0.2c0.8,0.1,1.6,0.1,2.4,0.3c0.8,0.2,1.5,0.3,2.3,0.5
+		c3,0.8,5.9,2,8.5,3.6c2.6,1.6,4.9,3.4,6.8,5.4c1,1,1.8,2.1,2.7,3.1c0.8,1.1,1.5,2.1,2.1,3.2c0.6,1.1,1.2,2.1,1.6,3.1
+		c0.4,1,0.9,2,1.2,3c0.3,1,0.6,1.9,0.8,2.7c0.2,0.9,0.3,1.6,0.5,2.4c0.1,0.4,0.1,0.7,0.2,1c0,0.3,0.1,0.6,0.1,0.9
+		c0.1,0.6,0.1,1,0.1,1.4C74,39.6,74,40,74,40c0.2,2.2-1.5,4.1-3.7,4.3s-4.1-1.5-4.3-3.7c0-0.1,0-0.2,0-0.3l0-0.4c0,0,0-0.3,0-0.9
+		c0-0.3,0-0.7,0-1.1c0-0.2,0-0.5,0-0.7c0-0.2-0.1-0.5-0.1-0.8c-0.1-0.6-0.1-1.2-0.2-1.9c-0.1-0.7-0.3-1.4-0.4-2.2
+		c-0.2-0.8-0.5-1.6-0.7-2.4c-0.3-0.8-0.7-1.7-1.1-2.6c-0.5-0.9-0.9-1.8-1.5-2.7c-0.6-0.9-1.2-1.8-1.9-2.7c-1.4-1.8-3.2-3.4-5.2-4.9
+		c-2-1.5-4.4-2.7-6.9-3.6c-0.6-0.2-1.3-0.4-1.9-0.6c-0.7-0.2-1.3-0.3-1.9-0.4c-1.2-0.3-2.8-0.4-4.2-0.5l-2,0c-0.7,0-1.4,0.1-2.1,0.1
+		c-0.7,0.1-1.4,0.1-2,0.3c-0.7,0.1-1.3,0.3-2,0.4c-2.6,0.7-5.2,1.7-7.5,3.1c-2.2,1.4-4.3,2.9-6,4.7c-0.9,0.8-1.6,1.8-2.4,2.7
+		c-0.7,0.9-1.3,1.9-1.9,2.8c-0.5,1-1,1.9-1.4,2.8c-0.4,0.9-0.8,1.8-1,2.6c-0.3,0.9-0.5,1.6-0.7,2.4c-0.2,0.7-0.3,1.4-0.4,2.1
+		c-0.1,0.3-0.1,0.6-0.2,0.9c0,0.3-0.1,0.6-0.1,0.8c0,0.5-0.1,0.9-0.1,1.3C10,39.6,10,40,10,40z"><animateTransform attributeType="xml" attributeName="transform" type="rotate" from="0 40 40" to="360 40 40" dur="0.8s" repeatCount="indefinite"></animateTransform></path><path fill="currentColor" d="M62,40.1c0,0,0,0.2-0.1,0.7c0,0.2,0,0.5-0.1,0.8c0,0.2,0,0.3,0,0.5c0,0.2-0.1,0.4-0.1,0.7
+		c-0.1,0.5-0.2,1-0.3,1.6c-0.2,0.5-0.3,1.1-0.5,1.8c-0.2,0.6-0.5,1.3-0.7,1.9c-0.3,0.7-0.7,1.3-1,2.1c-0.4,0.7-0.9,1.4-1.4,2.1
+		c-0.5,0.7-1.1,1.4-1.7,2c-1.2,1.3-2.7,2.5-4.4,3.6c-1.7,1-3.6,1.8-5.5,2.4c-2,0.5-4,0.7-6.2,0.7c-1.9-0.1-4.1-0.4-6-1.1
+		c-1.9-0.7-3.7-1.5-5.2-2.6c-1.5-1.1-2.9-2.3-4-3.7c-0.6-0.6-1-1.4-1.5-2c-0.4-0.7-0.8-1.4-1.2-2c-0.3-0.7-0.6-1.3-0.8-2
+		c-0.2-0.6-0.4-1.2-0.6-1.8c-0.1-0.6-0.3-1.1-0.4-1.6c-0.1-0.5-0.1-1-0.2-1.4c-0.1-0.9-0.1-1.5-0.1-2c0-0.5,0-0.7,0-0.7
+		s0,0.2,0.1,0.7c0.1,0.5,0,1.1,0.2,2c0.1,0.4,0.2,0.9,0.3,1.4c0.1,0.5,0.3,1,0.5,1.6c0.2,0.6,0.4,1.1,0.7,1.8
+		c0.3,0.6,0.6,1.2,0.9,1.9c0.4,0.6,0.8,1.3,1.2,1.9c0.5,0.6,1,1.3,1.6,1.8c1.1,1.2,2.5,2.3,4,3.2c1.5,0.9,3.2,1.6,5,2.1
+		c1.8,0.5,3.6,0.6,5.6,0.6c1.8-0.1,3.7-0.4,5.4-1c1.7-0.6,3.3-1.4,4.7-2.4c1.4-1,2.6-2.1,3.6-3.3c0.5-0.6,0.9-1.2,1.3-1.8
+		c0.4-0.6,0.7-1.2,1-1.8c0.3-0.6,0.6-1.2,0.8-1.8c0.2-0.6,0.4-1.1,0.5-1.7c0.1-0.5,0.2-1,0.3-1.5c0.1-0.4,0.1-0.8,0.1-1.2
+		c0-0.2,0-0.4,0.1-0.5c0-0.2,0-0.4,0-0.5c0-0.3,0-0.6,0-0.8c0-0.5,0-0.7,0-0.7c0-1.1,0.9-2,2-2s2,0.9,2,2C62,40,62,40.1,62,40.1z"><animateTransform attributeType="xml" attributeName="transform" type="rotate" from="0 40 40" to="-360 40 40" dur="0.6s" repeatCount="indefinite"></animateTransform></path></svg></div> <div class="preload-status app-1bmuzuj" style="margin-top: 1.25rem; max-width: min(360px, 80vw); margin-left: auto; margin-right: auto; text-align: left; font-size: 0.95rem; color: #f2f2f2;"><!--[0--><div class="preload-status-line preload-status-line--muted app-1bmuzuj" style="margin: 0; padding: 0.25rem 0; line-height: 1.35; font-weight: 500; opacity: 0.7; font-style: italic;">Initializing secure pipeline…</div><!--]--></div> <!--[-1--><!--]--> <!--[-1--><!--]--></div></div><!--]--> <!--[-1--><!--]--></div></div><!--]--><!----><!--]--><!--]--><!----><!--]--><!--]--> <!--[-1--><!--]--><!--]-->
+			
+			<script>
+				{
+					__pr_1w6szex = {
+						base: new URL("..", location).pathname.slice(0, -1)
+					};
+
+					const element = document.currentScript.parentElement;
+
+					Promise.all([
+						import("../res/immutable/entry/start.BCkriuQC.js"),
+						import("../res/immutable/entry/app.DduqZf-2.js")
+					]).then(([kit, app]) => {
+						kit.start(app, element, {
+							node_ids: [0, 2, 12],
+							data: [null,null,{type:"data",data:{skipIntro:false,cda3aec4effcfcbbf38d8a754066cb04_b7a411bc:"a2f456022b771c70d933dbf5","9c807c87f7e171be17bdbf2ada0dfc55_2c141fd3":"dd53cf1d62970e666354f596","355c319464305ad94b876f1559f53326":"2ac8880066b262937ad7aa25",e2834f8141e2857ef74c1358ad911797:"ac09b5266dfa1a86b7584e4b","5b2bfff4475c2dd12fe9b80666009b7c4dcb345c_1ee214ec":"90d361c4aa03dbcbad625c52",b5ed0bdcbcc78f359faaec504983b694:"7e5be0032c8104a820d01598",extracted_fonts:["https://vault-95.atomic4cdn.top/fonts/5ad3792b-c806-4364-88f0-08b423ddc6f0/Scratch.ttf","https://vault-95.atomic4cdn.top/fonts/5ad3792b-c806-4364-88f0-08b423ddc6f0/LTFinnegan_MediumItalic_0.ttf","https://vault-95.atomic4cdn.top/fonts/5ad3792b-c806-4364-88f0-08b423ddc6f0/GOTH720K.ttf","https://vault-95.atomic4cdn.top/fonts/5ad3792b-c806-4364-88f0-08b423ddc6f0/LT_C.ttf","https://vault-95.atomic4cdn.top/fonts/5ad3792b-c806-4364-88f0-08b423ddc6f0/Chippy_Handwriting.ttf","https://vault-95.atomic4cdn.top/fonts/5ad3792b-c806-4364-88f0-08b423ddc6f0/Brush_Strokes_6.ttf","https://vault-95.atomic4cdn.top/fonts/5ad3792b-c806-4364-88f0-08b423ddc6f0/FRADM.ttf","https://vault-95.atomic4cdn.top/fonts/5ad3792b-c806-4364-88f0-08b423ddc6f0/BriemScriptStd-Medium.otf","https://vault-95.atomic4cdn.top/fonts/5ad3792b-c806-4364-88f0-08b423ddc6f0/lino-stamp.ttf","https://vault-95.atomic4cdn.top/fonts/5ad3792b-c806-4364-88f0-08b423ddc6f0/FOTCometStdStripped-Bold_0.otf"],isLive:false,isHost:false,default_audio_track:0,thumbnails_vtt:"https://fetch8.flixcloud.cc/thumbnails_vtt/5ad3792b-c806-4364-88f0-08b423ddc6f0",available_fonts:{Scratch:"https://vault-95.atomic4cdn.top/fonts/5ad3792b-c806-4364-88f0-08b423ddc6f0/Scratch.ttf",LTFinnegan_MediumItalic_0:"https://vault-95.atomic4cdn.top/fonts/5ad3792b-c806-4364-88f0-08b423ddc6f0/LTFinnegan_MediumItalic_0.ttf",GOTH720K:"https://vault-95.atomic4cdn.top/fonts/5ad3792b-c806-4364-88f0-08b423ddc6f0/GOTH720K.ttf",LT_C:"https://vault-95.atomic4cdn.top/fonts/5ad3792b-c806-4364-88f0-08b423ddc6f0/LT_C.ttf",Chippy_Handwriting:"https://vault-95.atomic4cdn.top/fonts/5ad3792b-c806-4364-88f0-08b423ddc6f0/Chippy_Handwriting.ttf",Brush_Strokes_6:"https://vault-95.atomic4cdn.top/fonts/5ad3792b-c806-4364-88f0-08b423ddc6f0/Brush_Strokes_6.ttf",FRADM:"https://vault-95.atomic4cdn.top/fonts/5ad3792b-c806-4364-88f0-08b423ddc6f0/FRADM.ttf","BriemScriptStd-Medium":"https://vault-95.atomic4cdn.top/fonts/5ad3792b-c806-4364-88f0-08b423ddc6f0/BriemScriptStd-Medium.otf","lino-stamp":"https://vault-95.atomic4cdn.top/fonts/5ad3792b-c806-4364-88f0-08b423ddc6f0/lino-stamp.ttf","FOTCometStdStripped-Bold_0":"https://vault-95.atomic4cdn.top/fonts/5ad3792b-c806-4364-88f0-08b423ddc6f0/FOTCometStdStripped-Bold_0.otf"},subtitles:[{url:"https://vault-95.atomic4cdn.top/subtitles/5ad3792b-c806-4364-88f0-08b423ddc6f0/5ad3792b-c806-4364-88f0-08b423ddc6f0_eng_3.ass",language:"English (Signs & Songs)",format:"ass",default:false},{url:"https://vault-95.atomic4cdn.top/subtitles/5ad3792b-c806-4364-88f0-08b423ddc6f0/5ad3792b-c806-4364-88f0-08b423ddc6f0_eng_4.ass",language:"English (Dialogue)",format:"ass",default:true},{url:"https://vault-95.atomic4cdn.top/subtitles/5ad3792b-c806-4364-88f0-08b423ddc6f0/5ad3792b-c806-4364-88f0-08b423ddc6f0.srt",language:"English (Dubtitle(AI))",format:"srt",default:false}],e26be221a8d896c9da4d3fb4b93b90fd_0ca6983a:"25383d43fefbf06e002e77cb",f66693e643ff78dca53c4f71306c0955_fdd69413:"ecd0bb3cc3afc5e50e6b9c60","798142e4aa70263e3356ac25ba755aca_576be27c":"54ac8eb84e45eb86a0490405",b15da30e8d2272c5cbdc21b0be5b22a5_fedd70e6:"d7d7f1ce96b7365c77e5d60f",is_domain_owner:false,premium:false,ae417f8d30ee461df7ea8588b232505c:"6563beb8743f1055390fee4d",e592e11eeae4e95ccd6f372fe23d0891:"306826c9349f71cab8deaf91",iframe_domain:null,autoplay:false,"861f5ed07a94f79ee6f6c19d437d79fb_3a3e874b":"10d5a5bd667d7bd01258c7ed",e3624b6fa18d459bef3b_b4562cfcd21bcf9dc6cb:"80c4ebe61207acac125984e9",intro_chapter:{start:133,end:223,title:"OP"},"2ae0363c7dcea737bf2f7f48e2c1_42cab2c50dc3":"d74e478fdb6f0d5b913805ff","01dcb423a729116d2cdd303f41afcba6_ac57c78c":"570baca0b8959da6794e46f1",thumbnail:"https://fetch8.flixcloud.cc/thumbnail/5ad3792b-c806-4364-88f0-08b423ddc6f0",start_at:null,chapters:[{start:0,end:133,title:"Intro"},{start:133,end:223,title:"OP"},{start:223,end:730,title:"Part A"},{start:730,end:1361,title:"Part B"},{start:1361,end:1451,title:"ED"},{start:1451,end:1529,title:"Preview"}],"760a532b54c1d5714915142e6fe59f3d_a5abd9e4":"82ed7d83544eef241e5b0b06",dea3d8530480ef421282045c_dd7189b92f68a3d7:"cf352e5bca4500afe0110dc0",player_settings:{primary_color:"#23ade5",secondary_color:"#fbff00",show_download_button:true,show_share_button:true,show_fullscreen_button:true,show_quality_selector:true,show_branding:true,show_pip_button:true,show_screenshot_button:true},is_iframe:false,"360b57f4fd94a1ef_fd94a1ef":"a4392005c95f82254dd4753f",outro_chapter:{start:1361,end:1451,title:"ED"},obfuscated_crypto_data:{cd_32f9f509:{ad_166fbc63:[{od_6af98d5f:{kf_0d9c7ff4:"RNA9Lt8BLa8m3h/qlLsezpO7ao2DhV5at7MAI1YXgHY=",ivf_368d9906:"5hCWcO5BzZCEXIh3XdUmXA==",be5d:"0.xmyg1izs5wg","2ceb":"yhN2DDjzVoc=",metadata:{timestamp:1788844373003,version:"2.1",encoding:"aes256cbc"}}}]}},aid:"68050p0lh9wh","19aa64a5ebc305578484197c276eaafb_50eedf03":"6d6303b66be952d9cc9b878d",obfuscation_seed:"d57fcdbc116004e4",video_title:"[Anime Time] Haikyuu!! - 09.mkv","85e37bcbdf75ba73b29ae69ef32cd24b016c_c76b":"8f222c398bda41c2d2a17bce",c0384896922befe7d6c5191c39599853_47f12f4a:"7390a3ba26445b56ce46eca6",skipOutro:false,video_id:"5ad3792b-c806-4364-88f0-08b423ddc6f0",w_payload:"AGFzbQEAAAABEQNgAX8AYAV/f39/fwBgAAF/AwQDAAECBQMBAAEGBgF/AUEACwcZBAZtZW1vcnkCAAJfcwAAAl9yAAECX2MAAgr4AQMGACAAJAALsAEBA39BACEFA0ACQCAFIARPDQAgACAFai0AACABIAVqLQAAcyACIAVqLQAAcyEGIAZBAnRB/wFxIAZBBnZyIQYgBkEVcyEGIAZBB3RB/wFxIAZBAXZyIQYgBkE1akH/AXEhBiAGQSZqQf8BcSEGIAZBwwBqQf8BcSEGIAZBywBqQf8BcSEGIAVBKWwjAGpB/wFxIQcgBiAHcyEGIAMgBWogBjoAACAFQQFqIQUMAQsLCz0BAX9BACEAA0ACQCAAQSBPDQBBkBAgAGpB0A8gAGotAABB8A8gAGotAABzOgAAIABBAWohAAwBCwtBkBALC0cBAEHQDwtAhxyURPbS1Ya8QfoX904vfwtmxXPUICyDtKFeWb2B8mVrTzZ0/wiLHFKnlQxOvueIBdRwwQlX+ZnTgpuEFU+KvA==","69b385269ca11fa8_70447804":"LHItnC0oyHXUSBKboo6o/bgIWnV5CNMlpT5FUu4ipxs=","2abc24834cb265f1dc04682ec1839ada_0ab6b503":"a82f86e3672c29c7d4653410",f2201b6c0e7d9c5ab00a54a62b9a495b_c0800177:"35a90886e18adb161f09f580","8f4a8dd311e1bd8e4386ab8ad55b9d9d_8431942d":"9446e3cd210200e6b1c194e9",c8cc4dcc3928c0902eb176f667411bb7_739e3ae9:"8bd81417476c3bf32f4ebc0a",audio_type:"dual"},uses:{search_params:["v","autoplay","autoPlay","a","ski","skI","isHost","type","skO","isLive","start_at","token"],params:["access_id"],url:1}}],
+							form: null,
+							error: null
+						});
+					});
+				}
+			</script>
+		</div>
+	<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v31edd6df95cf4e85bb4c19e7a9bdbcba1788362987495" integrity="sha512-iIg7k2xntmwu6/uSb5tpc/hySgZc4eoL31yB29W6tJFo2akwjPWcEqnCEdJvGexCL0KEQwVYv5BlowfhVz26hg==" data-cf-beacon='{"version":"2024.11.0","token":"a5a106217d96456e9ebc6b6d62204f4c","r":1,"spa":2}' crossorigin="anonymous"></script>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a37b75f7cbb25e02',t:'MTc4ODg0NDM3Mw=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>

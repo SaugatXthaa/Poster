@@ -1,0 +1,37 @@
+package com.cncverse;
+
+import java.util.Iterator;
+import java.util.Map;
+import kotlin.Metadata;
+import kotlin.jvm.internal.SourceDebugExtension;
+import okhttp3.Interceptor;
+import okhttp3.Request;
+import okhttp3.Response;
+import org.jetbrains.annotations.NotNull;
+
+/* compiled from: DoFlixProvider.kt */
+@Metadata(d1 = {"\u0000\"\n\u0002\u0018\u0002\n\u0002\u0018\u0002\n\u0000\n\u0002\u0010$\n\u0002\u0010\u000e\n\u0002\b\u0003\n\u0002\u0018\u0002\n\u0000\n\u0002\u0018\u0002\n\u0000\u0018\u00002\u00020\u0001B\u001b\u0012\u0012\u0010\u0002\u001a\u000e\u0012\u0004\u0012\u00020\u0004\u0012\u0004\u0012\u00020\u00040\u0003¢\u0006\u0004\b\u0005\u0010\u0006J\u0010\u0010\u0007\u001a\u00020\b2\u0006\u0010\t\u001a\u00020\nH\u0016R\u001a\u0010\u0002\u001a\u000e\u0012\u0004\u0012\u00020\u0004\u0012\u0004\u0012\u00020\u00040\u0003X\u0082\u0004¢\u0006\u0002\n\u0000¨\u0006\u000b"}, d2 = {"Lcom/cncverse/HeaderReplacementInterceptor;", "Lokhttp3/Interceptor;", "customHeaders", "", "", "<init>", "(Ljava/util/Map;)V", "intercept", "Lokhttp3/Response;", "chain", "Lokhttp3/Interceptor$Chain;", "DoFlixProvider_debug"}, k = 1, mv = {2, 3, 0}, xi = 48)
+@SourceDebugExtension({"SMAP\nDoFlixProvider.kt\nKotlin\n*S Kotlin\n*F\n+ 1 DoFlixProvider.kt\ncom/cncverse/HeaderReplacementInterceptor\n+ 2 _Collections.kt\nkotlin/collections/CollectionsKt___CollectionsKt\n+ 3 _Maps.kt\nkotlin/collections/MapsKt___MapsKt\n*L\n1#1,836:1\n1915#2,2:837\n221#3,2:839\n*S KotlinDebug\n*F\n+ 1 DoFlixProvider.kt\ncom/cncverse/HeaderReplacementInterceptor\n*L\n27#1:837,2\n32#1:839,2\n*E\n"})
+/* loaded from: classes.dex */
+public final class HeaderReplacementInterceptor implements Interceptor {
+
+    @NotNull
+    private final Map<String, String> customHeaders;
+
+    public HeaderReplacementInterceptor(@NotNull Map<String, String> map) {
+        this.customHeaders = map;
+    }
+
+    @NotNull
+    public Response intercept(@NotNull Interceptor.Chain chain) {
+        Request.Builder newBuilder = chain.request().newBuilder();
+        Iterator<T> it = this.customHeaders.keySet().iterator();
+        while (it.hasNext()) {
+            newBuilder.removeHeader((String) it.next());
+        }
+        for (Map.Entry<String, String> entry : this.customHeaders.entrySet()) {
+            newBuilder.addHeader(entry.getKey(), entry.getValue());
+        }
+        return chain.proceed(newBuilder.build());
+    }
+}

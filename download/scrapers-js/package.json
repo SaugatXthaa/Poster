@@ -1,0 +1,47 @@
+{
+  "name": "penguplay-scrapers",
+  "version": "1.0.0",
+  "description": "Node.js scrapers for PenguPlay streaming sources: Antova, HDGharTV, Cinejoy, 2Peckle, ZXCStream",
+  "main": "test_all.js",
+  "scripts": {
+    "test": "node test_all.js",
+    "test:antova": "node antova_scraper.js",
+    "test:hdghartv": "node hdghartv_scraper.js",
+    "test:cinejoy": "node cinejoy_scraper.js",
+    "test:2peckle": "node 2peckle_scraper.js movie 634649",
+    "test:2peckle:tv": "node 2peckle_scraper.js tv 82856 1 1",
+    "test:2peckle:search": "node 2peckle_scraper.js search \"no way home\"",
+    "test:zxc": "node zxcstream_scraper.js",
+    "test:cinejoy:browser": "RUN_BROWSER=1 node cinejoy_scraper.js",
+    "test:zxc:streams": "GET_STREAMS=1 node zxcstream_scraper.js"
+  },
+  "dependencies": {
+    "axios": "^1.19.0",
+    "cheerio": "^1.2.0",
+    "cheerio-without-node-native": "^0.20.2",
+    "cors": "^2.8.6",
+    "crypto-js": "^4.2.0",
+    "cycletls": "^2.0.5",
+    "express": "^5.2.1",
+    "got": "^15.1.0",
+    "got-scraping": "^4.2.1",
+    "playwright": "^1.49.0",
+    "playwright-extra": "^4.3.6",
+    "puppeteer-extra-plugin-stealth": "^2.11.2",
+    "stremio-addon-sdk": "^1.6.10"
+  },
+  "keywords": [
+    "stremio",
+    "stremio-addon",
+    "scraper",
+    "streaming",
+    "m3u8",
+    "hls",
+    "anilibria",
+    "cinejoy",
+    "hdghartv",
+    "zxcstream",
+    "penguplay"
+  ],
+  "license": "MIT"
+}

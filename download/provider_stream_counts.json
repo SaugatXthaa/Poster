@@ -1,0 +1,1042 @@
+[
+  {
+    "source": "Codeberg: nuvio-plugin",
+    "provider": "brellor",
+    "test_case": "movie",
+    "title": "Inception (2010)",
+    "ok": true,
+    "count": 0,
+    "error": null,
+    "last_log": null
+  },
+  {
+    "source": "Codeberg: nuvio-plugin",
+    "provider": "brellor",
+    "test_case": "tv",
+    "title": "Breaking Bad S01E01",
+    "ok": true,
+    "count": 0,
+    "error": null,
+    "last_log": null
+  },
+  {
+    "source": "Codeberg: nuvio-plugin",
+    "provider": "durnel",
+    "test_case": "movie",
+    "title": "Inception (2010)",
+    "ok": true,
+    "count": 0,
+    "error": null,
+    "last_log": null
+  },
+  {
+    "source": "Codeberg: nuvio-plugin",
+    "provider": "durnel",
+    "test_case": "tv",
+    "title": "Breaking Bad S01E01",
+    "ok": true,
+    "count": 0,
+    "error": null,
+    "last_log": null
+  },
+  {
+    "source": "Codeberg: nuvio-plugin",
+    "provider": "evyrith",
+    "test_case": "movie",
+    "title": "Inception (2010)",
+    "ok": true,
+    "count": 0,
+    "error": null,
+    "last_log": null
+  },
+  {
+    "source": "Codeberg: nuvio-plugin",
+    "provider": "evyrith",
+    "test_case": "tv",
+    "title": "Breaking Bad S01E01",
+    "ok": true,
+    "count": 0,
+    "error": null,
+    "last_log": null
+  },
+  {
+    "source": "Codeberg: nuvio-plugin",
+    "provider": "fastrion",
+    "test_case": "movie",
+    "title": "Inception (2010)",
+    "ok": true,
+    "count": 0,
+    "error": null,
+    "last_log": "[VidFast] No servers available"
+  },
+  {
+    "source": "Codeberg: nuvio-plugin",
+    "provider": "fastrion",
+    "test_case": "tv",
+    "title": "Breaking Bad S01E01",
+    "ok": true,
+    "count": 0,
+    "error": null,
+    "last_log": null
+  },
+  {
+    "source": "Codeberg: nuvio-plugin",
+    "provider": "fendrix",
+    "test_case": "movie",
+    "title": "Inception (2010)",
+    "ok": true,
+    "count": 0,
+    "error": null,
+    "last_log": "[VidFast] No servers available"
+  },
+  {
+    "source": "Codeberg: nuvio-plugin",
+    "provider": "fendrix",
+    "test_case": "tv",
+    "title": "Breaking Bad S01E01",
+    "ok": true,
+    "count": 1,
+    "error": null,
+    "last_log": null
+  },
+  {
+    "source": "Codeberg: nuvio-plugin",
+    "provider": "fjoral",
+    "test_case": "movie",
+    "title": "Inception (2010)",
+    "ok": true,
+    "count": 0,
+    "error": null,
+    "last_log": "[Vidlink] Successfully processed 3 streams"
+  },
+  {
+    "source": "Codeberg: nuvio-plugin",
+    "provider": "fjoral",
+    "test_case": "tv",
+    "title": "Breaking Bad S01E01",
+    "ok": true,
+    "count": 0,
+    "error": null,
+    "last_log": null
+  },
+  {
+    "source": "Codeberg: nuvio-plugin",
+    "provider": "gravix",
+    "test_case": "movie",
+    "title": "Inception (2010)",
+    "ok": true,
+    "count": 0,
+    "error": null,
+    "last_log": null
+  },
+  {
+    "source": "Codeberg: nuvio-plugin",
+    "provider": "gravix",
+    "test_case": "tv",
+    "title": "Breaking Bad S01E01",
+    "ok": true,
+    "count": 1,
+    "error": null,
+    "last_log": "[Vidlink] Successfully processed 4 streams"
+  },
+  {
+    "source": "Codeberg: nuvio-plugin",
+    "provider": "hexion",
+    "test_case": "movie",
+    "title": "Inception (2010)",
+    "ok": true,
+    "count": 0,
+    "error": null,
+    "last_log": null
+  },
+  {
+    "source": "Codeberg: nuvio-plugin",
+    "provider": "hexion",
+    "test_case": "tv",
+    "title": "Breaking Bad S01E01",
+    "ok": true,
+    "count": 0,
+    "error": null,
+    "last_log": null
+  },
+  {
+    "source": "Codeberg: nuvio-plugin",
+    "provider": "jyniq",
+    "test_case": "movie",
+    "title": "Inception (2010)",
+    "ok": true,
+    "count": 2,
+    "error": null,
+    "last_log": null
+  },
+  {
+    "source": "Codeberg: nuvio-plugin",
+    "provider": "jyniq",
+    "test_case": "tv",
+    "title": "Breaking Bad S01E01",
+    "ok": true,
+    "count": 0,
+    "error": null,
+    "last_log": null
+  },
+  {
+    "source": "Codeberg: nuvio-plugin",
+    "provider": "karnis",
+    "test_case": "movie",
+    "title": "Inception (2010)",
+    "ok": true,
+    "count": 1,
+    "error": null,
+    "last_log": null
+  },
+  {
+    "source": "Codeberg: nuvio-plugin",
+    "provider": "karnis",
+    "test_case": "tv",
+    "title": "Breaking Bad S01E01",
+    "ok": true,
+    "count": 1,
+    "error": null,
+    "last_log": null
+  },
+  {
+    "source": "Codeberg: nuvio-plugin",
+    "provider": "kethrax",
+    "test_case": "movie",
+    "title": "Inception (2010)",
+    "ok": true,
+    "count": 1,
+    "error": null,
+    "last_log": null
+  },
+  {
+    "source": "Codeberg: nuvio-plugin",
+    "provider": "kethrax",
+    "test_case": "tv",
+    "title": "Breaking Bad S01E01",
+    "ok": true,
+    "count": 1,
+    "error": null,
+    "last_log": null
+  },
+  {
+    "source": "Codeberg: nuvio-plugin",
+    "provider": "kryxalia",
+    "test_case": "movie",
+    "title": "Inception (2010)",
+    "ok": true,
+    "count": 2,
+    "error": null,
+    "last_log": null
+  },
+  {
+    "source": "Codeberg: nuvio-plugin",
+    "provider": "kryxalia",
+    "test_case": "tv",
+    "title": "Breaking Bad S01E01",
+    "ok": true,
+    "count": 1,
+    "error": null,
+    "last_log": null
+  },
+  {
+    "source": "Codeberg: nuvio-plugin",
+    "provider": "lyrin",
+    "test_case": "movie",
+    "title": "Inception (2010)",
+    "ok": true,
+    "count": 0,
+    "error": null,
+    "last_log": null
+  },
+  {
+    "source": "Codeberg: nuvio-plugin",
+    "provider": "lyrin",
+    "test_case": "tv",
+    "title": "Breaking Bad S01E01",
+    "ok": true,
+    "count": 0,
+    "error": null,
+    "last_log": null
+  },
+  {
+    "source": "Codeberg: nuvio-plugin",
+    "provider": "mavonyx",
+    "test_case": "movie",
+    "title": "Inception (2010)",
+    "ok": true,
+    "count": 0,
+    "error": null,
+    "last_log": null
+  },
+  {
+    "source": "Codeberg: nuvio-plugin",
+    "provider": "mavonyx",
+    "test_case": "tv",
+    "title": "Breaking Bad S01E01",
+    "ok": true,
+    "count": 0,
+    "error": null,
+    "last_log": null
+  },
+  {
+    "source": "Codeberg: nuvio-plugin",
+    "provider": "novus",
+    "test_case": "movie",
+    "title": "Inception (2010)",
+    "ok": true,
+    "count": 0,
+    "error": null,
+    "last_log": null
+  },
+  {
+    "source": "Codeberg: nuvio-plugin",
+    "provider": "novus",
+    "test_case": "tv",
+    "title": "Breaking Bad S01E01",
+    "ok": true,
+    "count": 0,
+    "error": null,
+    "last_log": null
+  },
+  {
+    "source": "Codeberg: nuvio-plugin",
+    "provider": "nyxora",
+    "test_case": "movie",
+    "title": "Inception (2010)",
+    "ok": true,
+    "count": 0,
+    "error": null,
+    "last_log": null
+  },
+  {
+    "source": "Codeberg: nuvio-plugin",
+    "provider": "nyxora",
+    "test_case": "tv",
+    "title": "Breaking Bad S01E01",
+    "ok": true,
+    "count": 0,
+    "error": null,
+    "last_log": "[timeout] bollyflix.js :: Breaking Bad S01E01 exceeded 20000ms"
+  },
+  {
+    "source": "Codeberg: nuvio-plugin",
+    "provider": "onyxia",
+    "test_case": "movie",
+    "title": "Inception (2010)",
+    "ok": true,
+    "count": 0,
+    "error": null,
+    "last_log": null
+  },
+  {
+    "source": "Codeberg: nuvio-plugin",
+    "provider": "onyxia",
+    "test_case": "tv",
+    "title": "Breaking Bad S01E01",
+    "ok": true,
+    "count": 1,
+    "error": null,
+    "last_log": null
+  },
+  {
+    "source": "Codeberg: nuvio-plugin",
+    "provider": "praxiel",
+    "test_case": "movie",
+    "title": "Inception (2010)",
+    "ok": true,
+    "count": 0,
+    "error": null,
+    "last_log": null
+  },
+  {
+    "source": "Codeberg: nuvio-plugin",
+    "provider": "praxiel",
+    "test_case": "tv",
+    "title": "Breaking Bad S01E01",
+    "ok": true,
+    "count": 0,
+    "error": null,
+    "last_log": "[timeout] dahmermovies.js :: Breaking Bad S01E01 exceeded 20000ms"
+  },
+  {
+    "source": "Codeberg: nuvio-plugin",
+    "provider": "pynvix",
+    "test_case": "movie",
+    "title": "Inception (2010)",
+    "ok": true,
+    "count": 0,
+    "error": null,
+    "last_log": null
+  },
+  {
+    "source": "Codeberg: nuvio-plugin",
+    "provider": "pynvix",
+    "test_case": "tv",
+    "title": "Breaking Bad S01E01",
+    "ok": true,
+    "count": 0,
+    "error": null,
+    "last_log": null
+  },
+  {
+    "source": "Codeberg: nuvio-plugin",
+    "provider": "qorva",
+    "test_case": "movie",
+    "title": "Inception (2010)",
+    "ok": true,
+    "count": 3,
+    "error": null,
+    "last_log": "[timeout] embed69.js :: Inception (2010) exceeded 20000ms"
+  },
+  {
+    "source": "Codeberg: nuvio-plugin",
+    "provider": "qorva",
+    "test_case": "tv",
+    "title": "Breaking Bad S01E01",
+    "ok": true,
+    "count": 3,
+    "error": null,
+    "last_log": "[timeout] embed69.js :: Breaking Bad S01E01 exceeded 20000ms"
+  },
+  {
+    "source": "Codeberg: nuvio-plugin",
+    "provider": "quinox",
+    "test_case": "movie",
+    "title": "Inception (2010)",
+    "ok": true,
+    "count": 0,
+    "error": null,
+    "last_log": "[timeout] faselhd.js :: Breaking Bad S01E01 exceeded 20000ms"
+  },
+  {
+    "source": "Codeberg: nuvio-plugin",
+    "provider": "quinox",
+    "test_case": "tv",
+    "title": "Breaking Bad S01E01",
+    "ok": true,
+    "count": 0,
+    "error": null,
+    "last_log": null
+  },
+  {
+    "source": "Codeberg: nuvio-plugin",
+    "provider": "qyrvaen",
+    "test_case": "movie",
+    "title": "Inception (2010)",
+    "ok": true,
+    "count": 4,
+    "error": null,
+    "last_log": "[timeout] movieblast.js :: Inception (2010) exceeded 20000ms"
+  },
+  {
+    "source": "Codeberg: nuvio-plugin",
+    "provider": "qyrvaen",
+    "test_case": "tv",
+    "title": "Breaking Bad S01E01",
+    "ok": true,
+    "count": 1,
+    "error": null,
+    "last_log": "[timeout] tokyoinsider.js :: Inception (2010) exceeded 20000ms"
+  },
+  {
+    "source": "Codeberg: nuvio-plugin",
+    "provider": "rynara",
+    "test_case": "movie",
+    "title": "Inception (2010)",
+    "ok": true,
+    "count": 1,
+    "error": null,
+    "last_log": "[timeout] tokyoinsider.js :: Breaking Bad S01E01 exceeded 20000ms"
+  },
+  {
+    "source": "Codeberg: nuvio-plugin",
+    "provider": "rynara",
+    "test_case": "tv",
+    "title": "Breaking Bad S01E01",
+    "ok": true,
+    "count": 0,
+    "error": null,
+    "last_log": null
+  },
+  {
+    "source": "Codeberg: nuvio-plugin",
+    "provider": "solunix",
+    "test_case": "movie",
+    "title": "Inception (2010)",
+    "ok": true,
+    "count": 1,
+    "error": null,
+    "last_log": "[timeout] uhdmovies.js :: Inception (2010) exceeded 20000ms"
+  },
+  {
+    "source": "Codeberg: nuvio-plugin",
+    "provider": "solunix",
+    "test_case": "tv",
+    "title": "Breaking Bad S01E01",
+    "ok": true,
+    "count": 1,
+    "error": null,
+    "last_log": null
+  },
+  {
+    "source": "Codeberg: nuvio-plugin",
+    "provider": "soryn",
+    "test_case": "movie",
+    "title": "Inception (2010)",
+    "ok": true,
+    "count": 0,
+    "error": null,
+    "last_log": null
+  },
+  {
+    "source": "Codeberg: nuvio-plugin",
+    "provider": "soryn",
+    "test_case": "tv",
+    "title": "Breaking Bad S01E01",
+    "ok": true,
+    "count": 2,
+    "error": null,
+    "last_log": null
+  },
+  {
+    "source": "Codeberg: nuvio-plugin",
+    "provider": "sylphera",
+    "test_case": "movie",
+    "title": "Inception (2010)",
+    "ok": true,
+    "count": 1,
+    "error": null,
+    "last_log": "[timeout] uhdmovies.js :: Breaking Bad S01E01 exceeded 20000ms"
+  },
+  {
+    "source": "Codeberg: nuvio-plugin",
+    "provider": "sylphera",
+    "test_case": "tv",
+    "title": "Breaking Bad S01E01",
+    "ok": true,
+    "count": 0,
+    "error": null,
+    "last_log": null
+  },
+  {
+    "source": "Codeberg: nuvio-plugin",
+    "provider": "vornix",
+    "test_case": "movie",
+    "title": "Inception (2010)",
+    "ok": true,
+    "count": 0,
+    "error": null,
+    "last_log": null
+  },
+  {
+    "source": "Codeberg: nuvio-plugin",
+    "provider": "vornix",
+    "test_case": "tv",
+    "title": "Breaking Bad S01E01",
+    "ok": true,
+    "count": 0,
+    "error": null,
+    "last_log": null
+  },
+  {
+    "source": "Codeberg: nuvio-plugin",
+    "provider": "vyranel",
+    "test_case": "movie",
+    "title": "Inception (2010)",
+    "ok": true,
+    "count": 0,
+    "error": null,
+    "last_log": null
+  },
+  {
+    "source": "Codeberg: nuvio-plugin",
+    "provider": "vyranel",
+    "test_case": "tv",
+    "title": "Breaking Bad S01E01",
+    "ok": true,
+    "count": 2,
+    "error": null,
+    "last_log": null
+  },
+  {
+    "source": "Codeberg: nuvio-plugin",
+    "provider": "waelum",
+    "test_case": "movie",
+    "title": "Inception (2010)",
+    "ok": true,
+    "count": 2,
+    "error": null,
+    "last_log": null
+  },
+  {
+    "source": "Codeberg: nuvio-plugin",
+    "provider": "waelum",
+    "test_case": "tv",
+    "title": "Breaking Bad S01E01",
+    "ok": true,
+    "count": 2,
+    "error": null,
+    "last_log": null
+  },
+  {
+    "source": "Codeberg: nuvio-plugin",
+    "provider": "wrenok",
+    "test_case": "movie",
+    "title": "Inception (2010)",
+    "ok": true,
+    "count": 1,
+    "error": null,
+    "last_log": "[timeout] videasy.js :: Inception (2010) exceeded 20000ms"
+  },
+  {
+    "source": "Codeberg: nuvio-plugin",
+    "provider": "wrenok",
+    "test_case": "tv",
+    "title": "Breaking Bad S01E01",
+    "ok": true,
+    "count": 1,
+    "error": null,
+    "last_log": "[timeout] videasy.js :: Breaking Bad S01E01 exceeded 20000ms"
+  },
+  {
+    "source": "Codeberg: nuvio-plugin",
+    "provider": "xandril",
+    "test_case": "movie",
+    "title": "Inception (2010)",
+    "ok": true,
+    "count": 1,
+    "error": null,
+    "last_log": "[timeout] vidfast.js :: Inception (2010) exceeded 20000ms"
+  },
+  {
+    "source": "Codeberg: nuvio-plugin",
+    "provider": "xandril",
+    "test_case": "tv",
+    "title": "Breaking Bad S01E01",
+    "ok": true,
+    "count": 2,
+    "error": null,
+    "last_log": null
+  },
+  {
+    "source": "Codeberg: nuvio-plugin",
+    "provider": "xylos",
+    "test_case": "movie",
+    "title": "Inception (2010)",
+    "ok": true,
+    "count": 0,
+    "error": null,
+    "last_log": null
+  },
+  {
+    "source": "Codeberg: nuvio-plugin",
+    "provider": "xylos",
+    "test_case": "tv",
+    "title": "Breaking Bad S01E01",
+    "ok": true,
+    "count": 0,
+    "error": null,
+    "last_log": null
+  },
+  {
+    "source": "Codeberg: nuvio-plugin",
+    "provider": "zevran",
+    "test_case": "movie",
+    "title": "Inception (2010)",
+    "ok": true,
+    "count": 3,
+    "error": null,
+    "last_log": "[timeout] vidlink.js :: Inception (2010) exceeded 20000ms"
+  },
+  {
+    "source": "Codeberg: nuvio-plugin",
+    "provider": "zevran",
+    "test_case": "tv",
+    "title": "Breaking Bad S01E01",
+    "ok": true,
+    "count": 3,
+    "error": null,
+    "last_log": null
+  },
+  {
+    "source": "Codeberg: nuvio-plugin",
+    "provider": "zyrvael",
+    "test_case": "movie",
+    "title": "Inception (2010)",
+    "ok": true,
+    "count": 0,
+    "error": null,
+    "last_log": null
+  },
+  {
+    "source": "Codeberg: nuvio-plugin",
+    "provider": "zyrvael",
+    "test_case": "tv",
+    "title": "Breaking Bad S01E01",
+    "ok": true,
+    "count": 0,
+    "error": null,
+    "last_log": null
+  },
+  {
+    "source": "GitHub: nuvio-plugins",
+    "provider": "4khdhub",
+    "test_case": "movie",
+    "title": "Inception (2010)",
+    "ok": true,
+    "count": 14,
+    "error": null,
+    "last_log": "[DahmerMovies] Initializing Dahmer Movies scraper"
+  },
+  {
+    "source": "GitHub: nuvio-plugins",
+    "provider": "4khdhub",
+    "test_case": "tv",
+    "title": "Breaking Bad S01E01",
+    "ok": true,
+    "count": 6,
+    "error": null,
+    "last_log": "[4KHDHub] Fetching TMDB details from: https://api.themoviedb.org/3/tv/1396?api_key=1c29a5198ee1854bd5eb45dbe8d17d92"
+  },
+  {
+    "source": "GitHub: nuvio-plugins",
+    "provider": "airflix",
+    "test_case": "movie",
+    "title": "Inception (2010)",
+    "ok": true,
+    "count": 0,
+    "error": null,
+    "last_log": "[Airflix] tmdbId=27205 type=movie"
+  },
+  {
+    "source": "GitHub: nuvio-plugins",
+    "provider": "airflix",
+    "test_case": "tv",
+    "title": "Breaking Bad S01E01",
+    "ok": true,
+    "count": 0,
+    "error": null,
+    "last_log": "[Airflix] tmdbId=1396 type=tv S1E1"
+  },
+  {
+    "source": "GitHub: nuvio-plugins",
+    "provider": "animepahe",
+    "test_case": "movie",
+    "title": "Inception (2010)",
+    "ok": true,
+    "count": 0,
+    "error": null,
+    "last_log": null
+  },
+  {
+    "source": "GitHub: nuvio-plugins",
+    "provider": "animepahe",
+    "test_case": "tv",
+    "title": "Breaking Bad S01E01",
+    "ok": true,
+    "count": 0,
+    "error": null,
+    "last_log": null
+  },
+  {
+    "source": "GitHub: nuvio-plugins",
+    "provider": "anineko",
+    "test_case": "movie",
+    "title": "Inception (2010)",
+    "ok": true,
+    "count": 4,
+    "error": null,
+    "last_log": "[DahmerMovies] Initializing Dahmer Movies scraper"
+  },
+  {
+    "source": "GitHub: nuvio-plugins",
+    "provider": "anineko",
+    "test_case": "tv",
+    "title": "Breaking Bad S01E01",
+    "ok": true,
+    "count": 0,
+    "error": null,
+    "last_log": "[Airflix] Fetching: https://streamdata.vaplayer.ru/api.php?tmdb=27205&type=movie"
+  },
+  {
+    "source": "GitHub: nuvio-plugins",
+    "provider": "bollyflix",
+    "test_case": "movie",
+    "title": "Inception (2010)",
+    "ok": true,
+    "count": 0,
+    "error": null,
+    "last_log": "[BollyFlix] Searching: https://bollyflix.at/search/Inception"
+  },
+  {
+    "source": "GitHub: nuvio-plugins",
+    "provider": "bollyflix",
+    "test_case": "tv",
+    "title": "Breaking Bad S01E01",
+    "ok": true,
+    "count": 0,
+    "error": null,
+    "last_log": "[4KHDHub] Found URL with pattern: /var\\s+url\\s*=\\s*'([^']+)'/"
+  },
+  {
+    "source": "GitHub: nuvio-plugins",
+    "provider": "dahmermovies",
+    "test_case": "movie",
+    "title": "Inception (2010)",
+    "ok": true,
+    "count": 5,
+    "error": null,
+    "last_log": "[4KHDHub] Found 6 total streams"
+  },
+  {
+    "source": "GitHub: nuvio-plugins",
+    "provider": "dahmermovies",
+    "test_case": "tv",
+    "title": "Breaking Bad S01E01",
+    "ok": true,
+    "count": 5,
+    "error": null,
+    "last_log": "[4KHDHub] Extracting from HubCloud: https://hubcloud.ist/drive/rrfdaafz55lsn7s"
+  },
+  {
+    "source": "GitHub: nuvio-plugins",
+    "provider": "embed69",
+    "test_case": "movie",
+    "title": "Inception (2010)",
+    "ok": true,
+    "count": 0,
+    "error": null,
+    "last_log": "[4KHDHub] Found 14 total streams"
+  },
+  {
+    "source": "GitHub: nuvio-plugins",
+    "provider": "embed69",
+    "test_case": "tv",
+    "title": "Breaking Bad S01E01",
+    "ok": true,
+    "count": 0,
+    "error": null,
+    "last_log": "[Embed69] No se encontró dataLink en el HTML"
+  },
+  {
+    "source": "GitHub: nuvio-plugins",
+    "provider": "faselhd",
+    "test_case": "movie",
+    "title": "Inception (2010)",
+    "ok": true,
+    "count": 0,
+    "error": null,
+    "last_log": "[Embed69] No se encontró dataLink en el HTML"
+  },
+  {
+    "source": "GitHub: nuvio-plugins",
+    "provider": "faselhd",
+    "test_case": "tv",
+    "title": "Breaking Bad S01E01",
+    "ok": true,
+    "count": 3,
+    "error": null,
+    "last_log": "[FaselHD] === Done: 3 streams in 420ms ==="
+  },
+  {
+    "source": "GitHub: nuvio-plugins",
+    "provider": "filmmodu",
+    "test_case": "movie",
+    "title": "Inception (2010)",
+    "ok": true,
+    "count": 3,
+    "error": null,
+    "last_log": "[FaselHD] === Done: 0 streams in 527ms ==="
+  },
+  {
+    "source": "GitHub: nuvio-plugins",
+    "provider": "filmmodu",
+    "test_case": "tv",
+    "title": "Breaking Bad S01E01",
+    "ok": true,
+    "count": 0,
+    "error": null,
+    "last_log": "[FilmModu] Sadece film destekleniyor, mediaType: tv"
+  },
+  {
+    "source": "GitHub: nuvio-plugins",
+    "provider": "hdhub4u",
+    "test_case": "movie",
+    "title": "Inception (2010)",
+    "ok": true,
+    "count": 0,
+    "error": null,
+    "last_log": "[HDHub4u] Fetching streams for TMDB ID: 27205, Type: movie"
+  },
+  {
+    "source": "GitHub: nuvio-plugins",
+    "provider": "hdhub4u",
+    "test_case": "tv",
+    "title": "Breaking Bad S01E01",
+    "ok": true,
+    "count": 0,
+    "error": null,
+    "last_log": "[FilmModu] Aranıyor: https://www.filmmodu.one/film-ara?term=Inception"
+  },
+  {
+    "source": "GitHub: nuvio-plugins",
+    "provider": "movieblast",
+    "test_case": "movie",
+    "title": "Inception (2010)",
+    "ok": true,
+    "count": 3,
+    "error": null,
+    "last_log": "[HDHub4u] TMDB Info: \"Breaking Bad\" (2008)"
+  },
+  {
+    "source": "GitHub: nuvio-plugins",
+    "provider": "movieblast",
+    "test_case": "tv",
+    "title": "Breaking Bad S01E01",
+    "ok": true,
+    "count": 0,
+    "error": null,
+    "last_log": "[MovieBlast] Fetching streams for TMDB ID: 1396, Type: tv"
+  },
+  {
+    "source": "GitHub: nuvio-plugins",
+    "provider": "movix",
+    "test_case": "movie",
+    "title": "Inception (2010)",
+    "ok": true,
+    "count": 2,
+    "error": null,
+    "last_log": "[MovieBlast] Searching for: \"Inception\" (2010)"
+  },
+  {
+    "source": "GitHub: nuvio-plugins",
+    "provider": "movix",
+    "test_case": "tv",
+    "title": "Breaking Bad S01E01",
+    "ok": true,
+    "count": 2,
+    "error": null,
+    "last_log": "[MovieBlast] Successfully found 3 streams."
+  },
+  {
+    "source": "GitHub: nuvio-plugins",
+    "provider": "showbox",
+    "test_case": "movie",
+    "title": "Inception (2010)",
+    "ok": true,
+    "count": 0,
+    "error": null,
+    "last_log": "[ShowBox] Fetching streams for TMDB ID: 27205, Type: movie"
+  },
+  {
+    "source": "GitHub: nuvio-plugins",
+    "provider": "showbox",
+    "test_case": "tv",
+    "title": "Breaking Bad S01E01",
+    "ok": true,
+    "count": 0,
+    "error": null,
+    "last_log": "[ShowBox] Fetching streams for TMDB ID: 1396, Type: tv"
+  },
+  {
+    "source": "GitHub: nuvio-plugins",
+    "provider": "tokyoinsider",
+    "test_case": "movie",
+    "title": "Inception (2010)",
+    "ok": true,
+    "count": 0,
+    "error": null,
+    "last_log": "[MovieBlast] No confident matches found in MovieBlast."
+  },
+  {
+    "source": "GitHub: nuvio-plugins",
+    "provider": "tokyoinsider",
+    "test_case": "tv",
+    "title": "Breaking Bad S01E01",
+    "ok": true,
+    "count": 0,
+    "error": null,
+    "last_log": "[AniNeko] Got 4 stream(s)"
+  },
+  {
+    "source": "GitHub: nuvio-plugins",
+    "provider": "uhdmovies",
+    "test_case": "movie",
+    "title": "Inception (2010)",
+    "ok": true,
+    "count": 5,
+    "error": null,
+    "last_log": "[FilmModu] Toplam stream: 3"
+  },
+  {
+    "source": "GitHub: nuvio-plugins",
+    "provider": "uhdmovies",
+    "test_case": "tv",
+    "title": "Breaking Bad S01E01",
+    "ok": true,
+    "count": 5,
+    "error": null,
+    "last_log": "[Movix] Found 2 streams"
+  },
+  {
+    "source": "GitHub: nuvio-plugins",
+    "provider": "videasy",
+    "test_case": "movie",
+    "title": "Inception (2010)",
+    "ok": true,
+    "count": 0,
+    "error": null,
+    "last_log": "[Movix] Found 2 streams"
+  },
+  {
+    "source": "GitHub: nuvio-plugins",
+    "provider": "videasy",
+    "test_case": "tv",
+    "title": "Breaking Bad S01E01",
+    "ok": true,
+    "count": 0,
+    "error": null,
+    "last_log": "[Videasy] Total unique streams: 0"
+  },
+  {
+    "source": "GitHub: nuvio-plugins",
+    "provider": "vidfast",
+    "test_case": "movie",
+    "title": "Inception (2010)",
+    "ok": true,
+    "count": 0,
+    "error": null,
+    "last_log": "[TokyoInsider] Could not find content with any title variation"
+  },
+  {
+    "source": "GitHub: nuvio-plugins",
+    "provider": "vidfast",
+    "test_case": "tv",
+    "title": "Breaking Bad S01E01",
+    "ok": true,
+    "count": 0,
+    "error": null,
+    "last_log": "[Videasy] Total unique streams: 0"
+  },
+  {
+    "source": "GitHub: nuvio-plugins",
+    "provider": "vidlink",
+    "test_case": "movie",
+    "title": "Inception (2010)",
+    "ok": true,
+    "count": 3,
+    "error": null,
+    "last_log": "[UHDMovies] Extracting Driveseed page: https://driveseed.org/file/oHasUpdYbtx8F38tR60q"
+  },
+  {
+    "source": "GitHub: nuvio-plugins",
+    "provider": "vidlink",
+    "test_case": "tv",
+    "title": "Breaking Bad S01E01",
+    "ok": true,
+    "count": 4,
+    "error": null,
+    "last_log": "[UHDMovies] Extracting InstantLink: https://cdn.video-gen.xyz/0ded219c9d0dccb91dad57f44472826e3880e2d35e812e1d8e04c2852aa9cab1ba19098f3c9de823d54b731ef658a4153efac4968f90f5dc72c85b2b75f48cb8fd35014e83683e0fb4a9833b7938ee0a95567e8da7c781111e5643440ca14d683b903ad3d6f4131ebb6af910cee50ca4::aa0178218f5b464d31361496d7ee72c7"
+  }
+]

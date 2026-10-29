@@ -1,0 +1,13 @@
+{
+  "name": "adult-streaming-hub",
+  "version": "1.0.0",
+  "description": "Stremio/Nuvio addon with 4 adult streaming sources",
+  "main": "addon.js",
+  "scripts": {
+    "start": "node addon.js"
+  },
+  "dependencies": {
+    "express": "^4.18.0",
+    "cors": "^2.8.5"
+  }
+}

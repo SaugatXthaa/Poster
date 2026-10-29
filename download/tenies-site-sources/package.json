@@ -1,0 +1,20 @@
+{
+  "name": "tenies-site-sources",
+  "version": "2.3.0",
+  "description": "All working source scrapers for the TENIES.SITE Stremio addon",
+  "main": "addon.js",
+  "scripts": {
+    "start": "node addon.js",
+    "test": "node test_sources.js"
+  },
+  "dependencies": {
+    "cheerio": "1.0.0-rc.12",
+    "cheerio-without-node-native": "^0.20.2",
+    "cors": "^2.8.5",
+    "crypto-js": "^4.2.0",
+    "express": "^4.18.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

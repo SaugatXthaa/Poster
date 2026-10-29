@@ -1,0 +1,1 @@
+import{I as v,J as o,K as y,L as f,M as l,N as m,O as p,P as i,R as T,Q as R}from"./BXDC7g9l.js";import{B as A}from"./NFT1odnC.js";function E(d,_,e){var s;o&&(s=R,y());var r=new A(d);v(()=>{var a=_()??null;if(o){var h=l(s),c=h===T,u=a!==null;if(c!==u){var t=m();p(t),r.anchor=t,i(!1),r.ensure(a,a&&(n=>e(n,a))),i(!0);return}}r.ensure(a,a&&(n=>e(n,a)))},f)}export{E as c};

@@ -1,0 +1,123 @@
+Running 104 test cases (concurrency=8)...
+[GitHub] animepahe      movie -> OK streams=0
+[Airflix] Fatal: Unexpected end of JSON input
+[GitHub] airflix        movie -> OK streams=0
+[AniNeko] Error: No search results found for: Breaking Bad
+[GitHub] anineko        tv    -> OK streams=0
+[GitHub] 4khdhub        tv    -> OK streams=6
+[Airflix] Fatal: Unexpected end of JSON input
+[GitHub] airflix        tv    -> OK streams=0
+[GitHub] 4khdhub        movie -> OK streams=14
+[GitHub] embed69        movie -> OK streams=0
+[GitHub] embed69        tv    -> OK streams=0
+[AniNeko] Server Doodstream failed: HTTP 403
+[AniNeko] Server Doodstream failed: HTTP 403
+[AniNeko] Server Doodstream failed: HTTP 403
+[GitHub] faselhd        tv    -> OK streams=3
+[GitHub] faselhd        movie -> OK streams=0
+[GitHub] filmmodu       tv    -> OK streams=0
+[GitHub] dahmermovies   movie -> OK streams=5
+[GitHub] dahmermovies   tv    -> OK streams=5
+[GitHub] animepahe      tv    -> OK streams=0
+[HDHub4u] Scraping error: Unexpected token '<', "
+
+
+<!DOCTYPE "... is not valid JSON
+[GitHub] hdhub4u        movie -> OK streams=0
+[HDHub4u] Scraping error: Unexpected token '<', "
+
+
+<!DOCTYPE "... is not valid JSON
+[GitHub] hdhub4u        tv    -> OK streams=0
+[GitHub] movieblast     movie -> OK streams=3
+[ShowBox] No UI token (cookie) found in settings. Go to Scraper Settings to configure.
+[GitHub] showbox        movie -> OK streams=0
+[ShowBox] No UI token (cookie) found in settings. Go to Scraper Settings to configure.
+[GitHub] showbox        tv    -> OK streams=0
+[GitHub] movieblast     tv    -> OK streams=0
+[GitHub] anineko        movie -> OK streams=4
+[GitHub] filmmodu       movie -> OK streams=3
+[GitHub] movix          tv    -> OK streams=2
+[GitHub] movix          movie -> OK streams=2
+[GitHub] videasy        movie -> OK streams=0
+[GitHub] tokyoinsider   tv    -> OK streams=0
+[GitHub] videasy        tv    -> OK streams=0
+[GitHub] uhdmovies      movie -> OK streams=5
+[GitHub] uhdmovies      tv    -> OK streams=5
+[Codeberg] brellor        movie -> OK streams=0
+[Codeberg] brellor        tv    -> OK streams=0
+[BollyFlix] Error: fetch failed
+[GitHub] bollyflix      movie -> OK streams=0
+[BollyFlix] Error: fetch failed
+[GitHub] bollyflix      tv    -> OK streams=0
+[Codeberg] evyrith        movie -> OK streams=0
+[Codeberg] evyrith        tv    -> OK streams=0
+[GitHub] vidfast        movie -> OK streams=0
+[Codeberg] fastrion       tv    -> OK streams=0
+[GitHub] vidfast        tv    -> OK streams=0
+[Codeberg] fastrion       movie -> OK streams=0
+[GitHub] vidlink        movie -> OK streams=3
+[Codeberg] fjoral         movie -> OK streams=0
+[Codeberg] fendrix        tv    -> OK streams=1
+[GitHub] vidlink        tv    -> OK streams=4
+[Codeberg] fjoral         tv    -> OK streams=0
+[Codeberg] gravix         movie -> OK streams=0
+[Codeberg] jyniq          movie -> OK streams=2
+[Codeberg] jyniq          tv    -> OK streams=0
+[Codeberg] karnis         movie -> OK streams=1
+[Codeberg] karnis         tv    -> OK streams=1
+[Codeberg] gravix         tv    -> OK streams=1
+[Codeberg] hexion         tv    -> OK streams=0
+[Codeberg] hexion         movie -> OK streams=0
+[Codeberg] kethrax        movie -> OK streams=1
+[Codeberg] lyrin          movie -> OK streams=0
+[Codeberg] lyrin          tv    -> OK streams=0
+[Codeberg] kethrax        tv    -> OK streams=1
+[Codeberg] kryxalia       movie -> OK streams=2
+[Codeberg] kryxalia       tv    -> OK streams=1
+[Codeberg] novus          tv    -> OK streams=0
+[Codeberg] novus          movie -> OK streams=0
+[Codeberg] nyxora         movie -> OK streams=0
+[Codeberg] nyxora         tv    -> OK streams=0
+[Codeberg] mavonyx        movie -> OK streams=0
+[Codeberg] praxiel        movie -> OK streams=0
+[Codeberg] mavonyx        tv    -> OK streams=0
+[Codeberg] pynvix         movie -> OK streams=0
+[Codeberg] pynvix         tv    -> OK streams=0
+[Codeberg] praxiel        tv    -> OK streams=0
+[Codeberg] onyxia         movie -> OK streams=0
+[Codeberg] quinox         movie -> OK streams=0
+[Codeberg] quinox         tv    -> OK streams=0
+[Codeberg] qyrvaen        movie -> OK streams=4
+[GitHub] tokyoinsider   movie -> OK streams=0
+[Codeberg] qyrvaen        tv    -> OK streams=1
+[Codeberg] rynara         tv    -> OK streams=0
+[Codeberg] qorva          movie -> OK streams=3
+[Codeberg] qorva          tv    -> OK streams=3
+[Codeberg] onyxia         tv    -> OK streams=1
+[Codeberg] solunix        movie -> OK streams=1
+[Codeberg] solunix        tv    -> OK streams=1
+[Codeberg] sylphera       movie -> OK streams=1
+[Codeberg] soryn          tv    -> OK streams=2
+[Codeberg] soryn          movie -> OK streams=0
+[Codeberg] sylphera       tv    -> OK streams=0
+[Codeberg] rynara         movie -> OK streams=1
+[Codeberg] waelum         movie -> OK streams=2
+[Codeberg] waelum         tv    -> OK streams=2
+[Codeberg] vornix         tv    -> OK streams=0
+[Codeberg] vornix         movie -> OK streams=0
+[Codeberg] wrenok         movie -> OK streams=1
+[Codeberg] xandril        tv    -> OK streams=2
+[Codeberg] xylos          movie -> OK streams=0
+[Codeberg] wrenok         tv    -> OK streams=1
+[Codeberg] xylos          tv    -> OK streams=0
+[Codeberg] zevran         movie -> OK streams=3
+[Codeberg] xandril        movie -> OK streams=1
+[Codeberg] zevran         tv    -> OK streams=3
+[Codeberg] zyrvael        movie -> OK streams=0
+[Codeberg] durnel         movie -> OK streams=0
+[Codeberg] vyranel        movie -> OK streams=0
+[Codeberg] zyrvael        tv    -> OK streams=0
+[Codeberg] durnel         tv    -> OK streams=0
+[Codeberg] fendrix        movie -> OK streams=0
+[Codeberg] vyranel        tv    -> OK streams=2

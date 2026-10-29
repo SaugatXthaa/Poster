@@ -1,0 +1,16 @@
+node_modules/
+data/
+.backups/
+# Sample renders (not referenced by any code — kept out of the repo so
+# Render/GitHub clones stay small; regenerate anytime from the configurator)
+public/examples/
+*.db
+*.db-shm
+*.db-wal
+*.sqlite*
+*.log
+npm-debug.log*
+.env
+.DS_Store
+Thumbs.db
+*.swp

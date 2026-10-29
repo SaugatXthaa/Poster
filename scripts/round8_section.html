@@ -1,0 +1,71 @@
+        <!-- 0. TOP X — charts and languages (the topx options) -->
+        <div class="section" data-tab="topx">
+          <div class="section-body">
+
+            <span class="group-title">Charts</span>
+            <div class="field">
+              <label class="field-label" data-tip="Which Top 10 chart the preview renders and the manifest ships: Movies or Series.">Catalog</label>
+              <div class="topx-pills">
+                <button type="button" class="mini-pill tx-cat active" data-txcat="movie">Movies</button>
+                <button type="button" class="mini-pill tx-cat" data-txcat="series">Series</button>
+              </div>
+            </div>
+            <div class="field">
+              <label class="field-label" data-tip="Which rank of the chart the live preview renders. The manifest always ships all ten — AIOMetadata fills {rank} per title.">Rank</label>
+              <div class="topx-rank">
+                <button type="button" id="prevRankTop" title="Previous rank">‹</button>
+                <span class="rank-label" id="rankLabelTop">#1 / 10</span>
+                <button type="button" id="nextRankTop" title="Next rank">›</button>
+              </div>
+            </div>
+            <div class="field">
+              <label class="field-label" data-tip="The country whose Top 10 chart the preview renders — 27 countries, the same charts the topx addon ships.">Country</label>
+              <div class="country-grid" id="countryGrid"></div>
+            </div>
+            <div class="field">
+              <label class="field-label" data-tip="The streaming platforms whose charts ship as catalogs in the manifest. Top X (Generic) is the country's overall Top 10.">Platforms</label>
+              <div class="platforms-grid" id="platformsGrid"></div>
+            </div>
+
+            <span class="group-title">Languages</span>
+            <div class="field">
+              <label class="field-label" data-tip="★ marks languages whose poster text is fully translated, not just the logo. Mirrors the Core tab's Native Language — the two never disagree about what the poster is rendered in.">Poster Language</label>
+              <select id="tx-lang" title="Poster language — every language supported"></select>
+            </div>
+            <div class="field">
+              <label class="field-label" data-tip="The language the Custom entry of Logo Priority stands for. ★ marks fully translated languages. Mirrors the Core tab's Custom Language.">Custom Language</label>
+              <select id="tx-lang-secondary" title="Custom language for the Logo Priority's Custom entry"></select>
+            </div>
+
+            <span class="group-title">Overlays</span>
+            <div class="field">
+              <label class="field-label" data-tip="What the ranked cover draws on top of the artwork.">Cover Extras</label>
+              <div class="topx-pills">
+                <button type="button" class="mini-pill tx-tog active" data-txtog="showRank" data-tip="Numbered Top 10 cover — off = clean poster (AIOMetadata per-title mode)">Rank #</button>
+                <button type="button" class="mini-pill tx-tog active" data-txtog="showMeta" data-tip="Genre · year · rating meta line on the cover">Meta</button>
+                <button type="button" class="mini-pill tx-tog active" data-txtog="showLogo" data-tip="Title logo on the cover">Logo</button>
+                <button type="button" class="mini-pill tx-tog" data-txtog="useOriginalArt" data-tip="Prefer art with the title baked in">Original art</button>
+                <button type="button" class="mini-pill tx-tog" data-txtog="posterCrop" data-tip="Crop portrait art to fill the 16:9 canvas">Crop 16:9</button>
+                <button type="button" class="mini-pill tx-tog" data-txtog="greyscale" data-tip="Greyscale landscape artwork">Greyscale</button>
+              </div>
+            </div>
+
+            <span class="group-title">Install</span>
+            <div class="field">
+              <label class="field-label" data-tip="Generate a Stremio / Nuvio manifest URL for the chart above — country, platforms, shape, canvas and overlays all baked in.">Manifest</label>
+              <div class="topx-pills">
+                <button type="button" class="mini-pill" id="tx-generate">Generate Manifest</button>
+              </div>
+              <div class="tx-manifest hidden" id="tx-manifest-box" style="margin-top:8px;">
+                <input id="tx-manifest-url" readonly placeholder="manifest URL…">
+                <button type="button" id="tx-copy-manifest">COPY</button>
+              </div>
+              <div class="tx-install hidden" id="tx-install-row" style="margin-top:8px;">
+                <a class="tx-install-btn" id="tx-stremio" href="#" target="_blank" rel="noopener">▶ Stremio</a>
+                <a class="tx-install-btn" id="tx-nuvio" href="#" target="_blank" rel="noopener">◆ Nuvio</a>
+              </div>
+            </div>
+
+          </div>
+        </div>
+

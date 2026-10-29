@@ -1,0 +1,8 @@
+{
+  "name": "nuvio-sources",
+  "version": "1.0.0",
+  "dependencies": {
+    "cheerio-without-node-native": "^1.0.0",
+    "crypto-js": "^4.2.0"
+  }
+}
