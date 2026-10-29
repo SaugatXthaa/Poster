@@ -797,8 +797,14 @@ function numberSvg(rank, layout, accent, genre = "", rating = "", canvasBackgrou
     ? Math.round(canvas.height * Number(extra.logoMaxHRatio)) : (isLandscape ? 72 : 85);
 
   // 1. Standalone Large Provider Logo (Left Column, Under Number)
+  // extra.providerLogo (the /poster provider_logo param) decouples the
+  // provider logo from show_logo (the title-logo switch) when explicitly
+  // set; the manifest /top-cover path keeps the legacy showLogo gate.
+  const wantProviderLogo = extra.providerLogo !== undefined
+    ? (!!extra.providerLogo && !!catalogId)
+    : !!(showLogo && catalogId);
   let logoXml = "";
-  const rawLogo = (showLogo && catalogId) ? getProviderLogoSvg(catalogId) : null;
+  const rawLogo = wantProviderLogo ? getProviderLogoSvg(catalogId) : null;
 
   if (rawLogo && rawLogo.svg) {
     const maxLogoW = logoWMax;
@@ -1792,7 +1798,34 @@ async function bannerLogoShade(base, L, titleLogo) {
   };
 }
 
-async function createBannerCover({ rank, artworkUrl, logoUrl, shape, genre, rating, catalogId, showLogo, fontFamily = "Inter", ratingFormat = "star", vignette = 0, vignetteOpts = null, metaColor = "", greyscale = false, resolution = 0, extra = {} }) {
+/* ── Brand Tint (topx chip): soft radial glow of the platform's accent
+ *  behind the number zone of the banner (fresh) canvas.  Pure SVG → sharp,
+ *  no extra fetches, so it costs ~1ms on top of the base render. ── */
+function brandTintOverlay(L, accent) {
+  const { width: W, height: H } = L;
+  const zoneW = Math.round(W * L.zone);
+  const safeAccent = /^#[0-9a-fA-F]{6}$/.test(String(accent)) ? accent : "#8C75FF";
+  const svg = Buffer.from(`
+    <svg width="${W}" height="${H}" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <radialGradient id="bt" gradientUnits="userSpaceOnUse"
+          cx="${Math.round(zoneW * 0.36)}" cy="${Math.round(H * 0.44)}" r="${Math.round(zoneW * 0.98)}">
+          <stop offset="0" stop-color="${safeAccent}" stop-opacity="0.50"/>
+          <stop offset="0.55" stop-color="${safeAccent}" stop-opacity="0.18"/>
+          <stop offset="1" stop-color="${safeAccent}" stop-opacity="0"/>
+        </radialGradient>
+        <linearGradient id="btl" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0" stop-color="${safeAccent}" stop-opacity="0.20"/>
+          <stop offset="1" stop-color="${safeAccent}" stop-opacity="0"/>
+        </linearGradient>
+      </defs>
+      <rect width="${zoneW}" height="${H}" fill="url(#btl)"/>
+      <rect width="${W}" height="${H}" fill="url(#bt)"/>
+    </svg>`);
+  return sharp(svg).png(FAST_PNG).toBuffer();
+}
+
+async function createBannerCover({ rank, artworkUrl, logoUrl, shape, genre, rating, catalogId, showLogo, fontFamily = "Inter", ratingFormat = "star", vignette = 0, vignetteOpts = null, metaColor = "", greyscale = false, resolution = 0, extra = {}, accent = "#8C75FF", brandTint = false }) {
   const L = BANNER_LAYOUTS[normalizedShape(shape)];
   const zoneW = Math.round(L.width * L.zone);
   // rank <= 0 → plain poster (no glass number): AIOMetadata /poster mode
@@ -1807,7 +1840,12 @@ async function createBannerCover({ rank, artworkUrl, logoUrl, shape, genre, rati
   const displayGenre = cleanGenre(genre);
   const rawRating = formatRating(rating);
   const displayRating = ratingFormat === "hidden" ? "" : rawRating;
-  const provider = showLogo && catalogId ? getProviderLogoSvg(catalogId) : null;
+  // Provider Logo chip: extra.providerLogo (the /poster provider_logo param)
+  // decouples the provider logo from show_logo (the title-logo switch).
+  const wantProvider = extra.providerLogo !== undefined
+    ? (!!extra.providerLogo && !!catalogId)
+    : !!(showLogo && catalogId);
+  const provider = wantProvider ? getProviderLogoSvg(catalogId) : null;
   const meta = bannerMetaLayout(L, zoneW, {
     genre: displayGenre,
     rating: displayRating,
@@ -1817,6 +1855,11 @@ async function createBannerCover({ rank, artworkUrl, logoUrl, shape, genre, rati
   });
 
   const layers = [];
+  // Brand Tint chip (topx): a soft glow of the platform's own accent behind
+  // the number zone, before the glass number and the meta line.
+  if (brandTint && accent) {
+    layers.push({ input: await brandTintOverlay(L, accent), left: 0, top: 0 });
+  }
   if (showNumber) {
     const g = await bannerNumberGeometry(rank, L, zoneW, {
       hasProvider: Boolean(provider?.svg),
@@ -1877,7 +1920,8 @@ export async function createTopCover({
   metaColor = "",
   resolution = 0,
   greyscale = false,
-  extra = {}
+  extra = {},
+  brandTint = false
 }) {
   if (!artworkUrl) throw new Error("artworkUrl mancante.");
   const requestedRank = Number(rank);
@@ -1885,7 +1929,7 @@ export async function createTopCover({
   rank = Number.isFinite(requestedRank) ? Math.max(0, Math.min(10, Math.trunc(requestedRank))) : 0;
 
   if (canvasBackground === "fresh" || normalizeStyle(style) === "banner") {
-    return createBannerCover({ rank, artworkUrl, logoUrl, shape, genre, rating, catalogId, showLogo, fontFamily, ratingFormat, vignette, vignetteOpts, metaColor, greyscale, resolution, extra });
+    return createBannerCover({ rank, artworkUrl, logoUrl, shape, genre, rating, catalogId, showLogo, fontFamily, ratingFormat, vignette, vignetteOpts, metaColor, greyscale, resolution, extra, accent, brandTint });
   }
 
   const normalized = normalizedShape(shape);

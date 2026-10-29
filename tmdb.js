@@ -165,8 +165,13 @@ function unwrapStremioId(rawId) {
 async function resolveAnimeId(provider, rawId, apiKey) {
   const id = String(rawId).trim();
   const cacheKey = `anime:${provider}:${id}`;
-  const cached = getTmdbMapping(cacheKey, "tv");
-  if (cached !== undefined) return cached;
+  // Positive hits live under "tv" (legacy) or "movie"; misses under "tv".
+  // Check both positives before honouring a negative.
+  const tvCached = getTmdbMapping(cacheKey, "tv");
+  if (tvCached) return { tmdbId: tvCached, type: "tv" };
+  const movieCached = getTmdbMapping(cacheKey, "movie");
+  if (movieCached) return { tmdbId: movieCached, type: "movie" };
+  if (tvCached === null || movieCached === null) return null;
 
   let title = "";
   let year = 0;
@@ -203,7 +208,17 @@ async function resolveAnimeId(provider, rawId, apiKey) {
       if (r.ok) {
         const html = await r.text();
         const m = html.match(/<title>([^<]+)<\/title>/i);
-        if (m) title = m[1].replace(/\s*-\s*MyAnimeList.*$/i, "").trim();
+        if (m) {
+          // MAL's video page titles read "Watch {Title} - MyAnimeList.net"
+          // (wrapped in newlines) — strip both wrappers before the TMDB
+          // search, or the "Watch " prefix kills every match. [\s\S]* (not
+          // .*$) because the captured title keeps its trailing newline and
+          // JS `$` will not match before it.
+          title = m[1]
+            .replace(/\s*-\s*MyAnimeList[\s\S]*$/i, "")
+            .replace(/^\s*Watch\s+/i, "")
+            .trim();
+        }
       }
     }
   } catch (err) {
@@ -211,17 +226,33 @@ async function resolveAnimeId(provider, rawId, apiKey) {
   }
   if (!title) { setTmdbMapping(cacheKey, "tv", null); return null; }
 
-  // Search TMDB for a TV show matching the title in Animation.
+  // Search TMDB for an Animation title matching the name. TV first (anime
+  // rows are usually series), then movies — MAL / Kitsu / AniList ids point
+  // at both, and AIOMetadata sends anime rows of both kinds.
   try {
     const yearParam = year ? `&first_air_date_year=${year}` : "";
     const sr = await tmdbFetch(
       `/search/tv?query=${encodeURIComponent(title)}${yearParam}&include_adult=false`,
       apiKey
     );
-    const hits = (sr?.results || []).filter(r => r.genre_ids?.includes(16));
-    const tmdbId = hits.length ? String(hits[0].id) : null;
-    setTmdbMapping(cacheKey, "tv", tmdbId);
-    return tmdbId;
+    const hit = (sr?.results || []).find(r => r.genre_ids?.includes(16));
+    if (hit) {
+      setTmdbMapping(cacheKey, "tv", String(hit.id));
+      return { tmdbId: String(hit.id), type: "tv" };
+    }
+    // TV missed → try the movie search (year filter uses the movie param name)
+    const mYearParam = year ? `&year=${year}` : "";
+    const sm = await tmdbFetch(
+      `/search/movie?query=${encodeURIComponent(title)}${mYearParam}&include_adult=false`,
+      apiKey
+    );
+    const mHit = (sm?.results || []).find(r => r.genre_ids?.includes(16));
+    if (mHit) {
+      setTmdbMapping(cacheKey, "movie", String(mHit.id));
+      return { tmdbId: String(mHit.id), type: "movie" };
+    }
+    setTmdbMapping(cacheKey, "tv", null);
+    return null;
   } catch (err) {
     console.warn(`[anime] TMDB search for "${title}" failed:`, err.message);
     setTmdbMapping(cacheKey, "tv", null);
@@ -248,11 +279,11 @@ export async function resolveTmdbIdAndType(typeHint, rawId, apiKey = DEFAULT_TMD
     return tmdbId ? { tmdbId, type: typeHint || "movie" } : null;
   }
 
-  // Anime namespaces — always TV.
+  // Anime namespaces — resolve against TMDB (series first, movies as fallback).
   const anime = id.match(/^(kitsu|anilist|mal):(\d+)/i);
   if (anime) {
-    const tmdbId = await resolveAnimeId(anime[1].toLowerCase(), anime[2], apiKey);
-    return tmdbId ? { tmdbId, type: "tv" } : null;
+    const r = await resolveAnimeId(anime[1].toLowerCase(), anime[2], apiKey);
+    return r ? { tmdbId: r.tmdbId, type: r.type } : null;
   }
 
   if (/^\d+$/.test(id)) {

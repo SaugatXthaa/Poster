@@ -778,6 +778,17 @@ app.get(["/poster", "/poster/"], async (req, res) => {
     const style = canvasBackground === "fresh" ? "banner" : "classic";
     const showMeta = q.show_meta !== undefined ? q.show_meta !== "false" : q.showMeta !== "false";
     const showLogo = q.show_logo !== undefined ? q.show_logo !== "false" : q.showLogo !== "false";
+    // Provider logo + brand tint (the topx "Provider Logo" / "Brand Tint"
+    // chips).  Both need a real streaming platform — generic Top X charts
+    // have no brand, exactly like the topx engine restricts brandTint to
+    // per-platform catalogs.  The platform code also drives the accent, so
+    // the brand tint glows in the platform's own colour.
+    const providerLogo = isTrue(q.provider_logo);
+    const brandTint = isTrue(q.brand_tint);
+    const platformRaw = cleanParam(q.platform || q.provider).toLowerCase().trim();
+    const platform = ["top10", "topx", ""].includes(platformRaw) ? "" : platformRaw;
+    const renderCatalogId = providerLogo && platform ? platform : "";
+    const renderBrandTint = brandTint && !!platform;
     let rank = Number(cleanParam(q.rank));
     if (!Number.isFinite(rank) || rank <= 0 || rank > 10) rank = 0; // absent/invalid → plain poster
 
@@ -846,6 +857,10 @@ app.get(["/poster", "/poster/"], async (req, res) => {
       logoMaxHRatio: landscapeLogoScale !== 1 ? logoMaxH * landscapeLogoScale : logoMaxH,
       logoBottomRatio: Number(q.logo_bottom_ratio) > 0 ? Number(q.logo_bottom_ratio) : 0,
       accentBarBottomRatio: Number(q.accent_bar_bottom_ratio) > 0 ? Number(q.accent_bar_bottom_ratio) : 0,
+      // topx Provider Logo / Brand Tint — explicit booleans (decoupled from
+      // show_logo, which stays the title-logo switch in banner mode)
+      providerLogo,
+      brandTint: renderBrandTint,
     };
 
     // ── Artwork: language-aware TMDB image selection ───────────────────
@@ -910,12 +925,17 @@ app.get(["/poster", "/poster/"], async (req, res) => {
     }
 
     // ── Render (disk-cached) ───────────────────────────────────────
-    const accent = catalogAccent({ id: `poster.${country}` });
+    // Accent follows the platform when one is given (the brand colour the
+    // provider logo and the brand tint glow in); generic charts keep the
+    // topx violet.
+    const accent = platform
+      ? (PLATFORMS.find(p => p.code === platform)?.accent || catalogAccent({ id: platform }))
+      : catalogAccent({ id: `poster.${country}` });
     // coverKey uses the resolved TMDB type so the cache is keyed by what was
     // actually rendered (a TV poster isn't a movie poster even if the URL
     // asked for one).
     const coverKey = computeCoverKey({
-      rank, type: effectiveType, shape, tmdbId, catalogId: "poster", canvasBackground, accent,
+      rank, type: effectiveType, shape, tmdbId, catalogId: `poster.${renderCatalogId || "x"}`, canvasBackground, accent,
       artworkUrl, genre, rating, showLogo, style, logoUrl, fontFamily,
       ratingFormat, vignette: legacyVignette,
       vignetteOptsJson: legacyVignette ? "" : JSON.stringify(vignetteOpts),
@@ -937,7 +957,7 @@ app.get(["/poster", "/poster/"], async (req, res) => {
     const generationPromise = (async () => {
       const png = await createTopCover({
         rank, artworkUrl, logoUrl, style, shape, accent, canvasBackground,
-        genre, rating, catalogId: "", showLogo, fontFamily, ratingFormat,
+        genre, rating, catalogId: renderCatalogId, showLogo, fontFamily, ratingFormat,
         vignette: legacyVignette,
         vignetteOpts: legacyVignette ? null : vignetteOpts,
         metaColor, resolution, greyscale,
