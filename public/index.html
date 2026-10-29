@@ -11907,6 +11907,10 @@ initCustomMobileSliders();
         if (TX.brandTint) u.searchParams.set('brand_tint', 'true');
         if (TX.providerLogo || TX.brandTint) u.searchParams.set('platform', platform);
       }
+      // preview renders at 800px wide — identical at card size, ~28% lighter
+      // and faster to composite than the native 1000/1280 the copied
+      // AIOMetadata template keeps rendering at
+      u.searchParams.set('resolution', '800');
       return u.toString();
     } catch (e) { return buildPreviewUrl(); }
   }
@@ -11990,6 +11994,7 @@ initCustomMobileSliders();
         if (TX.brandTint) u.searchParams.set('brand_tint', 'true');
         if (TX.providerLogo || TX.brandTint) u.searchParams.set('platform', platform);
       }
+      u.searchParams.set('resolution', '800');
       return u.toString();
     } catch (e) { return ''; }
   }
