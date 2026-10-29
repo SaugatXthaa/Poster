@@ -226,7 +226,10 @@ async function fetchJson(url, ttl = JSON_TTL) {
     headers: {
       "User-Agent": UA,
       "Accept": "application/json, text/plain, */*"
-    }
+    },
+    // a wedged upstream call must not hold a render-queue slot for the full
+    // 90s deadline — 15s is past every healthy TMDB / Cinemeta response
+    signal: AbortSignal.timeout(15000)
   });
   if (!response.ok) throw new Error(`HTTP ${response.status} (${response.statusText})`);
   const text = await response.text();
@@ -246,22 +249,41 @@ async function fetchJson(url, ttl = JSON_TTL) {
 const renderQueue = [];
 let activeRenders = 0;
 const MAX_CONCURRENT_RENDERS = 2;
-function enqueueRender(job) {
-  return new Promise((resolve, reject) => {
-    renderQueue.push({ job, resolve, reject });
-    pumpRenders();
+// `priority` (unshift) — the live preview's newest settings change jumps the
+// warm-ahead and stale probes still queued, so the poster the user is
+// watching renders first instead of behind minutes of superseded work.
+// `req` marks jobs whose browser already went away (a superseded preview
+// probe aborted client-side): those are dropped before they can burn a
+// render slot on art nobody is looking at any more.
+function enqueueRender(job, opts = {}) {
+  const item = { job, resolve: null, reject: null, closed: false };
+  const promise = new Promise((resolve, reject) => {
+    item.resolve = resolve; item.reject = reject;
   });
+  if (opts.priority) renderQueue.unshift(item); else renderQueue.push(item);
+  if (opts.req && typeof opts.req.once === "function") {
+    const mark = () => { item.closed = true; };
+    opts.req.once("close", mark);
+    opts.req.once("aborted", mark);
+  }
+  pumpRenders();
+  return promise;
 }
 const RENDER_DEADLINE_MS = 90000;
 function pumpRenders() {
   while (activeRenders < MAX_CONCURRENT_RENDERS && renderQueue.length) {
-    const { job, resolve, reject } = renderQueue.shift();
+    const item = renderQueue.shift();
+    if (item.closed) {
+      item.reject(new Error("request closed before its render started"));
+      continue;
+    }
     activeRenders++;
     // deadline: a wedged job (upstream stall the timeouts somehow missed)
     // must free its slot instead of starving the queue
     const deadline = new Promise((_, rej) =>
       setTimeout(() => rej(new Error("render deadline exceeded")), RENDER_DEADLINE_MS));
-    Promise.race([job(), deadline]).then(resolve, reject).finally(() => { activeRenders--; pumpRenders(); });
+    Promise.race([item.job(), deadline]).then(item.resolve, item.reject)
+      .finally(() => { activeRenders--; pumpRenders(); });
   }
 }
 
@@ -698,7 +720,7 @@ app.get(["/c/:token/top-cover", "/top-cover"], async (req, res) => {
       res.setHeader("X-Cover-Cache", "SHARED");
       return res.send(png);
     }
-    const generationPromise = enqueueRender(() => createTopCover({ rank, artworkUrl, logoUrl, style, shape, accent, canvasBackground, genre, rating, catalogId, showLogo, fontFamily, ratingFormat, vignette }).then(png => { saveCoverBuffer(coverKey, png); return png; }));
+    const generationPromise = enqueueRender(() => createTopCover({ rank, artworkUrl, logoUrl, style, shape, accent, canvasBackground, genre, rating, catalogId, showLogo, fontFamily, ratingFormat, vignette }).then(png => { saveCoverBuffer(coverKey, png); return png; }), { priority: true, req });
     pendingCovers.set(coverKey, generationPromise);
     try {
       const png = await generationPromise;
@@ -826,7 +848,7 @@ app.get(["/poster", "/poster/"], async (req, res) => {
     let ratingFormat = String(q.rating_format || "").toLowerCase().trim();
     if (!["star", "number", "hidden"].includes(ratingFormat)) {
       const mode = String(q.rating_display_mode ?? "1").trim();
-      ratingFormat = ({ "1": "star", "2": "number", "3": "number", "4": "hidden" })[mode] || "star";
+      ratingFormat = ({ "0": "hidden", "1": "star", "2": "number", "3": "number", "4": "hidden" })[mode] || "star";
     }
 
     // ── Colors ─────────────────────────────────────────────────────────
@@ -983,7 +1005,7 @@ app.get(["/poster", "/poster/"], async (req, res) => {
         vignetteOpts: legacyVignette ? null : vignetteOpts,
         metaColor, resolution, greyscale,
         extra,
-      }).then(png => { saveCoverBuffer(coverKey, png); return png; }));
+      }).then(png => { saveCoverBuffer(coverKey, png); return png; }), { priority: true, req });
     pendingCovers.set(coverKey, generationPromise);
     try {
       const png = await generationPromise;
