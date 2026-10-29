@@ -1,0 +1,1320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TOPX Posters+ · Unified Configurator</title>
+<link rel="icon" type="image/svg+xml" href="https://raw.githubusercontent.com/blvckroby/MusicDB/refs/heads/main/loghi/Top10Badge.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --black:#0a0a0b; --black1:#111114; --black2:#18181c; --black3:#1f1f25;
+    --black4:#27272f; --black5:#2f2f39;
+    --gold:#c9a84c; --gold-bright:#e8c76a; --gold-dim:#8a6e2e; --gold-glow:rgba(201,168,76,0.12);
+    --silver:#b8bec9; --silver-dim:#787e8a; --cream:#e7e1d4;
+    --text-primary:#dde0e8; --text-secondary:#7d838f; --text-muted:#3d4048;
+    --border:#252530; --border-active:#8a6e2e;
+    --accent-red:#ff3366;
+    --serif:'Cormorant Garamond',Georgia,serif;
+    --mono:'Inter',system-ui,sans-serif;
+    --radius:10px; --radius-sm:6px;
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    background:var(--black); color:var(--text-primary);
+    font-family:var(--mono); font-size:12px;
+    overflow:hidden;                      /* ONLY .options-scroll scrolls */
+    display:flex; flex-direction:column;
+  }
+  body::before{
+    content:''; position:fixed; inset:0; pointer-events:none; z-index:0;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
+    opacity:.6;
+  }
+  .shell{position:relative; z-index:1; display:flex; flex-direction:column; height:100vh; width:min(1280px,100%); margin:0 auto; padding:0 14px;}
+
+  /* ── HEADER (compact) ── */
+  .header{display:flex; align-items:center; justify-content:space-between; padding:8px 0 6px; border-bottom:1px solid var(--border); flex-shrink:0;}
+  .header-left{display:flex; align-items:baseline; gap:12px;}
+  .logo{font-family:var(--serif); font-size:19px; font-weight:300; letter-spacing:.22em; color:var(--gold); text-transform:uppercase;}
+  .logo em{font-style:normal; color:var(--gold-bright); font-weight:500;}
+  .logo-sub{font-size:8px; font-weight:300; color:var(--silver-dim); letter-spacing:.28em; text-transform:uppercase;}
+  .header-stats{display:flex; gap:6px; font-size:9px; color:var(--silver-dim); letter-spacing:.08em; text-transform:uppercase;}
+  .header-stats span{padding:3px 8px; border:1px solid var(--border); border-radius:4px;}
+  .header-stats b{color:var(--gold-bright); font-weight:700;}
+  @media (max-width:820px){ .header-stats{display:none} }
+
+  /* ── LIVE PREVIEW STAGES — twin strips pinned above + below the tabs.
+     Only .options-scroll ever scrolls; both images stay glued in place. ── */
+  .preview-stage{
+    flex-shrink:0; display:flex; gap:14px; align-items:center; justify-content:center;
+    padding:8px 10px; border-bottom:1px solid var(--border);
+    background:
+      repeating-linear-gradient(135deg, rgba(255,255,255,0.012) 0 1px, transparent 1px 9px),
+      linear-gradient(180deg, rgba(201,168,76,0.03), transparent);
+    height:38vh; min-height:250px;
+  }
+  .preview-stage.bottom-stage{
+    border-bottom:0; border-top:1px solid var(--border);
+    background:linear-gradient(0deg, rgba(201,168,76,0.03), transparent);
+    height:24vh; min-height:180px; padding:6px 10px;
+  }
+  @media (max-width:900px){ .preview-stage{height:32vh; min-height:210px} .preview-stage.bottom-stage{height:20vh; min-height:150px} }
+  @media (max-height:760px){ .preview-stage{height:30vh; min-height:190px} .preview-stage.bottom-stage{height:18vh; min-height:140px} }
+  .preview-side{
+    display:flex; flex-direction:column; gap:8px; align-items:center; justify-content:center;
+    min-width:150px; max-width:240px;
+  }
+  .rank-nav{display:flex; gap:5px; align-items:center; font-size:10px; color:var(--silver-dim);}
+  .rank-nav button{
+    width:26px; height:26px; border-radius:5px; border:1px solid var(--border);
+    background:var(--black2); color:var(--silver); cursor:pointer; font-size:12px; transition:all .15s;
+  }
+  .rank-nav button:hover:not(:disabled){border-color:var(--gold-dim); color:var(--gold-bright);}
+  .rank-nav button:disabled{opacity:.35; cursor:not-allowed;}
+  .rank-label{letter-spacing:.06em;}
+  .preview-frame{
+    position:relative; border:1px solid var(--border); border-radius:8px; background:#000;
+    box-shadow:0 10px 40px -10px rgba(0,0,0,.7), 0 0 0 1px rgba(201,168,76,.06);
+    overflow:hidden; cursor:zoom-in; height:100%; display:flex; align-items:center; justify-content:center;
+  }
+  .preview-frame img{display:block; max-width:100%; max-height:100%; object-fit:contain;}
+  .preview-frame.loading img{opacity:.35;}
+  .preview-frame .spin{
+    position:absolute; inset:0; display:none; align-items:center; justify-content:center;
+    font-size:10px; letter-spacing:.2em; text-transform:uppercase; color:var(--gold-dim);
+  }
+  .preview-frame.loading .spin{display:flex;}
+  .preview-meta{font-size:10px; color:var(--silver-dim); text-align:center; letter-spacing:.05em; line-height:1.5; max-width:240px;}
+  .preview-meta b{color:var(--gold-bright);}
+  .preview-hint{font-size:8.5px; color:var(--text-muted); letter-spacing:.08em; text-transform:uppercase;}
+  /* quick shape / background switch — instant visual feedback in the preview */
+  .preview-quick{display:flex; gap:4px; align-items:center; flex-wrap:wrap; justify-content:center;}
+  .mini-pill{
+    padding:4px 9px; border-radius:999px; border:1px solid var(--border); background:var(--black2);
+    color:var(--silver-dim); font-size:9px; font-weight:600; cursor:pointer; letter-spacing:.06em; transition:all .15s;
+  }
+  .mini-pill:hover{border-color:var(--black5); color:var(--silver);}
+  .mini-pill.active{border-color:var(--gold-dim); color:var(--gold-bright); background:linear-gradient(180deg, rgba(201,168,76,.10), rgba(201,168,76,.03));}
+  .quick-bg{
+    padding:4px 7px; border-radius:6px; border:1px solid var(--border); background:var(--black2);
+    color:var(--silver); font-size:9px; cursor:pointer; font-family:var(--mono);
+  }
+  .quick-bg:focus{outline:none; border-color:var(--gold-dim);}
+  /* zoom overlay */
+  .zoom-overlay{
+    position:fixed; inset:0; z-index:200; background:rgba(4,4,6,.92);
+    display:none; align-items:center; justify-content:center; cursor:zoom-out; padding:3vh;
+  }
+  .zoom-overlay.show{display:flex;}
+  .zoom-overlay img{max-width:96vw; max-height:94vh; object-fit:contain; border-radius:8px;}
+
+  /* ── TAB BAR (fixed) ── */
+  .tab-bar{display:flex; padding:0 4px; border-bottom:1px solid var(--border); flex-shrink:0;}
+  .tab-btn{
+    display:flex; align-items:center; gap:6px; padding:8px 13px 9px; cursor:pointer;
+    font-size:10px; font-weight:500; letter-spacing:.12em; text-transform:uppercase;
+    color:var(--silver-dim); border-bottom:2px solid transparent; transition:color .15s,border-color .15s;
+  }
+  .tab-btn:hover{color:var(--silver)}
+  .tab-btn.active{color:var(--gold-bright); border-bottom-color:var(--gold);}
+  .tab-btn svg{width:13px; height:13px; stroke:currentColor; flex-shrink:0;}
+  @media (max-width:700px){ .tab-btn span{display:none} .tab-btn{padding:8px 11px} }
+
+  /* ── OPTIONS (the ONLY scrolling region — previews stay glued) ── */
+  .options-scroll{flex:1; min-height:0; overflow-y:auto; padding:16px 22px 20px;}
+  .options-scroll::-webkit-scrollbar{width:5px;}
+  .options-scroll::-webkit-scrollbar-thumb{background:var(--black4); border-radius:5px;}
+  .section{display:none; max-width:980px; margin:0 auto;}
+  .section.active{display:block;}
+  .group-title{
+    display:block; font-family:var(--serif); font-size:13px; font-weight:500; color:var(--cream);
+    letter-spacing:.18em; text-transform:uppercase; margin:20px 0 11px; padding-bottom:6px; border-bottom:1px solid var(--border);
+  }
+  .group-title:first-child{margin-top:0;}
+  .field{margin-bottom:13px;}
+  .field-label{display:block; font-size:10px; color:var(--text-secondary); letter-spacing:.1em; text-transform:uppercase; margin-bottom:6px;}
+  .field-hint{font-size:9px; color:var(--text-muted); margin-top:5px; line-height:1.5;}
+  .two-col{display:grid; grid-template-columns:1fr 1fr; gap:13px;}
+  .three-col{display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:12px;}
+  @media (max-width:700px){ .two-col{grid-template-columns:1fr} }
+
+  .country-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(108px,1fr)); gap:6px;}
+  .country-card{
+    display:flex; flex-direction:column; align-items:center; gap:3px; padding:9px 5px;
+    border-radius:6px; border:1px solid var(--border); background:var(--black2);
+    cursor:pointer; transition:all .2s; position:relative; font-family:var(--mono); color:var(--text-primary);
+  }
+  .country-card:hover{background:var(--black3); border-color:var(--black5);}
+  .country-card.active{
+    border-color:var(--gold-dim);
+    background:linear-gradient(180deg, rgba(201,168,76,.08), rgba(201,168,76,.02));
+    box-shadow:0 0 0 1px var(--gold-dim), 0 4px 12px -4px var(--gold-glow);
+  }
+  .country-card .flag{font-size:19px; line-height:1;}
+  .country-card .name{font-size:10.5px; font-weight:500;}
+  .country-card .native{font-size:8.5px; color:var(--silver-dim);}
+  .country-card .check{position:absolute; top:4px; right:4px; width:5px; height:5px; border-radius:50%; background:var(--gold-bright); opacity:0; box-shadow:0 0 6px var(--gold-glow); transition:opacity .2s;}
+  .country-card.active .check{opacity:1;}
+
+  .platforms-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); gap:6px;}
+  .platform-chip{
+    display:flex; align-items:center; gap:8px; padding:8px 11px; border-radius:6px;
+    border:1px solid var(--border); background:var(--black2); cursor:pointer;
+    transition:all .2s; color:var(--text-primary); font-size:11px;
+  }
+  .platform-chip:hover{background:var(--black3); border-color:var(--black5);}
+  .platform-chip.active{border-color:var(--gold-dim); background:linear-gradient(180deg, rgba(201,168,76,.06), rgba(201,168,76,.02));}
+  .platform-chip .pdot{width:7px; height:7px; border-radius:50%; box-shadow:0 0 0 1px rgba(255,255,255,.1); flex-shrink:0;}
+  .platform-chip .pname{flex:1;}
+  .platform-chip .pcheck{color:var(--gold-bright); opacity:0; transition:opacity .15s;}
+  .platform-chip.active .pcheck{opacity:1;}
+
+  .opt-pills{display:flex; flex-wrap:wrap; gap:5px;}
+  .pill{
+    padding:6px 12px; border-radius:999px; border:1px solid var(--border); background:var(--black2);
+    color:var(--silver-dim); font-size:10px; font-weight:500; cursor:pointer; transition:all .15s; letter-spacing:.04em;
+  }
+  .pill:hover{border-color:var(--black5); color:var(--silver);}
+  .pill.active{border-color:var(--gold-dim); color:var(--gold-bright); background:linear-gradient(180deg, rgba(201,168,76,.10), rgba(201,168,76,.03));}
+
+  .field-select{
+    width:100%; padding:8px 10px; border-radius:6px; border:1px solid var(--border); background:var(--black2);
+    color:var(--text-primary); font-family:var(--mono); font-size:11px; cursor:pointer;
+    appearance:none; -webkit-appearance:none;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='%23787e8a' d='M0 0l5 6 5-6z'/%3E%3C/svg%3E");
+    background-repeat:no-repeat; background-position:right 10px center;
+  }
+  .field-select:hover{border-color:var(--black5)}
+  .field-select:focus{outline:none; border-color:var(--gold-dim);}
+  .field-input{
+    width:100%; padding:8px 10px; border-radius:6px; border:1px solid var(--border); background:var(--black2);
+    color:var(--text-primary); font-family:var(--mono); font-size:11px;
+  }
+  .field-input:focus{outline:none; border-color:var(--gold-dim);}
+  .color-row{display:flex; gap:6px; align-items:center;}
+  .color-row input[type=color]{width:34px; height:32px; padding:2px; border:1px solid var(--border); border-radius:6px; background:var(--black2); cursor:pointer;}
+  .color-row .field-input{flex:1;}
+
+  .toggle-row{display:flex; flex-direction:column; gap:7px;}
+  .toggle{
+    display:flex; align-items:center; justify-content:space-between; padding:9px 13px;
+    border:1px solid var(--border); border-radius:6px; background:var(--black2); cursor:pointer; transition:border-color .2s;
+  }
+  .toggle:hover{border-color:var(--black5)}
+  .toggle.on{border-color:var(--gold-dim); background:linear-gradient(180deg, rgba(201,168,76,.04), transparent);}
+  .toggle .tlabel{font-size:11px; color:var(--text-primary);}
+  .toggle .tdesc{font-size:9px; color:var(--silver-dim); margin-top:2px;}
+  .switch{position:relative; width:32px; height:18px; border-radius:999px; background:var(--black4); transition:background .2s; flex-shrink:0;}
+  .switch::after{content:''; position:absolute; top:2px; left:2px; width:14px; height:14px; border-radius:50%; background:#fff; transition:transform .2s;}
+  .toggle.on .switch{background:var(--gold);}
+  .toggle.on .switch::after{transform:translateX(14px);}
+
+  .range-row{display:flex; align-items:center; gap:10px;}
+  .range-row input[type=range]{flex:1; -webkit-appearance:none; appearance:none; height:4px; border-radius:999px; background:var(--black4); outline:none;}
+  .range-row input[type=range]::-webkit-slider-thumb{-webkit-appearance:none; appearance:none; width:14px; height:14px; border-radius:50%; background:var(--gold-bright); cursor:pointer; box-shadow:0 0 0 1px var(--gold-dim), 0 0 8px var(--gold-glow);}
+  .range-row input[type=range]::-moz-range-thumb{width:14px; height:14px; border-radius:50%; border:0; background:var(--gold-bright); cursor:pointer;}
+  .range-val{font-size:10px; color:var(--gold-bright); min-width:44px; text-align:right;}
+
+  .note{
+    padding:9px 12px; border-radius:6px; font-size:10px; line-height:1.6; letter-spacing:.03em;
+    border:1px solid var(--gold-dim); background:rgba(201,168,76,.05); color:var(--gold-bright); margin-top:12px;
+  }
+  .note.dim{border-color:var(--border); background:var(--black2); color:var(--silver-dim);}
+
+  /* ── BOTTOM BAR (fixed) ── */
+  .bottom-bar{
+    flex-shrink:0; border-top:1px solid var(--border);
+    background:linear-gradient(180deg, rgba(201,168,76,.05), var(--black1));
+    padding:9px 16px 11px; display:flex; flex-direction:column; gap:7px;
+  }
+  .bb-row{display:flex; align-items:center; gap:10px; flex-wrap:wrap;}
+  .gen-summary{flex:1; min-width:200px; font-size:10px; color:var(--silver-dim); letter-spacing:.04em;}
+  .gen-summary b{color:var(--gold-bright); font-weight:600;}
+  .btn-primary{
+    padding:10px 22px; border-radius:6px;
+    background:linear-gradient(180deg, rgba(201,168,76,.18), rgba(201,168,76,.06));
+    border:1px solid var(--gold-dim); color:var(--gold-bright);
+    font-size:10px; font-weight:700; letter-spacing:.15em; text-transform:uppercase; cursor:pointer; transition:all .2s;
+  }
+  .btn-primary:hover:not(:disabled){background:linear-gradient(180deg, rgba(201,168,76,.30), rgba(201,168,76,.12)); border-color:var(--gold); box-shadow:0 0 12px var(--gold-glow);}
+  .btn-primary:disabled{opacity:.4; cursor:not-allowed;}
+  .url-grid{display:grid; grid-template-columns:1fr 1fr; gap:8px;}
+  @media (max-width:820px){ .url-grid{grid-template-columns:1fr} }
+  .url-box{display:flex; gap:5px; padding:5px; border:1px solid var(--border); border-radius:6px; background:var(--black2);}
+  .url-box .url-tag{
+    flex-shrink:0; display:flex; align-items:center; padding:0 8px; font-size:8.5px; letter-spacing:.1em;
+    text-transform:uppercase; color:var(--gold-dim); border-right:1px solid var(--border); white-space:nowrap;
+  }
+  .url-box input{flex:1; min-width:0; background:transparent; border:0; outline:0; color:var(--text-primary); font-family:var(--mono); font-size:9.5px; padding:6px 8px;}
+  .url-box button{padding:6px 10px; border-radius:4px; background:var(--black4); color:var(--silver); font-size:8.5px; font-weight:600; letter-spacing:.08em; cursor:pointer; white-space:nowrap;}
+  .url-box button:hover{background:var(--black5); color:var(--gold-bright);}
+  .install-row{display:grid; grid-template-columns:1fr 1fr; gap:8px;}
+  .install-btn{
+    display:flex; align-items:center; justify-content:center; gap:7px; padding:10px 16px;
+    border-radius:6px; border:1px solid var(--border); background:var(--black2); color:var(--text-primary);
+    text-decoration:none; font-size:9.5px; font-weight:600; letter-spacing:.12em; text-transform:uppercase; transition:all .2s;
+  }
+  .install-btn:hover{background:var(--black3); border-color:var(--gold-dim); color:var(--gold-bright);}
+  .msg{font-size:10px; padding:6px 11px; border-radius:5px; opacity:0; transition:opacity .25s; letter-spacing:.04em;}
+  .msg.show{opacity:1;}
+  .msg.ok{background:rgba(201,168,76,.08); color:var(--gold-bright); border:1px solid var(--gold-dim);}
+  .msg.bad{background:rgba(255,59,105,.08); color:var(--accent-red); border:1px solid rgba(255,59,105,.3);}
+  .hidden{display:none !important;}
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <!-- ── HEADER ── -->
+  <header class="header">
+    <div class="header-left">
+      <div class="logo"><em>TOPX</em> Posters+</div>
+      <div class="logo-sub">// blvckTOP × PostersPlus × TOPX</div>
+    </div>
+    <div class="header-stats">
+      <span><b>27</b> Countries</span><span><b>10</b> Platforms</span><span><b>9</b> Fonts</span>
+      <span><b>5</b> Backgrounds</span><span><b>22</b> Languages</span><span><b>AIOMetadata</b> Ready</span>
+    </div>
+  </header>
+
+  <!-- ── LIVE PREVIEW · TOP PIN (never scrolls — glued above the tabs) ── -->
+  <div class="preview-stage" id="stageTop">
+    <div class="preview-side">
+      <div class="rank-nav">
+        <button id="prevRankTop" title="Previous rank">‹</button>
+        <span class="rank-label" id="rankLabelTop">#1 / 10</span>
+        <button id="nextRankTop" title="Next rank">›</button>
+      </div>
+      <div class="preview-meta" id="previewMetaTop">—</div>
+      <div class="preview-quick">
+        <button class="mini-pill active" data-qshape="landscape" id="qpLandscape">16:9</button>
+        <button class="mini-pill" data-qshape="poster" id="qpPoster">2:3</button>
+        <select class="quick-bg" id="quickBg" title="Canvas background">
+          <option value="fresh">Fresh</option><option value="provider">Glass</option>
+          <option value="stremio">Navy</option><option value="black">Black</option>
+          <option value="transparent">Clear</option>
+        </select>
+      </div>
+      <div class="preview-hint">click poster to zoom · live /poster render</div>
+    </div>
+    <div class="preview-frame" id="previewFrameTop">
+      <div class="spin">Rendering…</div>
+      <img id="previewImgTop" alt="Live preview" referrerpolicy="no-referrer">
+    </div>
+  </div>
+
+  <!-- ── TAB BAR ── -->
+  <div class="tab-bar" id="tabBar">
+    <div class="tab-btn active" data-tab="catalogs" onclick="showTab('catalogs')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><line x1="4" y1="8" x2="20" y2="8"/><circle cx="9" cy="8" r="2"/><line x1="4" y1="16" x2="20" y2="16"/><circle cx="15" cy="16" r="2"/></svg>
+      <span>Catalogs</span>
+    </div>
+    <div class="tab-btn" data-tab="layout" onclick="showTab('layout')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+      <span>Layout</span>
+    </div>
+    <div class="tab-btn" data-tab="language" onclick="showTab('language')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+      <span>Language</span>
+    </div>
+    <div class="tab-btn" data-tab="style" onclick="showTab('style')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><polygon points="12 3 14.5 9 21 9.5 16 13.5 17.5 20 12 16.5 6.5 20 8 13.5 3 9.5 9.5 9"/></svg>
+      <span>Style</span>
+    </div>
+    <div class="tab-btn" data-tab="extras" onclick="showTab('extras')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M12 3l7 3v6c0 4-3 7-7 9-4-2-7-5-7-9V6z"/></svg>
+      <span>Extras</span>
+    </div>
+  </div>
+
+  <!-- ── OPTIONS (scrollable — the only moving region) ── -->
+  <div class="options-scroll" id="optionsScroll">
+    <div class="section active" data-tab="catalogs" id="sec-catalogs"></div>
+    <div class="section" data-tab="layout" id="sec-layout"></div>
+    <div class="section" data-tab="language" id="sec-language"></div>
+    <div class="section" data-tab="style" id="sec-style"></div>
+    <div class="section" data-tab="extras" id="sec-extras"></div>
+  </div>
+
+  <!-- ── LIVE PREVIEW · BOTTOM PIN (never scrolls — glued below the options) ── -->
+  <div class="preview-stage bottom-stage" id="stageBottom">
+    <div class="preview-frame" id="previewFrameBottom" style="height:100%;">
+      <div class="spin">Rendering…</div>
+      <img id="previewImgBottom" alt="Live preview" referrerpolicy="no-referrer">
+    </div>
+    <div class="preview-side">
+      <div class="rank-nav">
+        <button id="prevRankBottom" title="Previous rank">‹</button>
+        <span class="rank-label" id="rankLabelBottom">#1 / 10</span>
+        <button id="nextRankBottom" title="Next rank">›</button>
+      </div>
+      <div class="preview-meta" id="previewMetaBottom">—</div>
+      <div class="preview-quick">
+        <button class="mini-pill" data-qshape="landscape" id="qbLandscape">16:9</button>
+        <button class="mini-pill" data-qshape="poster" id="qbPoster">2:3</button>
+        <select class="quick-bg" id="quickBgBottom" title="Canvas background">
+          <option value="fresh">Fresh</option><option value="provider">Glass</option>
+          <option value="stremio">Navy</option><option value="black">Black</option>
+          <option value="transparent">Clear</option>
+        </select>
+      </div>
+    </div>
+  </div>
+  <div class="zoom-overlay" id="zoomOverlay"><img id="zoomImg" alt="Zoomed preview"></div>
+
+  <!-- ── BOTTOM BAR (fixed) ── -->
+  <div class="bottom-bar">
+    <div class="msg" id="msg"></div>
+    <div class="bb-row">
+      <div class="gen-summary" id="genSummary">— pick a country to start</div>
+      <button class="btn-primary" id="generateBtn">Generate Manifest</button>
+    </div>
+    <div class="url-grid">
+      <div class="url-box">
+        <span class="url-tag">AIOMetadata</span>
+        <input id="posterUrlInput" readonly placeholder="poster URL template…">
+        <button id="copyPosterBtn">COPY</button>
+      </div>
+      <div class="url-box hidden" id="manifestBox">
+        <span class="url-tag">Manifest</span>
+        <input id="manifestUrl" readonly>
+        <button id="copyBtn">COPY</button>
+      </div>
+    </div>
+    <div class="install-row hidden" id="installRow">
+      <a class="install-btn" id="stremioBtn" href="#" target="_blank" rel="noopener"><span>▶ Stremio</span></a>
+      <a class="install-btn" id="nuvioBtn" href="#" target="_blank" rel="noopener"><span>◆ Nuvio</span></a>
+    </div>
+  </div>
+</div>
+
+<script>
+"use strict";
+
+/* ═══ CONSTANTS ════════════════════════════════════════════════════════════ */
+const FONTS = [
+  {v:"inter", label:"Inter (default)"},
+  {v:"spacegrotesk", label:"Space Grotesk"},
+  {v:"bebas", label:"Bebas Neue"},
+  {v:"oswald", label:"Oswald"},
+  {v:"montserrat", label:"Montserrat"},
+  {v:"manrope", label:"Manrope"},
+  {v:"fira", label:"Fira Sans"},
+  {v:"robotocondensed", label:"Roboto Condensed"},
+  {v:"playfair", label:"Playfair Display"},
+];
+const NATIVE_LANGS = [
+  {code:"",label:"Follow country (auto)"},{code:"en",label:"English"},{code:"it",label:"Italiano"},
+  {code:"fr",label:"Français"},{code:"de",label:"Deutsch"},{code:"es",label:"Español"},
+  {code:"pt-BR",label:"Português (Brasil)"},{code:"pt",label:"Português"},{code:"nl",label:"Nederlands"},
+  {code:"tr",label:"Türkçe"},{code:"ar",label:"العربية"},{code:"hi",label:"हिन्दी"},
+  {code:"el",label:"Ελληνικά"},{code:"ru",label:"Русский"},{code:"ja",label:"日本語"},
+  {code:"ko",label:"한국어"},{code:"zh",label:"中文"},{code:"id",label:"Bahasa Indonesia"},
+  {code:"ms",label:"Bahasa Melayu"},{code:"hu",label:"Magyar"},{code:"ro",label:"Română"},{code:"hr",label:"Hrvatski"},
+];
+const CLIENTS = ["stremio_desktop_web","stremio_tv_nuvio","stremio_android_tv","nuvio","bingecat","xperience"];
+const SASH_STYLES = ["silver","gold","rose","bronze","frosted","charcoal"];
+const CERT_COUNTRIES = ["US","UK","DE","AU","IN","IT","FR","ES","BR","NL","MX","JP","KR"];
+
+/* ═══ DEFAULTS — every PostersPlus URL parameter, default values matching the
+ *    PostersPlus configurator so the emitted URL is format-identical. ═════ */
+const DEFAULTS = {
+  // core
+  primary_client:"stremio_desktop_web",
+  language:"", logo_language:"", logo_priority:"native_original", logo_language_secondary:"",
+  original_labels:"", label_font:"inter",
+  // rating
+  rating_display_mode:"1", rating_text_color:"",
+  score_color_mode:"0", score_custom_palette:"",
+  score_glow_threshold:"85", score_glow_blur:"1", score_glow_alpha:"40",
+  glow_color_mode:"", glow_color:"",
+  accent_bar_font_size_ratio:"0.080", accent_bar_y_offset:"0.90",
+  accent_bar_append_mode:"0", accent_bar_bottom_ratio:"0.040",
+  numeric_score_font_size_ratio:"0.100", numeric_score_y_offset:"0.90", score_out_of_10:"false",
+  minimalist_append_mode:"0", minimalist_mode_font_size_ratio:"0.055",
+  minimalist_mode_font_x_offset:"0.065", minimalist_mode_font_y_offset:"0.920",
+  minimalist_score_out_of_10:"false", minimalist_center:"false",
+  minimalist_separator:"pip", minimalist_rating_separator:"star",
+  // compact bar (mode 4)
+  bar_style:"frosted", bar_accent:"silver", bar_append:"rating_year", bar_score_out_of_10:"false",
+  bar_height_ratio:"0.080", bar_font_size_ratio:"0.55",
+  bar_frost_opacity:"0.85", bar_frost_saturation:"1.20", frost_reference:"false",
+  // gradients + colour vignette
+  top_gradient:"off", top_gradient_opacity:"", top_gradient_height:"",
+  bottom_gradient:"off", bottom_gradient_opacity:"", bottom_gradient_height:"",
+  vignette_poster_color_top:"false", vignette_poster_color_bottom:"false",
+  vignette_color_saturation:"2.50", vignette_color_lightness:"1.30", vignette_color_blur:"1.00",
+  vignette_color_style:"shade", vignette_color_ramp:"true", vignette_color_local:"true",
+  // hide elements
+  hide_genre:"false", hide_year:"false", hide_rating:"false", textless:"false",
+  // sash / notch
+  sash_mode:"sash", sash_badge_style:"silver", sash_badge_pos:"top",
+  sash_text_color:"", sash_winner_star:"false",
+  sash_badge_size_w:"1.00", sash_badge_size_h:"1.00", sash_badge_pad:"1.00", sash_badge_font_ratio:"1.00",
+  sash_badge_opacity:"0.90", sash_badge_frost_opacity:"0.85", sash_badge_frost_saturation:"1.20",
+  sash_chip_x:"0", sash_chip_y:"0", sash_edge_y:"0.50",
+  muted:"false", sash_poster_color:"false",
+  sash_length_ratio:"1.00", sash_height_ratio:"0.140", sash_side:"right",
+  // graphic badges
+  badge_display_mode:"0", badge_group1:"chip:4:video,audio,res,cert", badge_group2:"", badge_group3:"", badge_group4:"",
+  badge_min_score:"0", badge_cert_country:"US",
+  badge_legacy_style:"notch", badge_quality_style:"solid", badge_logo_style:"solid",
+  badge_cinema_style:"auto", badge_cert_style:"solid",
+  badge_pos:"top_left", landscape_badge_style:"glass", landscape_badge_shape:"ribbon",
+  landscape_badge_case:"auto", landscape_badge_scale:"1.00",
+  // meta / ratings sources
+  meta_order:"", imdb_rating_source:"mdblist", tmdb_rating_source:"mdblist",
+  movie_weights:"", tv_weights:"", fallback_to_imdb:"true",
+  // trending rank mark
+  trending_style:"sash_label", trending_side:"left", trending_scale:"1.00", trending_sash:"keep",
+  trending_ribbon_style:"charcoal", trending_frost_opacity:"0.85", trending_frost_saturation:"1.20",
+  trending_label:"false", trending_corner:"false",
+  // logo
+  logo_max_w_ratio:"0.40", logo_max_h_ratio:"0.20", logo_bottom_ratio:"0.17", logo_bottom_anchor:"false",
+  // landscape options
+  landscape_art:"textless", landscape_info_pos:"", landscape_info_scale:"1.00",
+  landscape_logo_pos:"", landscape_logo_scale:"1.00",
+  landscape_rating_mode:"line", landscape_separator:"", landscape_rating_separator:"",
+  landscape_score_out_of_10:"false",
+  // art selection
+  original_art_source:"primary", poster_pick:"top",
+  // output
+  resolution:"", fallback_bg_style:"minimal",
+  // release status
+  release_status_cinema_only:"true", release_status_dates:"true",
+  airing_dates:"true", hide_unreleased_rating:"false",
+  cinema_greyscale:"false", cinema_greyscale_skip_if_available:"false",
+};
+
+const state = {
+  country: "world",
+  platforms: new Set(["top10"]),
+  shape: "landscape",
+  bg: "fresh",
+  showMeta: true,
+  showLogo: true,
+  showRank: true,
+  useOriginalArt: false,
+  posterCrop: false,
+  greyscale: false,
+  pp: { ...DEFAULTS },
+  countries: [], platformsForCountry: [],
+  previewMetas: [], previewRank: 1,
+};
+
+const $ = id => document.getElementById(id);
+const msgEl = $("msg");
+let msgTimer;
+function setMessage(t, kind="ok"){ msgEl.textContent = t; msgEl.className = "msg show " + kind; clearTimeout(msgTimer); msgTimer = setTimeout(()=>msgEl.classList.remove("show"), 5000); }
+function showTab(name){
+  document.querySelectorAll(".tab-btn").forEach(b=>b.classList.toggle("active", b.dataset.tab===name));
+  document.querySelectorAll(".section").forEach(s=>s.classList.toggle("active", s.dataset.tab===name));
+}
+const hex6 = v => /^[0-9a-fA-F]{6}$/.test(String(v||"").trim());
+const opts = list => list.map(([v,l])=>`<option value="${v}">${l}</option>`).join("");
+
+/* ═══ SECTIONS ═════════════════════════════════════════════════════════════ */
+function renderSections(){
+  $("sec-catalogs").innerHTML = `
+    <span class="group-title">Country</span>
+    <div class="country-grid" id="countryGrid"></div>
+    <span class="group-title">Platforms</span>
+    <div class="platforms-grid" id="platformsGrid"></div>
+    <span class="group-title">Rank Number (blvckTOP)</span>
+    <div class="toggle-row">
+      <div class="toggle on" id="toggleRank">
+        <div><div class="tlabel">Show rank number</div>
+        <div class="tdesc">// Numbered Top 10 cover. Off = clean poster (AIOMetadata per-title mode).</div></div>
+        <div class="switch"></div>
+      </div>
+    </div>`;
+
+  $("sec-layout").innerHTML = `
+    <span class="group-title">Shape</span>
+    <div class="field"><label class="field-label">Poster Shape</label>
+      <div class="opt-pills" id="shapePills">
+        <button class="pill active" data-shape="landscape">Landscape · 1280×720</button>
+        <button class="pill" data-shape="poster">Portrait · 1000×1500</button>
+      </div></div>
+    <span class="group-title">Background</span>
+    <div class="field"><label class="field-label">Canvas Background (blvckTOP)</label>
+      <div class="opt-pills" id="bgPills">
+        <button class="pill active" data-bg="fresh">Fresh · full-bleed</button>
+        <button class="pill" data-bg="provider">Provider Glass</button>
+        <button class="pill" data-bg="stremio">Stremio Navy</button>
+        <button class="pill" data-bg="black">Black</button>
+        <button class="pill" data-bg="transparent">Transparent</button>
+      </div></div>
+    <span class="group-title">Overlays</span>
+    <div class="toggle-row">
+      <div class="toggle on" id="toggleMeta"><div><div class="tlabel">Show genre &amp; rating</div><div class="tdesc">// Genre chip + TMDB vote under the artwork</div></div><div class="switch"></div></div>
+      <div class="toggle on" id="toggleLogo"><div><div class="tlabel">Show title logo</div><div class="tdesc">// Official logo over textless art when available</div></div><div class="switch"></div></div>
+      <div class="toggle" id="toggleOriginalArt"><div><div class="tlabel">Use original art (use_original_art)</div><div class="tdesc">// Art with the title baked in, as published — no logo overlay</div></div><div class="switch"></div></div>
+      <div class="toggle" id="togglePosterCrop"><div><div class="tlabel">Landscape poster crop (landscape_poster_crop)</div><div class="tdesc">// Crop portrait art to fill 16:9 instead of using backdrops</div></div><div class="switch"></div></div>
+      <div class="toggle" id="toggleGreyscale"><div><div class="tlabel">Greyscale artwork (landscape_greyscale)</div><div class="tdesc">// Desaturate the art for a monochrome look</div></div><div class="switch"></div></div>
+    </div>
+    <span class="group-title">Art Selection (PostersPlus)</span>
+    <div class="two-col">
+      <div class="field"><label class="field-label">Original art source (original_art_source)</label>
+        <select class="field-select" id="pp-original_art_source">
+          <option value="primary">Primary art</option><option value="backdrop">Backdrop</option>
+        </select></div>
+      <div class="field"><label class="field-label">Poster pick (poster_pick)</label>
+        <select class="field-select" id="pp-poster_pick">
+          <option value="top">Top (best rated)</option><option value="random">Random</option>
+          <option value="2">2nd poster</option><option value="3">3rd poster</option><option value="4">4th poster</option>
+        </select></div>
+    </div>
+    <span class="group-title">Hide Elements (PostersPlus)</span>
+    <div class="toggle-row">
+      <div class="toggle" id="pp-t-hide_genre"><div><div class="tlabel">Hide genre (hide_genre)</div><div class="tdesc">// Strip the genre from the info line</div></div><div class="switch"></div></div>
+      <div class="toggle" id="pp-t-hide_year"><div><div class="tlabel">Hide year (hide_year)</div><div class="tdesc">// Strip the year where drawn</div></div><div class="switch"></div></div>
+      <div class="toggle" id="pp-t-hide_rating"><div><div class="tlabel">Hide rating (hide_rating)</div><div class="tdesc">// Strip the score from the info line</div></div><div class="switch"></div></div>
+      <div class="toggle" id="pp-t-textless"><div><div class="tlabel">Force textless art (textless)</div><div class="tdesc">// Prefer artwork without burned-in titles</div></div><div class="switch"></div></div>
+    </div>
+    <span class="group-title">Landscape Options (PostersPlus)</span>
+    <div class="three-col">
+      <div class="field"><label class="field-label">Landscape art (landscape_art)</label>
+        <select class="field-select" id="pp-landscape_art">
+          <option value="textless">Textless + logo</option><option value="original">Original art</option>
+        </select></div>
+      <div class="field"><label class="field-label">Info position (landscape_info_pos)</label>
+        <select class="field-select" id="pp-landscape_info_pos">
+          <option value="">Auto</option><option value="bottom_left">Bottom left</option>
+          <option value="bottom_right">Bottom right</option><option value="bottom_center">Bottom centre</option>
+          <option value="top_left">Top left</option><option value="top_right">Top right</option>
+        </select></div>
+      <div class="field"><label class="field-label">Info scale (landscape_info_scale)</label>
+        <div class="range-row"><input type="range" id="pp-r-landscape_info_scale" min="0.60" max="2.00" step="0.05" value="1.00"><span class="range-val" id="pp-r-landscape_info_scaleV">1.00</span></div></div>
+      <div class="field"><label class="field-label">Logo position (landscape_logo_pos)</label>
+        <select class="field-select" id="pp-landscape_logo_pos">
+          <option value="">Auto (left)</option><option value="right">Right</option>
+          <option value="top_left">Top left</option><option value="top_right">Top right</option>
+        </select></div>
+      <div class="field"><label class="field-label">Logo scale (landscape_logo_scale)</label>
+        <div class="range-row"><input type="range" id="pp-r-landscape_logo_scale" min="0.50" max="1.50" step="0.05" value="1.00"><span class="range-val" id="pp-r-landscape_logo_scaleV">1.00</span></div></div>
+      <div class="field"><label class="field-label">Landscape rating mode (landscape_rating_mode)</label>
+        <select class="field-select" id="pp-landscape_rating_mode">
+          <option value="line">Info line</option><option value="number">Number</option>
+          <option value="bar">Compact bar</option><option value="off">Off</option>
+        </select></div>
+      <div class="field"><label class="field-label">Separator (landscape_separator)</label>
+        <select class="field-select" id="pp-landscape_separator">
+          <option value="">Dot (default)</option><option value="pip">Pip</option>
+        </select></div>
+      <div class="field"><label class="field-label">Rating separator (landscape_rating_separator)</label>
+        <select class="field-select" id="pp-landscape_rating_separator">
+          <option value="">Bullet (default)</option><option value="pipe">Pipe</option>
+          <option value="star">Star</option><option value="slash">Slash</option>
+        </select></div>
+    </div>`;
+
+  $("sec-language").innerHTML = `
+    <span class="group-title">Native Language</span>
+    <div class="two-col">
+      <div class="field"><label class="field-label">Language for titles &amp; artwork (language)</label>
+        <select class="field-select" id="pp-language">${opts(NATIVE_LANGS.map(l=>[l.code,l.label]))}</select>
+        <div class="field-hint">Follow country maps: Italy→Italian, Brazil→Portuguese, Morocco→Arabic, Greece→Greek…</div>
+      </div>
+      <div class="field"><label class="field-label">Logo language (logo_language)</label>
+        <select class="field-select" id="pp-logo_language">${opts(NATIVE_LANGS.map(l=>[l.code,l.label]))}</select>
+      </div>
+    </div>
+    <span class="group-title">Logo Priority (PostersPlus)</span>
+    <div class="two-col">
+      <div class="field"><label class="field-label">Priority order (logo_priority)</label>
+        <select class="field-select" id="pp-logo_priority">
+          <option value="native_original">Native → Original → English</option>
+          <option value="native_english_original">Native → English → Original</option>
+          <option value="native_custom_original">Native → Custom → Original</option>
+          <option value="english_native_original">English → Native → Original</option>
+          <option value="original_native_english">Original → Native → English</option>
+          <option value="native_original_english">Native → Original → English (custom last)</option>
+          <option value="native_only">Native only</option>
+          <option value="english_only">English only</option>
+        </select></div>
+      <div class="field"><label class="field-label">Custom language (logo_language_secondary)</label>
+        <select class="field-select" id="pp-logo_language_secondary">${opts(NATIVE_LANGS.filter(l=>l.code).map(l=>[l.code,l.label]))}</select></div>
+    </div>
+    <div class="field"><label class="field-label">Title's own language (original_labels)</label>
+      <input class="field-input" id="pp-original_labels" placeholder="e.g. ar,hi,ko — titles made in these languages keep their own labels">
+    </div>
+    <span class="group-title">Typography</span>
+    <div class="two-col">
+      <div class="field"><label class="field-label">Label font (label_font)</label>
+        <select class="field-select" id="pp-label_font">${opts(FONTS.map(f=>[f.v,f.label]))}</select>
+        <div class="field-hint">PostersPlus font names map to this instance's installed fonts; unknown values fall back to Inter.</div>
+      </div>
+      <div class="field"><label class="field-label">Info label order (meta_order)</label>
+        <input class="field-input" id="pp-meta_order" placeholder="genre,rating,provider — comma list reorders the info rows">
+      </div>
+    </div>`;
+
+  $("sec-style").innerHTML = `
+    <span class="group-title">Rating Display (PostersPlus)</span>
+    <div class="field"><label class="field-label">Display mode (rating_display_mode)</label>
+      <div class="opt-pills" id="ratingModePills">
+        <button class="pill active" data-rm="1">1 · Info line ★</button>
+        <button class="pill" data-rm="2">2 · Numeric</button>
+        <button class="pill" data-rm="3">3 · Minimalist</button>
+        <button class="pill" data-rm="4">4 · Compact bar</button>
+      </div></div>
+    <div class="two-col">
+      <div class="field"><label class="field-label">Text colour (rating_text_color)</label>
+        <div class="color-row"><input type="color" id="rtcPicker" value="#f1f5f9"><input class="field-input" id="pp-rating_text_color" placeholder="blank = default"></div></div>
+      <div class="field"><label class="field-label">Custom glow colour (score_glow_color)</label>
+        <select class="field-select" id="pp-glow_color_mode">
+          <option value="">Auto (accent)</option><option value="match">Match score colour</option><option value="custom">Custom hex</option>
+        </select></div>
+      <div class="field"><label class="field-label">Glow hex (when Custom)</label>
+        <div class="color-row"><input type="color" id="glowPicker" value="#ffffff"><input class="field-input" id="pp-glow_color" placeholder="blank = auto"></div></div>
+      <div class="field"><label class="field-label">Score colour mode (score_color_mode)</label>
+        <select class="field-select" id="pp-score_color_mode">
+          <option value="0">0 · Accent</option><option value="1">1 · Palette</option>
+          <option value="2">2 · Auto contrast</option><option value="3">3 · Custom palette</option>
+        </select></div>
+      <div class="field"><label class="field-label">Custom palette (score_custom_palette)</label>
+        <input class="field-input" id="pp-score_custom_palette" placeholder="FFB000,FF8A00,F1F5F9 — low → high"></div>
+      <div class="field"><label class="field-label">Fallback background (fallback_bg_style)</label>
+        <select class="field-select" id="pp-fallback_bg_style"><option value="minimal">Minimal</option><option value="photoreal">Photoreal</option></select></div>
+    </div>
+    <span class="group-title">Glow Tuning (PostersPlus)</span>
+    <div class="three-col">
+      <div class="field"><label class="field-label">Threshold (score_glow_threshold)</label>
+        <div class="range-row"><input type="range" id="pp-r-score_glow_threshold" min="0" max="100" step="1" value="85"><span class="range-val" id="pp-r-score_glow_thresholdV">85</span></div></div>
+      <div class="field"><label class="field-label">Blur (score_glow_blur)</label>
+        <div class="range-row"><input type="range" id="pp-r-score_glow_blur" min="0" max="10" step="1" value="1"><span class="range-val" id="pp-r-score_glow_blurV">1</span></div></div>
+      <div class="field"><label class="field-label">Alpha (score_glow_alpha)</label>
+        <div class="range-row"><input type="range" id="pp-r-score_glow_alpha" min="0" max="100" step="5" value="40"><span class="range-val" id="pp-r-score_glow_alphaV">40</span></div></div>
+    </div>
+    <span class="group-title">Font Ratios</span>
+    <div class="two-col">
+      <div class="field"><label class="field-label">Info-line font ratio (accent_bar_font_size_ratio)</label>
+        <div class="range-row"><input type="range" id="pp-r-accent_bar_font_size_ratio" min="0.04" max="0.16" step="0.005" value="0.08"><span class="range-val" id="pp-r-accent_bar_font_size_ratioV">0.080</span></div></div>
+      <div class="field"><label class="field-label">Info-line Y offset (accent_bar_y_offset)</label>
+        <div class="range-row"><input type="range" id="pp-r-accent_bar_y_offset" min="0.70" max="0.98" step="0.01" value="0.90"><span class="range-val" id="pp-r-accent_bar_y_offsetV">0.90</span></div></div>
+      <div class="field"><label class="field-label">Info-line bottom ratio (accent_bar_bottom_ratio)</label>
+        <div class="range-row"><input type="range" id="pp-r-accent_bar_bottom_ratio" min="0.00" max="0.20" step="0.005" value="0.04"><span class="range-val" id="pp-r-accent_bar_bottom_ratioV">0.040</span></div></div>
+      <div class="field"><label class="field-label">Info-line append (accent_bar_append_mode)</label>
+        <select class="field-select" id="pp-accent_bar_append_mode">
+          <option value="0">0 · Score only</option><option value="1">1 · + Year</option>
+          <option value="2">2 · + Info sash</option><option value="3">3 · + Year &amp; sash</option>
+        </select></div>
+      <div class="field"><label class="field-label">Numeric font ratio (numeric_score_font_size_ratio)</label>
+        <div class="range-row"><input type="range" id="pp-r-numeric_score_font_size_ratio" min="0.04" max="0.16" step="0.005" value="0.10"><span class="range-val" id="pp-r-numeric_score_font_size_ratioV">0.100</span></div></div>
+      <div class="field"><label class="field-label">Numeric Y offset (numeric_score_y_offset)</label>
+        <div class="range-row"><input type="range" id="pp-r-numeric_score_y_offset" min="0.70" max="0.98" step="0.01" value="0.90"><span class="range-val" id="pp-r-numeric_score_y_offsetV">0.90</span></div></div>
+      <div class="field"><label class="field-label">Minimalist font ratio (minimalist_mode_font_size_ratio)</label>
+        <div class="range-row"><input type="range" id="pp-r-minimalist_mode_font_size_ratio" min="0.02" max="0.10" step="0.002" value="0.055"><span class="range-val" id="pp-r-minimalist_mode_font_size_ratioV">0.055</span></div></div>
+      <div class="field"><label class="field-label">Minimalist X offset (minimalist_mode_font_x_offset)</label>
+        <div class="range-row"><input type="range" id="pp-r-minimalist_mode_font_x_offset" min="0.01" max="0.20" step="0.005" value="0.065"><span class="range-val" id="pp-r-minimalist_mode_font_x_offsetV">0.065</span></div></div>
+      <div class="field"><label class="field-label">Minimalist Y offset (minimalist_mode_font_y_offset)</label>
+        <div class="range-row"><input type="range" id="pp-r-minimalist_mode_font_y_offset" min="0.00" max="0.98" step="0.01" value="0.92"><span class="range-val" id="pp-r-minimalist_mode_font_y_offsetV">0.920</span></div></div>
+      <div class="field"><label class="field-label">Minimalist append (minimalist_append_mode)</label>
+        <select class="field-select" id="pp-minimalist_append_mode">
+          <option value="0">0 · Score only</option><option value="1">1 · + Year</option>
+          <option value="2">2 · + Info sash</option><option value="3">3 · + Year &amp; sash</option>
+        </select></div>
+      <div class="field"><label class="field-label">Minimalist separator (minimalist_separator)</label>
+        <select class="field-select" id="pp-minimalist_separator">
+          <option value="pip">Pip</option><option value="dot">Dot</option><option value="none">None</option>
+        </select></div>
+      <div class="field"><label class="field-label">Minimalist rating separator (minimalist_rating_separator)</label>
+        <select class="field-select" id="pp-minimalist_rating_separator">
+          <option value="star">Star</option><option value="slash">Slash</option><option value="none">None</option>
+        </select></div>
+    </div>
+    <div class="toggle-row">
+      <div class="toggle" id="pp-t-score_out_of_10"><div><div class="tlabel">Numeric score out of 10 (score_out_of_10)</div><div class="tdesc">// Print “7.5/10” in numeric mode</div></div><div class="switch"></div></div>
+      <div class="toggle" id="pp-t-minimalist_score_out_of_10"><div><div class="tlabel">Minimalist score out of 10 (minimalist_score_out_of_10)</div><div class="tdesc">// Print “7.5/10” in minimalist mode</div></div><div class="switch"></div></div>
+      <div class="toggle" id="pp-t-minimalist_center"><div><div class="tlabel">Centre minimalist score (minimalist_center)</div><div class="tdesc">// Anchor the minimalist line to centre</div></div><div class="switch"></div></div>
+    </div>
+    <span class="group-title">Top / Bottom Gradients</span>
+    <div class="two-col">
+      <div class="field"><label class="field-label">Top gradient (top_gradient)</label>
+        <select class="field-select" id="pp-top_gradient"><option value="off">Off</option><option value="low">Low</option><option value="medium">Medium</option><option value="high">High</option><option value="custom">Custom</option></select></div>
+      <div class="field"><label class="field-label">Bottom gradient (bottom_gradient)</label>
+        <select class="field-select" id="pp-bottom_gradient"><option value="off">Off</option><option value="low">Low</option><option value="medium">Medium</option><option value="high">High</option><option value="custom">Custom</option></select></div>
+      <div class="field"><label class="field-label">Top opacity override (top_gradient_opacity)</label>
+        <div class="range-row"><input type="range" id="pp-r-top_gradient_opacity" min="0" max="1" step="0.05" value="0"><span class="range-val" id="pp-r-top_gradient_opacityV">level</span></div></div>
+      <div class="field"><label class="field-label">Bottom opacity override (bottom_gradient_opacity)</label>
+        <div class="range-row"><input type="range" id="pp-r-bottom_gradient_opacity" min="0" max="1" step="0.05" value="0"><span class="range-val" id="pp-r-bottom_gradient_opacityV">level</span></div></div>
+      <div class="field"><label class="field-label">Top height override (top_gradient_height)</label>
+        <div class="range-row"><input type="range" id="pp-r-top_gradient_height" min="0" max="1" step="0.05" value="0"><span class="range-val" id="pp-r-top_gradient_heightV">level</span></div></div>
+      <div class="field"><label class="field-label">Bottom height override (bottom_gradient_height)</label>
+        <div class="range-row"><input type="range" id="pp-r-bottom_gradient_height" min="0" max="1" step="0.05" value="0"><span class="range-val" id="pp-r-bottom_gradient_heightV">level</span></div></div>
+    </div>
+    <div class="field-hint" style="margin-bottom:12px;">Overrides at 0 follow the named level; Custom level always sends its opacity/height pair.</div>
+    <span class="group-title">Colour Vignette (vignette_poster_color)</span>
+    <div class="toggle-row">
+      <div class="toggle" id="pp-t-vignette_poster_color_top"><div><div class="tlabel">Colour top band (vignette_poster_color_top)</div><div class="tdesc">// Tint the top gradient with the artwork's dominant colour</div></div><div class="switch"></div></div>
+      <div class="toggle" id="pp-t-vignette_poster_color_bottom"><div><div class="tlabel">Colour bottom band (vignette_poster_color_bottom)</div><div class="tdesc">// Tint the bottom gradient with the artwork's colour</div></div><div class="switch"></div></div>
+    </div>
+    <div class="three-col" style="margin-top:12px;">
+      <div class="field"><label class="field-label">Saturation (vignette_color_saturation)</label>
+        <div class="range-row"><input type="range" id="pp-r-vignette_color_saturation" min="0" max="3" step="0.05" value="2.5"><span class="range-val" id="pp-r-vignette_color_saturationV">2.50</span></div></div>
+      <div class="field"><label class="field-label">Lightness (vignette_color_lightness)</label>
+        <div class="range-row"><input type="range" id="pp-r-vignette_color_lightness" min="0.40" max="2.50" step="0.05" value="1.30"><span class="range-val" id="pp-r-vignette_color_lightnessV">1.30</span></div></div>
+      <div class="field"><label class="field-label">Blur (vignette_color_blur)</label>
+        <div class="range-row"><input type="range" id="pp-r-vignette_color_blur" min="0" max="1" step="0.05" value="1.0"><span class="range-val" id="pp-r-vignette_color_blurV">1.00</span></div></div>
+      <div class="field"><label class="field-label">Style (vignette_color_style)</label>
+        <select class="field-select" id="pp-vignette_color_style">
+          <option value="shade">Shade</option><option value="tint">Tint</option><option value="color">Colour</option>
+        </select></div>
+    </div>
+    <div class="toggle-row">
+      <div class="toggle on" id="pp-t-vignette_color_ramp"><div><div class="tlabel">Smooth ramp (vignette_color_ramp)</div><div class="tdesc">// Gradient falloff for the colour bands</div></div><div class="switch"></div></div>
+      <div class="toggle on" id="pp-t-vignette_color_local"><div><div class="tlabel">Local colour sampling (vignette_color_local)</div><div class="tdesc">// Sample each band's own edge colour</div></div><div class="switch"></div></div>
+    </div>
+    <span class="group-title">Output</span>
+    <div class="two-col">
+      <div class="field"><label class="field-label">Resolution (resolution, px width)</label>
+        <select class="field-select" id="pp-resolution">
+          <option value="">Native (1280 / 1000)</option><option value="342">342</option><option value="500">500</option><option value="640">640</option><option value="780">780</option>
+        </select></div>
+    </div>`;
+
+  $("sec-extras").innerHTML = `
+    <div class="note dim">Every parameter below rides the AIOMetadata poster URL in PostersPlus format. This engine draws what it supports natively (fonts, ratings, gradients, colour vignette, logo sizing, info strip); sash/badge/bar/trending styling is passed through untouched, so the same URL renders fully on a real PostersPlus instance too.</div>
+    <span class="group-title">Client</span>
+    <div class="field"><label class="field-label">Primary client (primary_client)</label>
+      <select class="field-select" id="pp-primary_client">${opts(CLIENTS.map(c=>[c,c]))}</select></div>
+    <span class="group-title">Sash / Notch</span>
+    <div class="three-col">
+      <div class="field"><label class="field-label">Sash mode (sash_mode)</label>
+        <select class="field-select" id="pp-sash_mode"><option value="sash">Sash</option><option value="notch">Notch</option><option value="hidden">Hidden</option></select></div>
+      <div class="field"><label class="field-label">Badge style (sash_badge_style)</label>
+        <select class="field-select" id="pp-sash_badge_style">${opts(SASH_STYLES.map(s=>[s,s]))}</select></div>
+      <div class="field"><label class="field-label">Badge position (sash_badge_pos)</label>
+        <select class="field-select" id="pp-sash_badge_pos"><option value="top">Top centre</option><option value="left">Left chip</option><option value="right">Right chip</option><option value="hidden">Hidden</option></select></div>
+      <div class="field"><label class="field-label">Badge width × (sash_badge_size_w)</label>
+        <div class="range-row"><input type="range" id="pp-r-sash_badge_size_w" min="0.5" max="1.5" step="0.05" value="1.00"><span class="range-val" id="pp-r-sash_badge_size_wV">1.00</span></div></div>
+      <div class="field"><label class="field-label">Badge height × (sash_badge_size_h)</label>
+        <div class="range-row"><input type="range" id="pp-r-sash_badge_size_h" min="0.5" max="1.5" step="0.05" value="1.00"><span class="range-val" id="pp-r-sash_badge_size_hV">1.00</span></div></div>
+      <div class="field"><label class="field-label">Badge padding × (sash_badge_pad)</label>
+        <div class="range-row"><input type="range" id="pp-r-sash_badge_pad" min="0.5" max="1.5" step="0.05" value="1.00"><span class="range-val" id="pp-r-sash_badge_padV">1.00</span></div></div>
+      <div class="field"><label class="field-label">Badge font × (sash_badge_font_ratio)</label>
+        <div class="range-row"><input type="range" id="pp-r-sash_badge_font_ratio" min="0.5" max="1.5" step="0.05" value="1.00"><span class="range-val" id="pp-r-sash_badge_font_ratioV">1.00</span></div></div>
+      <div class="field"><label class="field-label">Badge opacity (sash_badge_opacity)</label>
+        <div class="range-row"><input type="range" id="pp-r-sash_badge_opacity" min="0.2" max="1" step="0.05" value="0.90"><span class="range-val" id="pp-r-sash_badge_opacityV">0.90</span></div></div>
+      <div class="field"><label class="field-label">Sash text colour (sash_text_color)</label>
+        <div class="color-row"><input type="color" id="stcPicker" value="#ffffff"><input class="field-input" id="pp-sash_text_color" placeholder="blank = default"></div></div>
+      <div class="field"><label class="field-label">Sash side (sash_side)</label>
+        <select class="field-select" id="pp-sash_side"><option value="right">Right (default)</option><option value="left">Left</option></select></div>
+      <div class="field"><label class="field-label">Sash length × (sash_length_ratio)</label>
+        <div class="range-row"><input type="range" id="pp-r-sash_length_ratio" min="0.6" max="1.4" step="0.05" value="1.00"><span class="range-val" id="pp-r-sash_length_ratioV">1.00</span></div></div>
+      <div class="field"><label class="field-label">Sash height × (sash_height_ratio)</label>
+        <div class="range-row"><input type="range" id="pp-r-sash_height_ratio" min="0.08" max="0.24" step="0.005" value="0.140"><span class="range-val" id="pp-r-sash_height_ratioV">0.140</span></div></div>
+    </div>
+    <div class="toggle-row">
+      <div class="toggle" id="pp-t-sash_winner_star"><div><div class="tlabel">Winner star (sash_winner_star)</div><div class="tdesc">// Award winner marker on the sash</div></div><div class="switch"></div></div>
+      <div class="toggle" id="pp-t-muted"><div><div class="tlabel">Muted sash colours (muted)</div><div class="tdesc">// Desaturated sash palette</div></div><div class="switch"></div></div>
+      <div class="toggle" id="pp-t-sash_poster_color"><div><div class="tlabel">Sash from poster colour (sash_poster_color)</div><div class="tdesc">// Sash tint sampled from the artwork</div></div><div class="switch"></div></div>
+    </div>
+    <span class="group-title">Quality Badges</span>
+    <div class="two-col">
+      <div class="field"><label class="field-label">Badge display mode (badge_display_mode)</label>
+        <select class="field-select" id="pp-badge_display_mode"><option value="0">0 · Off</option><option value="7">7 · Graphic badges</option></select></div>
+      <div class="field"><label class="field-label">Minimum quality score (badge_min_score)</label>
+        <select class="field-select" id="pp-badge_min_score">${opts([0,2,3,4,5,6,7].map(n=>[String(n),String(n)]))}</select></div>
+      <div class="field"><label class="field-label">Group 1 (badge_group1)</label><input class="field-input" id="pp-badge_group1"></div>
+      <div class="field"><label class="field-label">Group 2 (badge_group2)</label><input class="field-input" id="pp-badge_group2"></div>
+      <div class="field"><label class="field-label">Group 3 (badge_group3)</label><input class="field-input" id="pp-badge_group3"></div>
+      <div class="field"><label class="field-label">Group 4 (badge_group4)</label><input class="field-input" id="pp-badge_group4"></div>
+      <div class="field"><label class="field-label">Age rating country (badge_cert_country)</label>
+        <select class="field-select" id="pp-badge_cert_country">${opts(CERT_COUNTRIES.map(c=>[c,c]))}</select></div>
+      <div class="field"><label class="field-label">Badge position (badge_pos)</label>
+        <select class="field-select" id="pp-badge_pos">
+          <option value="top_left">Top left</option><option value="top_right">Top right</option>
+          <option value="bottom_left">Bottom left</option><option value="bottom_right">Bottom right</option>
+        </select></div>
+    </div>
+    <span class="group-title">Compact Bar (mode 4)</span>
+    <div class="three-col">
+      <div class="field"><label class="field-label">Bar style (bar_style)</label>
+        <select class="field-select" id="pp-bar_style"><option value="frosted">Frosted</option><option value="rating_black">Rating black</option><option value="solid">Solid</option></select></div>
+      <div class="field"><label class="field-label">Bar accent (bar_accent)</label>
+        <select class="field-select" id="pp-bar_accent"><option value="silver">Silver</option><option value="gold">Gold</option><option value="palette_custom">Custom palette</option></select></div>
+      <div class="field"><label class="field-label">Bar append (bar_append)</label>
+        <select class="field-select" id="pp-bar_append"><option value="rating_year">Rating + year</option><option value="sash">Info sash</option><option value="none">Score only</option></select></div>
+      <div class="field"><label class="field-label">Bar height × (bar_height_ratio)</label>
+        <div class="range-row"><input type="range" id="pp-r-bar_height_ratio" min="0.04" max="0.18" step="0.005" value="0.080"><span class="range-val" id="pp-r-bar_height_ratioV">0.080</span></div></div>
+      <div class="field"><label class="field-label">Bar font × (bar_font_size_ratio)</label>
+        <div class="range-row"><input type="range" id="pp-r-bar_font_size_ratio" min="0.15" max="0.70" step="0.01" value="0.55"><span class="range-val" id="pp-r-bar_font_size_ratioV">0.55</span></div></div>
+      <div class="field"><label class="field-label">Bar frost (bar_frost_opacity)</label>
+        <div class="range-row"><input type="range" id="pp-r-bar_frost_opacity" min="0" max="1" step="0.05" value="0.85"><span class="range-val" id="pp-r-bar_frost_opacityV">0.85</span></div></div>
+      <div class="field"><label class="field-label">Frost saturation (bar_frost_saturation)</label>
+        <div class="range-row"><input type="range" id="pp-r-bar_frost_saturation" min="0" max="2" step="0.05" value="1.20"><span class="range-val" id="pp-r-bar_frost_saturationV">1.20</span></div></div>
+    </div>
+    <div class="toggle-row">
+      <div class="toggle" id="pp-t-bar_score_out_of_10"><div><div class="tlabel">Bar score out of 10 (bar_score_out_of_10)</div><div class="tdesc">// Print “7.5/10” in the compact bar</div></div><div class="switch"></div></div>
+      <div class="toggle" id="pp-t-frost_reference"><div><div class="tlabel">Frost reference colour (frost_reference)</div><div class="tdesc">// Frosted elements sample the artwork</div></div><div class="switch"></div></div>
+    </div>
+    <span class="group-title">Rating Sources &amp; Weights</span>
+    <div class="two-col">
+      <div class="field"><label class="field-label">IMDb source (imdb_rating_source)</label>
+        <select class="field-select" id="pp-imdb_rating_source"><option value="mdblist">MDBList</option><option value="fallback">Dataset (fallback)</option><option value="dataset">Dataset (primary)</option></select></div>
+      <div class="field"><label class="field-label">TMDB source (tmdb_rating_source)</label>
+        <select class="field-select" id="pp-tmdb_rating_source"><option value="mdblist">MDBList</option><option value="fallback">TMDB (fallback)</option><option value="tmdb">TMDB (primary)</option></select></div>
+      <div class="field"><label class="field-label">Movie weights (movie_weights)</label>
+        <input class="field-input" id="pp-movie_weights" placeholder="letterboxd:0.99,trakt:0.01"></div>
+      <div class="field"><label class="field-label">TV weights (tv_weights)</label>
+        <input class="field-input" id="pp-tv_weights" placeholder="trakt:0.80,tomatoes:0.20"></div>
+    </div>
+    <div class="toggle-row">
+      <div class="toggle on" id="pp-t-fallback_to_imdb"><div><div class="tlabel">Fallback to IMDb rating (fallback_to_imdb)</div><div class="tdesc">// Use IMDb score when MDBList has none</div></div><div class="switch"></div></div>
+    </div>
+    <span class="group-title">Trending Rank Display</span>
+    <div class="three-col">
+      <div class="field"><label class="field-label">Trending style (trending_style)</label>
+        <select class="field-select" id="pp-trending_style"><option value="sash_label">Sash label · #N Today</option><option value="number">Number</option><option value="ribbon">Ribbon</option><option value="off">Off</option></select></div>
+      <div class="field"><label class="field-label">Trending side (trending_side)</label>
+        <select class="field-select" id="pp-trending_side"><option value="left">Left</option><option value="right">Right</option></select></div>
+      <div class="field"><label class="field-label">Trending scale (trending_scale)</label>
+        <div class="range-row"><input type="range" id="pp-r-trending_scale" min="0.5" max="1.5" step="0.05" value="1.00"><span class="range-val" id="pp-r-trending_scaleV">1.00</span></div></div>
+      <div class="field"><label class="field-label">Ribbon style (trending_ribbon_style)</label>
+        <select class="field-select" id="pp-trending_ribbon_style">${opts(["charcoal","silver","gold","frosted"].map(s=>[s,s]))}</select></div>
+      <div class="field"><label class="field-label">Ribbon frost (trending_frost_opacity)</label>
+        <div class="range-row"><input type="range" id="pp-r-trending_frost_opacity" min="0" max="1" step="0.05" value="0.85"><span class="range-val" id="pp-r-trending_frost_opacityV">0.85</span></div></div>
+    </div>
+    <div class="toggle-row">
+      <div class="toggle" id="pp-t-trending_label"><div><div class="tlabel">Ribbon label (trending_label)</div><div class="tdesc">// Print “TOP 10” on the ribbon</div></div><div class="switch"></div></div>
+      <div class="toggle" id="pp-t-trending_corner"><div><div class="tlabel">Corner ribbon (trending_corner)</div><div class="tdesc">// Fold the ribbon into the corner</div></div><div class="switch"></div></div>
+    </div>
+    <span class="group-title">Logo Sizing</span>
+    <div class="three-col">
+      <div class="field"><label class="field-label">Max width ratio (logo_max_w_ratio)</label>
+        <div class="range-row"><input type="range" id="pp-r-logo_max_w_ratio" min="0.2" max="0.6" step="0.02" value="0.40"><span class="range-val" id="pp-r-logo_max_w_ratioV">0.40</span></div></div>
+      <div class="field"><label class="field-label">Max height ratio (logo_max_h_ratio)</label>
+        <div class="range-row"><input type="range" id="pp-r-logo_max_h_ratio" min="0.1" max="0.4" step="0.02" value="0.20"><span class="range-val" id="pp-r-logo_max_h_ratioV">0.20</span></div></div>
+      <div class="field"><label class="field-label">Bottom ratio (logo_bottom_ratio)</label>
+        <div class="range-row"><input type="range" id="pp-r-logo_bottom_ratio" min="0.05" max="0.40" step="0.01" value="0.17"><span class="range-val" id="pp-r-logo_bottom_ratioV">0.17</span></div></div>
+    </div>
+    <div class="toggle-row">
+      <div class="toggle" id="pp-t-logo_bottom_anchor"><div><div class="tlabel">Anchor logo to bottom (logo_bottom_anchor)</div><div class="tdesc">// Pin the logo to the canvas bottom edge</div></div><div class="switch"></div></div>
+    </div>
+    <span class="group-title">Release Status</span>
+    <div class="toggle-row">
+      <div class="toggle on" id="pp-t-release_status_cinema_only"><div><div class="tlabel">Cinema-only release status</div><div class="tdesc">// release_status_cinema_only</div></div><div class="switch"></div></div>
+      <div class="toggle on" id="pp-t-release_status_dates"><div><div class="tlabel">Show digital release dates</div><div class="tdesc">// release_status_dates</div></div><div class="switch"></div></div>
+      <div class="toggle on" id="pp-t-airing_dates"><div><div class="tlabel">Show airing dates</div><div class="tdesc">// airing_dates</div></div><div class="switch"></div></div>
+      <div class="toggle" id="pp-t-hide_unreleased_rating"><div><div class="tlabel">Hide rating on unreleased titles</div><div class="tdesc">// hide_unreleased_rating</div></div><div class="switch"></div></div>
+      <div class="toggle" id="pp-t-cinema_greyscale"><div><div class="tlabel">Cinema greyscale (cinema_greyscale)</div><div class="tdesc">// Monochrome art for cinema-only releases</div></div><div class="switch"></div></div>
+    </div>`;
+}
+
+/* ═══ WIRE ALL CONTROLS ═══════════════════════════════════════════════════ */
+/* Convention: selects/inputs id="pp-<key>", ranges id="pp-r-<key>", toggles id="pp-t-<key>".
+ * Each writes state.pp[<key>] and refreshes the live preview. */
+function wirePPControls(){
+  document.querySelectorAll("select[id^='pp-']").forEach(el=>{
+    const key = el.id.slice(3);
+    if (!(key in state.pp)) return;
+    el.addEventListener("change", e=>{ state.pp[key]=e.target.value; updateAll(); });
+  });
+  document.querySelectorAll("input[id^='pp-']:not([id^='pp-r-'])").forEach(el=>{
+    const key = el.id.slice(3);
+    if (!(key in state.pp)) return;
+    if (el.type === "color") return;
+    el.addEventListener("input", e=>{ state.pp[key]=e.target.value.trim(); updateAll(); });
+  });
+  document.querySelectorAll("input[type=range][id^='pp-r-']").forEach(el=>{
+    const key = el.id.slice(5);
+    if (!(key in state.pp)) return;
+    const valEl = $(el.id + "V");
+    const isOverride = key.endsWith("_gradient_opacity") || key.endsWith("_gradient_height");
+    const dec = (String(el.step).split(".")[1] || "").length;
+    el.addEventListener("input", e=>{
+      const v = Number(e.target.value);
+      if (isOverride) { valEl.textContent = v>0 ? v.toFixed(2) : "level"; state.pp[key] = v>0 ? v.toFixed(2) : ""; }
+      else { valEl.textContent = v.toFixed(dec); state.pp[key] = v.toFixed(dec); }
+      updateAll();
+    });
+  });
+  document.querySelectorAll(".toggle[id^='pp-t-']").forEach(el=>{
+    const key = el.id.slice(5);
+    if (!(key in state.pp)) return;
+    // initialise switch position from state
+    el.classList.toggle("on", state.pp[key]==="true");
+    el.addEventListener("click", ()=>{
+      state.pp[key] = state.pp[key]==="true" ? "false" : "true";
+      el.classList.toggle("on", state.pp[key]==="true");
+      updateAll();
+    });
+  });
+  // colour pickers → text inputs
+  const bindPicker=(picker, input, key)=>{
+    $(picker).addEventListener("input", e=>{
+      $(input).value = e.target.value.slice(1).toUpperCase();
+      state.pp[key] = e.target.value.slice(1).toUpperCase();
+      updateAll();
+    });
+  };
+  bindPicker("rtcPicker","pp-rating_text_color","rating_text_color");
+  bindPicker("glowPicker","pp-glow_color","glow_color");
+  bindPicker("stcPicker","pp-sash_text_color","sash_text_color");
+  $("pp-glow_color").addEventListener("input", e=>{
+    const v = e.target.value.trim().replace(/^#/,"");
+    state.pp.glow_color = hex6(v) ? v.toUpperCase() : "";
+    state.pp.glow_color_mode = state.pp.glow_color ? "custom" : (state.pp.glow_color_mode==="custom" ? "" : state.pp.glow_color_mode);
+    updateAll();
+  });
+  $("pp-rating_text_color").addEventListener("input", e=>{
+    const v = e.target.value.trim().replace(/^#/,"");
+    state.pp.rating_text_color = hex6(v) ? v.toUpperCase() : "";
+    updateAll();
+  });
+  $("pp-sash_text_color").addEventListener("input", e=>{
+    const v = e.target.value.trim().replace(/^#/,"");
+    state.pp.sash_text_color = hex6(v) ? v.toUpperCase() : "";
+    updateAll();
+  });
+}
+
+function wireControls(){
+  // Catalogs
+  $("toggleRank").addEventListener("click", ()=>{ state.showRank=!state.showRank; $("toggleRank").classList.toggle("on",state.showRank); updateAll(); });
+  // Layout
+  $("shapePills").addEventListener("click",e=>{ const b=e.target.closest(".pill"); if(!b)return; state.shape=b.dataset.shape; [...e.currentTarget.children].forEach(p=>p.classList.toggle("active",p===b)); updateAll(); });
+  $("bgPills").addEventListener("click",e=>{ const b=e.target.closest(".pill"); if(!b)return; state.bg=b.dataset.bg; [...e.currentTarget.children].forEach(p=>p.classList.toggle("active",p===b)); updateAll(); });
+  $("toggleMeta").addEventListener("click",()=>{ state.showMeta=!state.showMeta; $("toggleMeta").classList.toggle("on",state.showMeta); updateAll(); });
+  $("toggleLogo").addEventListener("click",()=>{ state.showLogo=!state.showLogo; $("toggleLogo").classList.toggle("on",state.showLogo); updateAll(); });
+  $("toggleOriginalArt").addEventListener("click",()=>{ state.useOriginalArt=!state.useOriginalArt; $("toggleOriginalArt").classList.toggle("on",state.useOriginalArt); updateAll(); });
+  $("togglePosterCrop").addEventListener("click",()=>{ state.posterCrop=!state.posterCrop; $("togglePosterCrop").classList.toggle("on",state.posterCrop); updateAll(); });
+  $("toggleGreyscale").addEventListener("click",()=>{ state.greyscale=!state.greyscale; $("toggleGreyscale").classList.toggle("on",state.greyscale); updateAll(); });
+  // Rating mode pills
+  $("ratingModePills").addEventListener("click",e=>{ const b=e.target.closest(".pill"); if(!b)return; state.pp.rating_display_mode=b.dataset.rm; [...e.currentTarget.children].forEach(p=>p.classList.toggle("active",p===b)); updateAll(); });
+  // Preview quick switchers (both strips)
+  const setShape = s => { state.shape = s;
+    [["qpLandscape","qpPoster"],["qbLandscape","qbPoster"]].forEach(([l,p])=>{
+      $(l).classList.toggle("active", s==="landscape"); $(p).classList.toggle("active", s==="poster");
+    });
+    $("shapePills").querySelectorAll(".pill").forEach(p=>p.classList.toggle("active", p.dataset.shape===s));
+  };
+  document.querySelectorAll("[data-qshape]").forEach(b=>b.addEventListener("click",()=>{ setShape(b.dataset.qshape); updateAll(); }));
+  const bindQuickBg = (sel, mirror) => {
+    $(sel).addEventListener("change", e=>{
+      state.bg = e.target.value;
+      $(mirror).value = e.target.value;
+      $("bgPills").querySelectorAll(".pill").forEach(p=>p.classList.toggle("active", p.dataset.bg===state.bg));
+      updateAll();
+    });
+  };
+  bindQuickBg("quickBg","quickBgBottom");
+  bindQuickBg("quickBgBottom","quickBg");
+  // Rank navigation — both strips, synced
+  const nav = d => { const n = state.previewRank + d;
+    if (n>=1 && n<=state.previewMetas.length){ state.previewRank = n; renderPreview(); } };
+  $("prevRankTop").addEventListener("click",()=>nav(-1));
+  $("nextRankTop").addEventListener("click",()=>nav(1));
+  $("prevRankBottom").addEventListener("click",()=>nav(-1));
+  $("nextRankBottom").addEventListener("click",()=>nav(1));
+  // Zoom from both frames
+  const zoom = src => { const img=$(src); if(img.src && img.naturalWidth){ $("zoomImg").src=img.src; $("zoomOverlay").classList.add("show"); } };
+  $("previewFrameTop").addEventListener("click",()=>zoom("previewImgTop"));
+  $("previewFrameBottom").addEventListener("click",()=>zoom("previewImgBottom"));
+  $("zoomOverlay").addEventListener("click",()=>$("zoomOverlay").classList.remove("show"));
+  document.addEventListener("keydown",e=>{ if(e.key==="Escape") $("zoomOverlay").classList.remove("show"); });
+  // Generate + copy
+  $("generateBtn").addEventListener("click",generateManifest);
+  $("copyBtn").addEventListener("click",async()=>{ try{ await navigator.clipboard.writeText($("manifestUrl").value); }catch{ $("manifestUrl").select(); document.execCommand("copy"); } $("copyBtn").textContent="COPIED!"; setTimeout(()=>$("copyBtn").textContent="COPY",1500); });
+  $("copyPosterBtn").addEventListener("click",async()=>{ try{ await navigator.clipboard.writeText($("posterUrlInput").value); }catch{ $("posterUrlInput").select(); document.execCommand("copy"); } $("copyPosterBtn").textContent="COPIED!"; setTimeout(()=>$("copyPosterBtn").textContent="COPY",1500); });
+}
+
+/* ═══ COUNTRIES & PLATFORMS ═══════════════════════════════════════════════ */
+function renderCountries(){
+  const grid=$("countryGrid"); grid.innerHTML="";
+  for(const c of state.countries){
+    const card=document.createElement("button");
+    card.className="country-card"+(c.code===state.country?" active":"");
+    card.innerHTML=`<span class="check"></span><span class="flag">${c.flag}</span><span class="name">${c.name}</span><span class="native">${c.nativeName}</span>`;
+    card.addEventListener("click",()=>selectCountry(c.code));
+    grid.append(card);
+  }
+}
+async function selectCountry(code){
+  state.country=code; state.previewRank=1; state.previewMetas=[];
+  [...$("countryGrid").children].forEach((card,i)=>card.classList.toggle("active", state.countries[i]?.code===code));
+  await loadPlatforms();
+  updateAll();
+  await loadPreviewMetas();
+}
+async function loadPlatforms(){
+  try{
+    const res=await fetch(`/api/platforms/${state.country}`);
+    const data=await res.json();
+    state.platformsForCountry=data.platforms||[];
+    const all=[{code:"top10",name:"Top X (Generic)",accent:"#8C75FF"},...state.platformsForCountry];
+    state.platforms=new Set([...state.platforms].filter(p=>all.some(ap=>ap.code===p)));
+    if(!state.platforms.size) state.platforms.add("top10");
+    renderPlatforms();
+  }catch(err){ setMessage(`// ERROR: ${err.message}`,"bad"); }
+}
+function renderPlatforms(){
+  const grid=$("platformsGrid"); grid.innerHTML="";
+  const all=[{code:"top10",name:"Top X (Generic)",accent:"#8C75FF"},...state.platformsForCountry];
+  for(const p of all){
+    const chip=document.createElement("button");
+    chip.className="platform-chip"+(state.platforms.has(p.code)?" active":"");
+    chip.innerHTML=`<span class="pdot" style="background:${p.accent}"></span><span class="pname">${p.name}</span><span class="pcheck">✓</span>`;
+    chip.addEventListener("click",()=>{
+      if(state.platforms.has(p.code)){ if(state.platforms.size>1) state.platforms.delete(p.code); }
+      else state.platforms.add(p.code);
+      renderPlatforms(); updateAll();
+    });
+    grid.append(chip);
+  }
+}
+
+/* ═══ AIOMETADATA /POSTER URL — PostersPlus format, param-for-param ═══════ */
+function buildPosterUrl({ concrete=false, meta=null, forceShape=null } = {}){
+  const origin = window.location.origin;
+  const p = new URLSearchParams();
+  const pp = state.pp;
+  // Core identity — AIOMetadata optional-placeholder form ({name?}), exactly
+  // like PostersPlus's AIOMetadata copy template; concrete for live preview.
+  if (concrete && meta) {
+    p.set("tmdb_id", meta.tmdbId);
+    p.set("type", meta.type === "tv" ? "tv" : "movie");
+  } else {
+    // PostersPlus AIOMetadata template form — see URL_REFERENCE.md § "Client templates":
+    //   tmdb_id={tmdb_id?}&imdb_id={imdb_id?}&stremio_id={id}&type={type}&shape={shape}
+    // {id} carries the raw Stremio/Nuvio meta id (kitsu:/mal:/tmdb:/tt…),
+    // and the server's resolveTmdbId() unwraps every spelling of it.
+    p.set("tmdb_id", "{tmdb_id?}");
+    p.set("imdb_id", "{imdb_id?}");
+    p.set("stremio_id", "{id}");
+    p.set("type", "{type}");
+  }
+  p.set("shape", concrete ? (forceShape || state.shape) : "{shape}");
+  p.set("primary_client", pp.primary_client);
+  // TOPX / blvckTOP extras
+  p.set("country", state.country);
+  if (state.bg !== "fresh") p.set("canvas_background", state.bg);
+  if (!state.showMeta) p.set("show_meta", "false");
+  if (!state.showLogo) p.set("show_logo", "false");
+  if (state.showRank) p.set("rank", concrete ? String(state.previewRank) : "{rank}");
+  // PostersPlus emission: non-defaults only (E), both-states always (A)
+  const E = (name, val) => { const v = val ?? pp[name]; const d = DEFAULTS[name];
+    if (v !== undefined && v !== "" && String(v) !== String(d ?? "")) p.set(name, v); };
+  const A = (name, val) => p.set(name, val ?? pp[name]);
+  // language block
+  E("language"); E("logo_language"); E("logo_priority");
+  if (String(pp.logo_priority).includes("custom")) E("logo_language_secondary");
+  E("original_labels"); E("label_font");
+  // hide elements — PostersPlus writes these in both states
+  A("hide_genre"); A("hide_year"); A("hide_rating"); A("textless");
+  // sash core
+  A("sash_mode");
+  // rating block
+  const mode = parseInt(pp.rating_display_mode, 10) || 1;
+  A("rating_display_mode", String(mode));
+  if (mode === 1 || mode === 3) E("score_color_mode");
+  if ((mode === 1 || mode === 3) && pp.score_color_mode === "3" && pp.score_custom_palette.trim())
+    p.set("score_custom_palette", pp.score_custom_palette.trim());
+  if (mode === 1) {
+    E("score_glow_threshold"); E("score_glow_blur"); E("score_glow_alpha");
+    if (pp.glow_color_mode === "match") p.set("score_glow_color", "match");
+    else if (pp.glow_color_mode === "custom" && hex6(pp.glow_color)) p.set("score_glow_color", pp.glow_color.toUpperCase());
+    E("accent_bar_font_size_ratio"); E("accent_bar_y_offset");
+    E("accent_bar_append_mode"); E("accent_bar_bottom_ratio");
+  } else if (mode === 2) {
+    E("numeric_score_font_size_ratio"); E("numeric_score_y_offset"); E("score_out_of_10");
+  } else if (mode === 3) {
+    E("minimalist_append_mode"); E("minimalist_mode_font_size_ratio");
+    E("minimalist_mode_font_x_offset"); E("minimalist_mode_font_y_offset");
+    E("minimalist_score_out_of_10"); E("minimalist_center");
+    E("minimalist_separator"); E("minimalist_rating_separator");
+  } else if (mode === 4) {
+    E("bar_style"); E("bar_accent"); E("bar_append"); E("bar_score_out_of_10");
+    E("bar_height_ratio"); E("bar_font_size_ratio");
+    E("bar_frost_opacity"); E("bar_frost_saturation");
+  }
+  if (hex6(pp.rating_text_color)) p.set("rating_text_color", pp.rating_text_color.toUpperCase());
+  if (pp.frost_reference === "true") p.set("frost_reference", "true");
+  // weights + sources — always emitted (PostersPlus emitWeights)
+  E("movie_weights"); E("tv_weights");
+  A("fallback_to_imdb"); A("imdb_rating_source"); A("tmdb_rating_source");
+  // output
+  E("resolution"); E("fallback_bg_style");
+  // art selection
+  if (state.useOriginalArt) p.set("use_original_art", "true");
+  E("original_art_source"); E("poster_pick");
+  // logo
+  E("logo_max_w_ratio"); E("logo_max_h_ratio"); E("logo_bottom_ratio"); E("logo_bottom_anchor");
+  // gradients
+  E("top_gradient"); E("top_gradient_opacity"); E("top_gradient_height");
+  E("bottom_gradient"); E("bottom_gradient_opacity"); E("bottom_gradient_height");
+  // colour vignette — emitted when either side is on (PostersPlus rule)
+  if (pp.vignette_poster_color_top === "true" || pp.vignette_poster_color_bottom === "true") {
+    A("vignette_poster_color_top"); A("vignette_poster_color_bottom");
+    A("vignette_color_saturation"); A("vignette_color_blur"); A("vignette_color_lightness");
+    A("vignette_color_ramp"); A("vignette_color_local"); A("vignette_color_style");
+  }
+  // TOPX overlay toggles
+  if (state.posterCrop) p.set("landscape_poster_crop", "true");
+  if (state.greyscale) p.set("landscape_greyscale", "true");
+  // landscape options
+  E("landscape_art"); E("landscape_info_pos"); E("landscape_info_scale");
+  E("landscape_logo_pos"); E("landscape_logo_scale");
+  E("landscape_rating_mode"); E("landscape_separator"); E("landscape_rating_separator");
+  E("landscape_score_out_of_10");
+  // meta order
+  E("meta_order");
+  // sash details
+  if (pp.sash_mode !== "hidden") {
+    E("sash_winner_star");
+    if (hex6(pp.sash_text_color)) p.set("sash_text_color", pp.sash_text_color.toUpperCase());
+    if (pp.sash_mode === "notch") {
+      E("sash_badge_style"); E("sash_badge_size_w"); E("sash_badge_size_h");
+      E("sash_badge_pad"); E("sash_badge_font_ratio");
+      if (pp.sash_badge_style === "frosted") { E("sash_badge_frost_opacity"); E("sash_badge_frost_saturation"); }
+      else if (pp.sash_badge_opacity !== DEFAULTS.sash_badge_opacity) E("sash_badge_opacity");
+      E("sash_badge_pos"); E("sash_chip_x"); E("sash_chip_y"); E("sash_edge_y");
+    } else {
+      E("muted"); E("sash_poster_color"); E("sash_length_ratio"); E("sash_height_ratio"); E("sash_side");
+    }
+  }
+  // trending
+  E("trending_style"); E("trending_scale"); E("trending_side"); E("trending_sash");
+  E("trending_ribbon_style"); E("trending_frost_opacity"); E("trending_frost_saturation");
+  E("trending_label"); E("trending_corner");
+  // badges
+  const badgeMode = parseInt(pp.badge_display_mode, 10) || 0;
+  A("badge_display_mode", String(badgeMode));
+  if (badgeMode === 7) {
+    E("badge_group1"); E("badge_group2"); E("badge_group3"); E("badge_group4");
+    E("badge_min_score"); E("badge_cert_country");
+    E("badge_legacy_style"); E("badge_quality_style"); E("badge_logo_style");
+    E("badge_cinema_style"); E("badge_cert_style");
+  }
+  E("badge_pos"); E("landscape_badge_style"); E("landscape_badge_shape");
+  E("landscape_badge_case"); E("landscape_badge_scale");
+  // release status — PostersPlus writes most of these in both states
+  A("release_status_cinema_only"); A("release_status_dates");
+  if (pp.airing_dates !== "true") p.set("airing_dates", "false");
+  A("hide_unreleased_rating");
+  E("cinema_greyscale"); E("cinema_greyscale_skip_if_available");
+  // URLSearchParams encodes the AIOMetadata placeholder braces; PostersPlus's
+  // emitted URLs keep them raw ({tmdb_id?}, {imdb_id?}, {type}, {shape}, {rank})
+  // so AIOMetadata can substitute them by string match. Decode just those
+  // three chars back — every other value stays URL-safe.
+  return `${origin}/poster?${p.toString().replace(/%7B/g, "{").replace(/%7D/g, "}").replace(/%3F/g, "?")}`;
+}
+
+/* ═══ SUMMARY + URL BOXES ═════════════════════════════════════════════════ */
+function updateAll(){
+  const c = state.countries.find(x=>x.code===state.country);
+  const fname = c ? `${c.flag} ${c.name}` : state.country;
+  const n = state.platforms.size;
+  $("genSummary").innerHTML =
+    `${fname} · <b>${n}</b> platform${n===1?"":"s"} · ${state.shape} · ${state.bg}` +
+    ` · font: <b>${state.pp.label_font}</b> · mode: <b>${state.pp.rating_display_mode}</b>` +
+    ` · rank: <b>${state.showRank?"on":"off"}</b>`;
+  $("posterUrlInput").value = buildPosterUrl();
+  // Preview reflects every option change
+  renderPreview();
+}
+
+/* ═══ PREVIEW — twin pinned strips, one render ════════════════════════════ */
+async function loadPreviewMetas(){
+  try{
+    const gen = await fetch("/api/generate",{
+      method:"POST", headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({ country: state.country, platforms:["top10"], posterShape: state.shape, canvasBackground: state.bg })
+    });
+    const gd = await gen.json();
+    if(!gd.ok) throw new Error(gd.error||"generate failed");
+    const token = gd.manifestUrl.split("/c/")[1].split("/")[0];
+    const res = await fetch(`/c/${token}/catalog/movie/tx.${state.country}.topx.movie.json`);
+    const cd = await res.json();
+    state.previewMetas = cd.metas || [];
+    if (state.previewRank > state.previewMetas.length) state.previewRank = 1;
+    renderPreview();
+  }catch(err){
+    setPreviewSrc("");
+    $("previewMetaTop").textContent = `// preview error: ${err.message}`;
+    $("previewMetaBottom").textContent = `// preview error`;
+  }
+}
+function setPreviewSrc(url){
+  for (const id of ["previewImgTop","previewImgBottom"]) {
+    const img = $(id), frame = $(id.replace("Img","Frame"));
+    frame.classList.add("loading");
+    img.onload = () => { frame.classList.remove("loading"); img.dataset.ok = "1"; };
+    img.onerror = () => { frame.classList.remove("loading"); img.dataset.ok = ""; };
+    if (url) { img.src = url; } else { img.removeAttribute("src"); img.dataset.ok = ""; frame.classList.remove("loading"); }
+  }
+}
+function renderPreview(){
+  const m = state.previewMetas[state.previewRank-1];
+  const total = Math.max(state.previewMetas.length, 10);
+  for (const id of ["rankLabelTop","rankLabelBottom"]) $(id).textContent = `#${state.previewRank} / ${total}`;
+  $("prevRankTop").disabled = $("prevRankBottom").disabled = state.previewRank<=1;
+  $("nextRankTop").disabled = $("nextRankBottom").disabled = state.previewRank>=state.previewMetas.length;
+  if(!m){ $("previewMetaTop").textContent="—"; $("previewMetaBottom").textContent="—"; return; }
+  const metaHtml = `<b>#${state.previewRank}</b> ${m.name}${m.genre?` · ${m.genre}`:""}${m.imdbRating?` · ★ ${m.imdbRating}`:""}`;
+  $("previewMetaTop").innerHTML = metaHtml;
+  $("previewMetaBottom").innerHTML = metaHtml;
+  setPreviewSrc(buildPosterUrl({ concrete:true, meta:m }));
+}
+
+/* ═══ GENERATE MANIFEST ═══════════════════════════════════════════════════ */
+async function generateManifest(){
+  $("manifestBox").classList.add("hidden");
+  $("installRow").classList.add("hidden");
+  $("generateBtn").disabled=true; $("generateBtn").textContent="Generating…";
+  try{
+    const body={
+      country: state.country,
+      platforms: [...state.platforms],
+      posterShape: state.shape,
+      canvasBackground: state.bg,
+      showMeta: state.showMeta,
+      showLogo: state.showLogo,
+      fontFamily: state.pp.label_font,
+      ratingFormat: ({ "1":"star","2":"number","3":"number","4":"hidden" })[state.pp.rating_display_mode] || "star",
+      vignette: 0,
+    };
+    const res=await fetch("/api/generate",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});
+    const data=await res.json();
+    if(!res.ok) throw new Error(data.error||"Generation failed");
+    $("manifestUrl").value = data.manifestUrl;
+    $("stremioBtn").href = "stremio://" + data.stremioManifestUrl.replace(/^https?:\/\//,"");
+    $("nuvioBtn").href   = "nuvio://"  + data.nuvioManifestUrl.replace(/^https?:\/\//,"");
+    $("manifestBox").classList.remove("hidden");
+    $("installRow").classList.remove("hidden");
+    setMessage(`// MANIFEST READY · ${data.catalogCount} CATALOGS · AIOMETADATA URL BELOW`, "ok");
+  }catch(err){ setMessage(`// ERROR: ${err.message}`,"bad"); }
+  finally{ $("generateBtn").disabled=false; $("generateBtn").textContent="Generate Manifest"; }
+}
+
+/* ═══ INIT ════════════════════════════════════════════════════════════════ */
+(async()=>{
+  renderSections();
+  // seed every control from state.pp before wiring
+  for (const [key,val] of Object.entries(state.pp)) {
+    const sel = $(`pp-${key}`); if (sel) sel.value = val;
+    const rng = $(`pp-r-${key}`); if (rng && val !== "") rng.value = val;
+    const tgl = $(`pp-t-${key}`); if (tgl) tgl.classList.toggle("on", val==="true");
+  }
+  wirePPControls();
+  wireControls();
+  try{
+    const res=await fetch("/api/countries");
+    const data=await res.json();
+    state.countries=data.countries||[];
+    renderCountries();
+  }catch(err){ setMessage(`// ERROR: ${err.message}`,"bad"); }
+  await loadPlatforms();
+  updateAll();
+  await loadPreviewMetas();
+})();
+
+</script>
+</body>
+</html>
