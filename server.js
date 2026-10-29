@@ -309,7 +309,24 @@ export function normalizeCanvasBackground(bg) {
   if (s === "transparent") return "transparent";
   if (s === "stremio" || s === "stremio-navy" || s === "rgb(26,23,62)" || s === "rgb(26, 23, 62)" || s === "#1a173e" || s === "1a173e") return "stremio";
   if (s === "black" || s === "nero") return "black";
+  if (s === "blvcktop" || s === "blvck" || s === "blvck-top") return "blvcktop";
   return "provider";
+}
+/* ── topx genre & rating placement — the topx template's genre options.
+ *    bottom is the engine's tuned default; top/left/right re-place the
+ *    meta line exactly like the topx site's position picker. ── */
+export function normalizeGenrePosition(pos) {
+  const s = String(pos || "").toLowerCase().trim();
+  return ["top", "bottom", "left", "right"].includes(s) ? s : "bottom";
+}
+/* ── topx extras — the 4K / HDR / BluRay / WebDL chips.  Stored as a
+ *    canonical comma list so the cache key and the SVG painter both see
+ *    one stable form. ── */
+export const EXTRA_BADGES = ["4k", "hdr", "bluray", "webdl"];
+export function normalizeExtras(list) {
+  const wanted = String(list || "").split(",").map(s => s.trim().toLowerCase()).filter(Boolean);
+  const picked = EXTRA_BADGES.filter(b => wanted.includes(b));
+  return picked.join(",");
 }
 function catalogAccent(catalog = {}) {
   const key = `${catalog.id || ""} ${catalog.name || ""}`.toLowerCase();
@@ -327,6 +344,10 @@ async function buildCoverUrl(req, token, meta, rank, type, catalog) {
   const showMeta = catalog.showMeta !== false;
   const showLogo = catalog.showLogo !== false;
   const fontFamily = String(catalog.fontFamily || "Inter");
+  // The topx genre position and the 4K/HDR/BluRay/WebDL extras ride on the
+  // catalog so the installed manifest renders the configured covers.
+  const genrePosition = normalizeGenrePosition(catalog.genrePosition);
+  const extras = normalizeExtras(catalog.extras);
   const ratingFormat = String(catalog.ratingFormat || "star");
   const vignette = Number(catalog.vignette || 0);
   const genre = showMeta ? meta?.genre || "" : "";
@@ -344,6 +365,8 @@ async function buildCoverUrl(req, token, meta, rank, type, catalog) {
         v: style === "banner" ? FRESH_VERSION : "7.5.0"
       });
       if (style === "banner") qs.set("style", style);
+      if (genrePosition !== "bottom") qs.set("genre_position", genrePosition);
+      if (extras) qs.set("extras", extras);
       return `${publicBase(req)}/c/${token}/top-cover?${qs}`;
     }
   } catch (err) { console.warn("TMDB resolve failed:", err.message); }
@@ -360,6 +383,8 @@ async function buildCoverUrl(req, token, meta, rank, type, catalog) {
     v: style === "banner" ? FRESH_VERSION : "7.5.0"
   });
   if (style === "banner") qs.set("style", style);
+  if (genrePosition !== "bottom") qs.set("genre_position", genrePosition);
+  if (extras) qs.set("extras", extras);
   return `${publicBase(req)}/c/${token}/top-cover?${qs}`;
 }
 
@@ -441,6 +466,8 @@ app.post("/api/generate", async (req, res) => {
           fontFamily: String(c.fontFamily || body.fontFamily || "Inter"),
           ratingFormat: String(c.ratingFormat || body.ratingFormat || "star"),
           vignette: Number(c.vignette ?? body.vignette ?? 0),
+          genrePosition: normalizeGenrePosition(c.genrePosition ?? body.genrePosition),
+          extras: normalizeExtras(c.extras ?? body.extras),
           country,
         });
       }
@@ -458,6 +485,8 @@ app.post("/api/generate", async (req, res) => {
         fontFamily = "Inter",
         ratingFormat = "star",
         vignette = 0,
+        genrePosition = "bottom",
+        extras = "",
       } = body;
 
       const countryData = COUNTRIES.find(c => c.code === country);
@@ -494,6 +523,8 @@ app.post("/api/generate", async (req, res) => {
         fontFamily: String(fontFamily || "Inter"),
         ratingFormat: String(ratingFormat || "star"),
         vignette: Number(vignette || 0),
+        genrePosition: normalizeGenrePosition(genrePosition),
+        extras: normalizeExtras(extras),
         country,
       }));
     }
@@ -501,13 +532,13 @@ app.post("/api/generate", async (req, res) => {
     const token = encryptConfig({ v: 4, catalogs: finalCatalogs });
     const base = publicBase(req);
 
-    // Stremio variant (canvasBackground "black" → "stremio" navy)
+    // Stremio variant (canvasBackground "black" → "stremio" navy; blvcktop keeps its own canvas)
     const stremioCatalogs = finalCatalogs.map(c => ({
       ...c, canvasBackground: c.canvasBackground === "black" || c.canvasBackground === "stremio" ? "stremio" : c.canvasBackground
     }));
     const stremioToken = encryptConfig({ v: 4, catalogs: stremioCatalogs });
 
-    // Nuvio variant (canvasBackground "stremio" → "black")
+    // Nuvio variant (canvasBackground "stremio" → "black"; blvcktop keeps its own canvas)
     const nuvioCatalogs = finalCatalogs.map(c => ({
       ...c, canvasBackground: c.canvasBackground === "black" || c.canvasBackground === "stremio" ? "black" : c.canvasBackground
     }));
@@ -681,6 +712,9 @@ app.get(["/c/:token/top-cover", "/top-cover"], async (req, res) => {
     const fontFamily = String(req.query.fontFamily ?? catalog.fontFamily ?? "Inter");
     const ratingFormat = String(req.query.ratingFormat ?? catalog.ratingFormat ?? "star");
     const vignette = Number(req.query.vignette ?? catalog.vignette ?? 0);
+    // topx genre position (top/bottom/left/right) + 4K/HDR/BluRay/WebDL extras
+    const genrePosition = normalizeGenrePosition(req.query.genre_position ?? catalog.genrePosition);
+    const extras = normalizeExtras(req.query.extras ?? catalog.extras);
     let genre = showMeta && req.query.genre ? String(req.query.genre) : "";
     let rating = showMeta && req.query.rating ? String(req.query.rating) : "";
     let artworkUrl = req.query.artwork ? String(req.query.artwork) : null;
@@ -706,7 +740,7 @@ app.get(["/c/:token/top-cover", "/top-cover"], async (req, res) => {
     }
     if (!artworkUrl) return res.status(404).send("No artwork available.");
 
-    const coverKey = computeCoverKey({ rank, type: effectiveType, shape, tmdbId: resolvedTmdbId, catalogId, canvasBackground, accent, artworkUrl, genre, rating, showLogo, style, logoUrl, fontFamily, ratingFormat, vignette });
+    const coverKey = computeCoverKey({ rank, type: effectiveType, shape, tmdbId: resolvedTmdbId, catalogId, canvasBackground, accent, artworkUrl, genre, rating, showLogo, style, logoUrl, fontFamily, ratingFormat, vignette, genrePosition, extras });
     const existingFilePath = getCoverFilePath(coverKey);
     if (existingFilePath) {
       res.setHeader("X-Cover-Cache", "HIT-DISK");
@@ -720,7 +754,7 @@ app.get(["/c/:token/top-cover", "/top-cover"], async (req, res) => {
       res.setHeader("X-Cover-Cache", "SHARED");
       return res.send(png);
     }
-    const generationPromise = enqueueRender(() => createTopCover({ rank, artworkUrl, logoUrl, style, shape, accent, canvasBackground, genre, rating, catalogId, showLogo, fontFamily, ratingFormat, vignette }).then(png => { saveCoverBuffer(coverKey, png); return png; }), { priority: true, req });
+    const generationPromise = enqueueRender(() => createTopCover({ rank, artworkUrl, logoUrl, style, shape, accent, canvasBackground, genre, rating, catalogId, showLogo, fontFamily, ratingFormat, vignette, genrePosition, extras }).then(png => { saveCoverBuffer(coverKey, png); return png; }), { priority: true, req });
     pendingCovers.set(coverKey, generationPromise);
     try {
       const png = await generationPromise;
@@ -836,6 +870,10 @@ app.get(["/poster", "/poster/"], async (req, res) => {
     let rank = Number(cleanParam(q.rank));
     if (!Number.isFinite(rank) || rank <= 0 || rank > 10) rank = 0; // absent/invalid → plain poster
 
+    // ── topx genre position (top/bottom/left/right) + 4K/HDR/BluRay/WebDL ──
+    const genrePosition = normalizeGenrePosition(q.genre_position);
+    const extras = normalizeExtras(q.extras);
+
     // ── Language ────────────────────────────────────────────────────────
     const language = String(q.language || q.logo_language || langForCountry(country));
     const logoPriority = String(q.logo_priority || "native_original");
@@ -905,6 +943,11 @@ app.get(["/poster", "/poster/"], async (req, res) => {
       // show_logo, which stays the title-logo switch in banner mode)
       providerLogo,
       brandTint: renderBrandTint,
+      // topx genre & rating placement (top/bottom/left/right) and the
+      // 4K/HDR/BluRay/WebDL extras — part of extra so the cover key (extrasJson)
+      // busts the cache whenever they change.
+      genrePosition,
+      extras,
     };
 
     // ── Artwork: language-aware TMDB image selection ───────────────────
@@ -1004,6 +1047,7 @@ app.get(["/poster", "/poster/"], async (req, res) => {
         vignette: legacyVignette,
         vignetteOpts: legacyVignette ? null : vignetteOpts,
         metaColor, resolution, greyscale,
+        genrePosition, extras,
         extra,
       }).then(png => { saveCoverBuffer(coverKey, png); return png; }), { priority: true, req });
     pendingCovers.set(coverKey, generationPromise);

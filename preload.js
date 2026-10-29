@@ -68,6 +68,8 @@ export function computeCoverKey({
   metaColor = "",
   resolution = "",
   greyscale = false,
+  genrePosition = "",
+  extras = "",
   extrasJson = ""
 }) {
   const isBanner = style === "banner" || canvasBackground === "fresh";
@@ -94,6 +96,9 @@ export function computeCoverKey({
     metaColor || "",
     String(resolution || ""),
     greyscale ? "gs" : "",
+    // topx genre position (top/bottom/left/right) + 4K/HDR/BluRay/WebDL extras
+    genrePosition || "",
+    extras || "",
     // PostersPlus extras (hide_genre, meta_order, score palette, glow alpha,
     // logo ratios, info scale) — one JSON blob keeps the key stable.
     extrasJson || ""

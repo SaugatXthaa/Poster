@@ -756,6 +756,17 @@ export function getProviderLogoSvg(catalogKey = "") {
   return null;
 }
 
+/* One combined "GENRE • ★ RATING" line for the vertical side placements —
+ * returns a draw function so the caller picks the size and the inks. */
+function genreLineParts(escapedGenre, ratingVal, starPrefix) {
+  const parts = [];
+  if (escapedGenre) parts.push((size, ink) => `<tspan fill="${ink}" font-size="${size}" font-weight="900" letter-spacing="${(size * 0.055).toFixed(1)}">${escapedGenre}</tspan>`);
+  if (escapedGenre && ratingVal) parts.push((size) => `<tspan fill="#94A3B8" font-size="${Math.round(size * 0.78)}" font-weight="800">\u00A0\u00A0\u2022\u00A0\u00A0</tspan>`);
+  if (ratingVal) parts.push((size, ink) => `<tspan fill="#FFB800" font-size="${Math.round(size * 1.12)}" font-weight="900">${starPrefix ? "\u2605 " : ""}</tspan><tspan fill="${ink}" font-size="${Math.round(size * 1.12)}" font-weight="900">${ratingVal}</tspan>`);
+  if (!parts.length) return null;
+  return (size, metaInk, ratingInk) => parts.map(p => p(size, metaInk, ratingInk)).join("");
+}
+
 function numberSvg(rank, layout, accent, genre = "", rating = "", canvasBackground = "transparent", showLogo = true, catalogId = "", fontFamily = "Inter", ratingFormat = "star", metaColor = "", extra = {}) {
   const { canvas, card, number } = layout;
   const isDouble = String(rank).length > 1;
@@ -828,49 +839,80 @@ function numberSvg(rank, layout, accent, genre = "", rating = "", canvasBackgrou
     `;
   }
 
-  // 2. Metadata (Genre & Rating Centered Under Artwork Card)
-  const metaX = isLandscape ? 750 : 575;
-  const metaY = isLandscape ? 672 : 1385;
+  // 2. Metadata (Genre & Rating) — the topx genre position decides where the
+  //    line stands: bottom (the tuned default, under the card), top, or stood
+  //    up along the left / right edge.  Left/right draw one combined line so
+  //    the vertical strip reads like the topx site's side label.
+  const genrePosition = normalizeGenrePosition(extra.genrePosition);
   let metaXml = "";
 
   if (isLandscape) {
     const gSize = escapedGenre.length > 14 ? 36 : (escapedGenre.length > 10 ? 40 : 44);
     const starSize = 50;
     const dotSize = 34;
+    const metaX = 750;
+    const metaY = 672;
 
-    if (escapedGenre && ratingVal) {
-      metaXml = `
-        <text x="${metaX}" y="${metaY}" text-anchor="middle" font-family="${fontStack}" filter="url(#metaShadow)">
-          <tspan fill="${metaInk}" font-size="${gSize}" font-weight="900" letter-spacing="2.5">${escapedGenre}</tspan>
-          <tspan fill="#94A3B8" font-size="${dotSize}" font-weight="800">   •   </tspan>
-          <tspan fill="#FFB800" font-size="${starSize}" font-weight="900">${starPrefix ? "★ " : ""}</tspan>
-          <tspan fill="${ratingInk}" font-size="${starSize}" font-weight="900">${ratingVal}</tspan>
-        </text>
-      `;
-    } else if (escapedGenre) {
-      metaXml = `<text x="${metaX}" y="${metaY}" text-anchor="middle" font-family="${fontStack}" font-size="44" font-weight="900" letter-spacing="2.5" fill="${metaInk}" filter="url(#metaShadow)">${escapedGenre}</text>`;
-    } else if (ratingVal) {
-      metaXml = `<text x="${metaX}" y="${metaY}" text-anchor="middle" font-family="${fontStack}" font-size="50" font-weight="900" filter="url(#metaShadow)">${starPrefix ? '<tspan fill="#FFB800">★ </tspan>' : ''}<tspan fill="${ratingInk}">${ratingVal}</tspan></text>`;
+    if (genrePosition === "left" || genrePosition === "right") {
+      // Vertical strip along the side edge, below the rank number's reach.
+      const line = genreLineParts(escapedGenre, ratingVal, starPrefix);
+      if (line) {
+        const sideX = genrePosition === "left" ? 54 : canvas.width - 54;
+        const rot = genrePosition === "left" ? -90 : 90;
+        const lineSize = escapedGenre && ratingVal ? 40 : 46;
+        const cy = canvas.height * 0.70;
+        metaXml = `<text x="0" y="0" transform="translate(${sideX} ${cy}) rotate(${rot})" text-anchor="middle" font-family="${fontStack}" filter="url(#metaShadow)">${line(lineSize, metaInk, ratingInk)}</text>`;
+      }
+    } else {
+      const metaYFinal = genrePosition === "top" ? Math.round(canvas.height * 0.085) : metaY;
+      if (escapedGenre && ratingVal) {
+        metaXml = `
+          <text x="${metaX}" y="${metaYFinal}" text-anchor="middle" font-family="${fontStack}" filter="url(#metaShadow)">
+            <tspan fill="${metaInk}" font-size="${gSize}" font-weight="900" letter-spacing="2.5">${escapedGenre}</tspan>
+            <tspan fill="#94A3B8" font-size="${dotSize}" font-weight="800">   •   </tspan>
+            <tspan fill="#FFB800" font-size="${starSize}" font-weight="900">${starPrefix ? "★ " : ""}</tspan>
+            <tspan fill="${ratingInk}" font-size="${starSize}" font-weight="900">${ratingVal}</tspan>
+          </text>
+        `;
+      } else if (escapedGenre) {
+        metaXml = `<text x="${metaX}" y="${metaYFinal}" text-anchor="middle" font-family="${fontStack}" font-size="44" font-weight="900" letter-spacing="2.5" fill="${metaInk}" filter="url(#metaShadow)">${escapedGenre}</text>`;
+      } else if (ratingVal) {
+        metaXml = `<text x="${metaX}" y="${metaYFinal}" text-anchor="middle" font-family="${fontStack}" font-size="50" font-weight="900" filter="url(#metaShadow)">${starPrefix ? '<tspan fill="#FFB800">★ </tspan>' : ''}<tspan fill="${ratingInk}">${ratingVal}</tspan></text>`;
+      }
     }
   } else {
     // Poster / Portrait
     const gSize = escapedGenre.length > 14 ? 48 : (escapedGenre.length > 10 ? 54 : 60);
     const starSize = 68;
     const dotSize = 42;
+    const metaX = 575;
+    const metaY = 1385;
 
-    if (escapedGenre && ratingVal) {
-      metaXml = `
-        <text x="${metaX}" y="${metaY}" text-anchor="middle" font-family="${fontStack}" filter="url(#metaShadow)">
-          <tspan fill="${metaInk}" font-size="${gSize}" font-weight="900" letter-spacing="3">${escapedGenre}</tspan>
-          <tspan fill="#94A3B8" font-size="${dotSize}" font-weight="800">   •   </tspan>
-          <tspan fill="#FFB800" font-size="${starSize}" font-weight="900">${starPrefix ? "★ " : ""}</tspan>
-          <tspan fill="${ratingInk}" font-size="${starSize}" font-weight="900">${ratingVal}</tspan>
-        </text>
-      `;
-    } else if (escapedGenre) {
-      metaXml = `<text x="${metaX}" y="${metaY}" text-anchor="middle" font-family="${fontStack}" font-size="60" font-weight="900" letter-spacing="3" fill="${metaInk}" filter="url(#metaShadow)">${escapedGenre}</text>`;
-    } else if (ratingVal) {
-      metaXml = `<text x="${metaX}" y="${metaY}" text-anchor="middle" font-family="${fontStack}" font-size="68" font-weight="900" filter="url(#metaShadow)">${starPrefix ? '<tspan fill="#FFB800">★ </tspan>' : ''}<tspan fill="${ratingInk}">${ratingVal}</tspan></text>`;
+    if (genrePosition === "left" || genrePosition === "right") {
+      const line = genreLineParts(escapedGenre, ratingVal, starPrefix);
+      if (line) {
+        const sideX = genrePosition === "left" ? 58 : canvas.width - 58;
+        const rot = genrePosition === "left" ? -90 : 90;
+        const lineSize = escapedGenre && ratingVal ? 48 : 54;
+        const cy = canvas.height * 0.72;
+        metaXml = `<text x="0" y="0" transform="translate(${sideX} ${cy}) rotate(${rot})" text-anchor="middle" font-family="${fontStack}" filter="url(#metaShadow)">${line(lineSize, metaInk, ratingInk)}</text>`;
+      }
+    } else {
+      const metaYFinal = genrePosition === "top" ? Math.round(canvas.height * 0.075) : metaY;
+      if (escapedGenre && ratingVal) {
+        metaXml = `
+          <text x="${metaX}" y="${metaYFinal}" text-anchor="middle" font-family="${fontStack}" filter="url(#metaShadow)">
+            <tspan fill="${metaInk}" font-size="${gSize}" font-weight="900" letter-spacing="3">${escapedGenre}</tspan>
+            <tspan fill="#94A3B8" font-size="${dotSize}" font-weight="800">   •   </tspan>
+            <tspan fill="#FFB800" font-size="${starSize}" font-weight="900">${starPrefix ? "★ " : ""}</tspan>
+            <tspan fill="${ratingInk}" font-size="${starSize}" font-weight="900">${ratingVal}</tspan>
+          </text>
+        `;
+      } else if (escapedGenre) {
+        metaXml = `<text x="${metaX}" y="${metaYFinal}" text-anchor="middle" font-family="${fontStack}" font-size="60" font-weight="900" letter-spacing="3" fill="${metaInk}" filter="url(#metaShadow)">${escapedGenre}</text>`;
+      } else if (ratingVal) {
+        metaXml = `<text x="${metaX}" y="${metaYFinal}" text-anchor="middle" font-family="${fontStack}" font-size="68" font-weight="900" filter="url(#metaShadow)">${starPrefix ? '<tspan fill="#FFB800">★ </tspan>' : ''}<tspan fill="${ratingInk}">${ratingVal}</tspan></text>`;
+      }
     }
   }
 
@@ -1128,7 +1170,7 @@ export function parseBackgroundColor(canvasBackground) {
   if (bg === "stremio" || bg === "stremio-navy" || bg === "rgb(26,23,62)" || bg === "rgb(26, 23, 62)" || bg === "#1a173e" || bg === "1a173e") {
     return { r: 26, g: 23, b: 62, alpha: 1 };
   }
-  if (bg === "black" || bg === "nero") {
+  if (bg === "black" || bg === "nero" || bg === "blvcktop" || bg === "blvck") {
     return { r: 0, g: 0, b: 0, alpha: 1 };
   }
   if (bg.startsWith("#")) {
@@ -1136,6 +1178,66 @@ export function parseBackgroundColor(canvasBackground) {
     return { r: rgb.r, g: rgb.g, b: rgb.b, alpha: 1 };
   }
   return { r: 0, g: 0, b: 0, alpha: 0 };
+}
+
+/* ── topx genre placement + 4K/HDR/BluRay/WebDL extras — local normalisers
+ *    mirroring the server's, so the engine can never draw an off-list value.
+ *    bottom is the tuned default; left/right stand the meta line up along the
+ *    cover's side edges, exactly like the topx position picker. ── */
+function normalizeGenrePosition(pos) {
+  const s = String(pos || "").toLowerCase().trim();
+  return ["top", "bottom", "left", "right"].includes(s) ? s : "bottom";
+}
+const EXTRA_BADGE_LABELS = { "4k": "4K", "hdr": "HDR", "bluray": "BLU-RAY", "webdl": "WEB-DL" };
+function normalizeExtrasList(list) {
+  const wanted = String(list || "").split(",").map(s => s.trim().toLowerCase()).filter(Boolean);
+  return Object.keys(EXTRA_BADGE_LABELS).filter(b => wanted.includes(b));
+}
+
+/* ── topx extras badges — the 4K / HDR / BLU-RAY / WEB-DL chips.  One row of
+ *    frosted chips (dark glass fill, bright rim, bold letterspaced text) so
+ *    they read on any artwork.  Default spot is the top-right corner, clear
+ *    of the meta line and the title logo; when the genre stands on top the
+ *    row drops to the bottom-centre instead, so the two never share an edge. ── */
+function extrasBadgeSvg(canvasW, canvasH, extrasList, genrePosition = "bottom", scale = 1) {
+  const badges = normalizeExtrasList(extrasList);
+  if (!badges.length) return null;
+  const chipH = Math.round(52 * scale);
+  const chipR = Math.round(14 * scale);
+  const font = Math.round(27 * scale);
+  const padX = Math.round(20 * scale);
+  const gap = Math.round(12 * scale);
+  const margin = Math.round(30 * scale);
+  const weights = { "4k": 640, "hdr": 700, "bluray": 640, "webdl": 640 };
+  const chipW = b => Math.round(padX * 2 + [...EXTRA_BADGE_LABELS[b]].reduce((w, ch) => w + (ch === "-" ? 0.42 : 0.68), 0) * font);
+  let widths = badges.map(chipW);
+  const total = widths.reduce((a, b) => a + b, 0) + gap * (badges.length - 1);
+  // Top-right corner by default; bottom-centre when the genre owns the top.
+  const onTop = genrePosition === "top";
+  const startX = onTop ? Math.round((canvasW - total) / 2) : canvasW - margin - total;
+  const yTop = onTop ? canvasH - margin - chipH : margin;
+  const chips = badges.map((b, i) => {
+    const x = startX + widths.slice(0, i).reduce((a, w) => a + w + gap, 0);
+    const cx = x + widths[i] / 2;
+    return `
+      <g>
+        <rect x="${x}" y="${yTop}" width="${widths[i]}" height="${chipH}" rx="${chipR}" ry="${chipR}"
+          fill="#0A0C12" fill-opacity="0.62" stroke="#FFFFFF" stroke-opacity="0.55" stroke-width="${Math.max(2, Math.round(2 * scale))}"/>
+        <text x="${cx}" y="${yTop + chipH / 2}" text-anchor="middle" dominant-baseline="central"
+          font-family="Inter, Arial, sans-serif" font-size="${font}" font-weight="${weights[b]}"
+          letter-spacing="${(font * 0.09).toFixed(1)}" fill="#FFFFFF" fill-opacity="0.96">${EXTRA_BADGE_LABELS[b]}</text>
+      </g>`;
+  }).join("");
+  return Buffer.from(`
+    <svg width="${canvasW}" height="${canvasH}" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <filter id="badgeShadow" x="-30%" y="-40%" width="160%" height="200%">
+          <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#000000" flood-opacity="0.85"/>
+        </filter>
+      </defs>
+      <g filter="url(#badgeShadow)">${chips}</g>
+    </svg>
+  `);
 }
 
 /* ---------------- Banner style: full-bleed artwork, glass rank on the left ---------------- */
@@ -1395,7 +1497,7 @@ function bannerMetaLayout(L, zoneW, { genre, rating, provider, metaColor = "", e
   };
 }
 
-async function bannerNumberGeometry(rank, L, zoneW, { hasProvider = true, hasMeta = true } = {}) {
+async function bannerNumberGeometry(rank, L, zoneW, { hasProvider = true, hasMeta = true } = {}, topOffset = 0) {
   const text = String(rank);
   const isDouble = text.length > 1;
   const spacing = isDouble ? -0.05 : 0;
@@ -1411,9 +1513,9 @@ async function bannerNumberGeometry(rank, L, zoneW, { hasProvider = true, hasMet
 
   const glyphW = m.width * scaleX * s;
   const glyphLeft = padX + (boxW - glyphW) / 2;
-  const glyphTop = numberOnly
+  const glyphTop = (numberOnly
     ? Math.round((H - glyphH) / 2)
-    : padY + (hasProvider ? 0 : Math.round(H * 0.035));
+    : padY + (hasProvider ? 0 : Math.round(H * 0.035))) + topOffset;
 
   const geometry = {
     text,
@@ -1827,6 +1929,43 @@ function brandTintOverlay(L, accent) {
   return sharp(svg).png(FAST_PNG).toBuffer();
 }
 
+/* ── Vertical side meta (topx genre position left/right): one combined
+ *    "GENRE • ★ RATING" line stood up along the cover's side edge.  Left
+ *    reads bottom→top, right reads top→bottom, both clear of the number
+ *    zone's vertical middle. ── */
+function bannerSideMetaSvg(L, { genre, rating, metaColor = "", extra = {}, genrePosition = "left" }) {
+  const isLandscape = L.height < L.width;
+  let ink = /^[0-9a-fA-F]{6}$/.test(String(metaColor || "")) ? `#${metaColor}` : "#FFFFFF";
+  const scoreMode = Number(extra.scoreColorMode) || 0;
+  if ((scoreMode === 1 || scoreMode === 3) && typeof extra.scoreCustomPalette === "string" && extra.scoreCustomPalette) {
+    const first = extra.scoreCustomPalette.split(",")[0]?.trim().replace(/^#/, "");
+    if (/^[0-9a-fA-F]{6}$/.test(first)) ink = `#${first}`;
+  }
+  const escapedGenre = extra.hideGenre ? "" : escapeXml(cleanGenre(genre));
+  const rawRating = formatRating(rating);
+  const ratingVal = extra.hideRating ? "" : rawRating;
+  const starPrefix = ratingVal ? "★ " : "";
+  const line = genreLineParts(escapedGenre, ratingVal, starPrefix);
+  if (!line) return null;
+  const size = isLandscape ? 34 : 40;
+  const sideX = genrePosition === "left" ? (isLandscape ? 42 : 50) : L.width - (isLandscape ? 42 : 50);
+  const rot = genrePosition === "left" ? -90 : 90;
+  const cy = Math.round(L.height * (isLandscape ? 0.74 : 0.70));
+  return Buffer.from(`
+    <svg width="${L.width}" height="${L.height}" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <filter id="metaShadowSide" x="-40%" y="-40%" width="200%" height="200%">
+          <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#000000" flood-opacity=".8"/>
+        </filter>
+      </defs>
+      <g filter="url(#metaShadowSide)">
+        <text x="0" y="0" transform="translate(${sideX} ${cy}) rotate(${rot})" text-anchor="middle"
+          font-family="Inter, Arial, sans-serif" font-size="${size}" font-weight="800">${line(size, ink, ink)}</text>
+      </g>
+    </svg>
+  `);
+}
+
 async function createBannerCover({ rank, artworkUrl, logoUrl, shape, genre, rating, catalogId, showLogo, fontFamily = "Inter", ratingFormat = "star", vignette = 0, vignetteOpts = null, metaColor = "", greyscale = false, resolution = 0, extra = {}, accent = "#8C75FF", brandTint = false }) {
   const L = BANNER_LAYOUTS[normalizedShape(shape)];
   const zoneW = Math.round(L.width * L.zone);
@@ -1857,23 +1996,37 @@ async function createBannerCover({ rank, artworkUrl, logoUrl, shape, genre, rati
   });
 
   const layers = [];
+  // topx genre position: bottom (tuned default) / top / left / right — and the
+  // 4K/HDR/BluRay/WebDL extras chips, which drop to the bottom-centre when the
+  // genre owns the top edge so the two never share it.
+  const genrePosition = normalizeGenrePosition(extra.genrePosition);
+  const badgeSvg = extrasBadgeSvg(L.width, L.height, extra.extras, genrePosition, L.height < L.width ? 0.92 : 1);
   // Brand Tint chip (topx): a soft glow of the platform's own accent behind
   // the number zone, before the glass number and the meta line.
   if (brandTint && accent) {
     layers.push({ input: await brandTintOverlay(L, accent), left: 0, top: 0 });
   }
+  const sideMeta = (genrePosition === "left" || genrePosition === "right")
+    ? bannerSideMetaSvg(L, { genre: displayGenre, rating: displayRating, metaColor, extra, genrePosition })
+    : null;
+  const metaOnTop = genrePosition === "top";
   if (showNumber) {
     const g = await bannerNumberGeometry(rank, L, zoneW, {
       hasProvider: Boolean(provider?.svg),
-      hasMeta: Boolean(displayGenre || displayRating)
-    });
+      hasMeta: Boolean((displayGenre || displayRating) && !sideMeta)
+    }, metaOnTop && meta.height ? meta.height + L.meta.gap * 1.4 : 0);
     const glass = await bannerGlassNumber(base, L, g, fontFamily);
     layers.push(...glass);
-    if (meta.height) layers.push({ input: meta.render(g.metaTop, g.centerX), left: 0, top: 0 });
+    if (sideMeta) layers.push({ input: sideMeta, left: 0, top: 0 });
+    else if (meta.height) layers.push({ input: meta.render(metaOnTop ? Math.round(L.height * 0.045) : g.metaTop, g.centerX), left: 0, top: 0 });
+  } else if (sideMeta) {
+    layers.push({ input: sideMeta, left: 0, top: 0 });
   } else if (meta.height) {
-    // No number: centre the meta line along the bottom zone
-    layers.push({ input: meta.render(L.height * 0.86, L.width * 0.5), left: 0, top: 0 });
+    // No number: centre the meta line along the bottom zone — or the top when
+    // the topx genre position says so.
+    layers.push({ input: meta.render(metaOnTop ? Math.round(L.height * 0.045) : L.height * 0.86, L.width * 0.5), left: 0, top: 0 });
   }
+  if (badgeSvg) layers.push({ input: badgeSvg, left: 0, top: 0 });
   const logoShade = await bannerLogoShade(base, L, titleLogo);
   if (logoShade) layers.push(logoShade);
   if (titleLogo) layers.push(...titleLogo.layers);
@@ -1922,6 +2075,8 @@ export async function createTopCover({
   metaColor = "",
   resolution = 0,
   greyscale = false,
+  genrePosition = "",
+  extras = "",
   extra = {},
   brandTint = false
 }) {
@@ -1930,15 +2085,27 @@ export async function createTopCover({
   // rank <= 0 / NaN → 0 → no rank number (plain poster, AIOMetadata mode)
   rank = Number.isFinite(requestedRank) ? Math.max(0, Math.min(10, Math.trunc(requestedRank))) : 0;
 
-  if (canvasBackground === "fresh" || normalizeStyle(style) === "banner") {
-    return createBannerCover({ rank, artworkUrl, logoUrl, shape, genre, rating, catalogId, showLogo, fontFamily, ratingFormat, vignette, vignetteOpts, metaColor, greyscale, resolution, extra, accent, brandTint });
+  // topx genre position + 4K/HDR/BluRay/WebDL extras ride in extra so both
+  // engines (banner and classic) read them from one place.
+  extra = {
+    ...extra,
+    genrePosition: genrePosition ?? extra.genrePosition,
+    extras: extras ?? extra.extras,
+  };
+  // blvcktop template: black canvas, monochrome artwork, neon rank — the
+  // classic engine with the greyscale switch forced on.
+  const isBlvcktop = String(canvasBackground || "").toLowerCase() === "blvcktop";
+  const artGreyscale = greyscale || isBlvcktop;
+
+  if (!isBlvcktop && (canvasBackground === "fresh" || normalizeStyle(style) === "banner")) {
+    return createBannerCover({ rank, artworkUrl, logoUrl, shape, genre, rating, catalogId, showLogo, fontFamily, ratingFormat, vignette, vignetteOpts, metaColor, greyscale: artGreyscale, resolution, extra, accent, brandTint });
   }
 
   const normalized = normalizedShape(shape);
   const layout = LAYOUTS[normalized];
 
   let artworkBuffer = await fetchBuffer(artworkUrl);
-  if (greyscale) artworkBuffer = await sharp(artworkBuffer).greyscale().png(FAST_PNG).toBuffer();
+  if (artGreyscale) artworkBuffer = await sharp(artworkBuffer).greyscale().png(FAST_PNG).toBuffer();
 
   const vigInput = vignetteOpts ?? vignette;
   const [art, shadow, ambient, vig] = await Promise.all([
@@ -1984,6 +2151,13 @@ export async function createTopCover({
   // Vignette goes on top of the artwork card to darken its edges.
   if (vig) {
     composites.push({ input: vig, left: 0, top: 0 });
+  }
+
+  // topx extras chips (4K / HDR / BLU-RAY / WEB-DL) — drawn above the card,
+  // top-right by default, bottom-centre when the genre stands on top.
+  const classicBadges = extrasBadgeSvg(canvas.width, canvas.height, extra.extras, normalizeGenrePosition(extra.genrePosition), normalized === "landscape" ? 0.92 : 1);
+  if (classicBadges) {
+    composites.push({ input: classicBadges, left: 0, top: 0 });
   }
 
   let baseSharp;
