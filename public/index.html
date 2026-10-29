@@ -12118,6 +12118,7 @@ body.tx-modal-open { overflow: hidden; }
         if (txObjUrls[family]) URL.revokeObjectURL(txObjUrls[family]);
         txObjUrls[family] = URL.createObjectURL(blob);
         txProbeSpin(host, false);
+        txProbeCtl[family] = null;
         opts.onApplied(txObjUrls[family]);
         return;
       } catch (err) {
@@ -12148,8 +12149,15 @@ body.tx-modal-open { overflow: hidden; }
     if (img.getAttribute('src') === url) return;
     const seq = ++txSwapSeqB;
     txProbe(url, { family: 'b', seq, host: $('tx-frame-b'),
-      onApplied: objUrl => { img.src = objUrl; },
-      onFailed: () => { /* card B is display-only — the stale cover stays */ } });
+      onApplied: objUrl => {
+        img.src = objUrl;
+        // card A's apply/fail owns the pill; only settle it here when A is idle
+        if (!txProbeCtl.a) { const st = $('preview-status'); if (st && st.textContent === 'LOADING') st.textContent = 'OK'; }
+      },
+      onFailed: () => {
+        if (!txProbeCtl.a) { const st = $('preview-status'); if (st && st.textContent === 'LOADING') st.textContent = 'OK'; }
+        /* card B is display-only — the stale cover stays */
+      } });
   }
 
   function txSwapImage() {
