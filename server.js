@@ -239,6 +239,27 @@ async function fetchJson(url, ttl = JSON_TTL) {
   }
 }
 
+/* ─── Render queue: cap concurrent sharp pipelines.  Render's free tier  ──
+ *  has 512 MB; a burst of parallel covers (warm-ahead + the two live cards
+ *  + AIOMetadata traffic) OOM-kills the instance and every in-flight request
+ *  502s.  FIFO, two at a time, shared by /poster and /top-cover.            */
+const renderQueue = [];
+let activeRenders = 0;
+const MAX_CONCURRENT_RENDERS = 2;
+function enqueueRender(job) {
+  return new Promise((resolve, reject) => {
+    renderQueue.push({ job, resolve, reject });
+    pumpRenders();
+  });
+}
+function pumpRenders() {
+  while (activeRenders < MAX_CONCURRENT_RENDERS && renderQueue.length) {
+    const { job, resolve, reject } = renderQueue.shift();
+    activeRenders++;
+    job().then(resolve, reject).finally(() => { activeRenders--; pumpRenders(); });
+  }
+}
+
 /* ─── Catalog/cover helpers ──────────────────────────────────────────────── */
 function publicBase(req) {
   const proto = req.headers["x-forwarded-proto"] || req.protocol;
@@ -672,11 +693,7 @@ app.get(["/c/:token/top-cover", "/top-cover"], async (req, res) => {
       res.setHeader("X-Cover-Cache", "SHARED");
       return res.send(png);
     }
-    const generationPromise = (async () => {
-      const png = await createTopCover({ rank, artworkUrl, logoUrl, style, shape, accent, canvasBackground, genre, rating, catalogId, showLogo, fontFamily, ratingFormat, vignette });
-      saveCoverBuffer(coverKey, png);
-      return png;
-    })();
+    const generationPromise = enqueueRender(() => createTopCover({ rank, artworkUrl, logoUrl, style, shape, accent, canvasBackground, genre, rating, catalogId, showLogo, fontFamily, ratingFormat, vignette }).then(png => { saveCoverBuffer(coverKey, png); return png; }));
     pendingCovers.set(coverKey, generationPromise);
     try {
       const png = await generationPromise;
@@ -954,18 +971,14 @@ app.get(["/poster", "/poster/"], async (req, res) => {
       res.setHeader("Cache-Control", "public, max-age=3600");
       return res.send(png);
     }
-    const generationPromise = (async () => {
-      const png = await createTopCover({
+    const generationPromise = enqueueRender(() => createTopCover({
         rank, artworkUrl, logoUrl, style, shape, accent, canvasBackground,
         genre, rating, catalogId: renderCatalogId, showLogo, fontFamily, ratingFormat,
         vignette: legacyVignette,
         vignetteOpts: legacyVignette ? null : vignetteOpts,
         metaColor, resolution, greyscale,
         extra,
-      });
-      saveCoverBuffer(coverKey, png);
-      return png;
-    })();
+      }).then(png => { saveCoverBuffer(coverKey, png); return png; }));
     pendingCovers.set(coverKey, generationPromise);
     try {
       const png = await generationPromise;
