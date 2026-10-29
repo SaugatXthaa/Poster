@@ -130,6 +130,11 @@
     letter-spacing:.18em; text-transform:uppercase; margin:20px 0 11px; padding-bottom:6px; border-bottom:1px solid var(--border);
   }
   .group-title:first-child{margin-top:0;}
+  .sub-title{
+    display:block; font-family:var(--mono); font-size:9.5px; font-weight:600; color:var(--gold-dim);
+    letter-spacing:.16em; text-transform:uppercase; margin:16px 0 9px; padding-bottom:4px; border-bottom:1px dashed var(--border);
+  }
+  .sub-title:first-child{margin-top:0;}
   .field{margin-bottom:13px;}
   .field-label{display:block; font-size:10px; color:var(--text-secondary); letter-spacing:.1em; text-transform:uppercase; margin-bottom:6px;}
   .field-hint{font-size:9px; color:var(--text-muted); margin-top:5px; line-height:1.5;}
@@ -774,10 +779,27 @@ function renderSections(){
     <span class="group-title">Client</span>
     <div class="field"><label class="field-label">Primary client (primary_client)</label>
       <select class="field-select" id="pp-primary_client">${opts(CLIENTS.map(c=>[c,c]))}</select></div>
+
     <span class="group-title">Sash / Notch</span>
+    <span class="sub-title">Mode &amp; Geometry</span>
     <div class="three-col">
       <div class="field"><label class="field-label">Sash mode (sash_mode)</label>
         <select class="field-select" id="pp-sash_mode"><option value="sash">Sash</option><option value="notch">Notch</option><option value="hidden">Hidden</option></select></div>
+      <div class="field"><label class="field-label">Sash side (sash_side)</label>
+        <select class="field-select" id="pp-sash_side"><option value="right">Right (default)</option><option value="left">Left</option></select></div>
+      <div class="field"><label class="field-label">Sash length × (sash_length_ratio)</label>
+        <div class="range-row"><input type="range" id="pp-r-sash_length_ratio" min="0.6" max="1.4" step="0.05" value="1.00"><span class="range-val" id="pp-r-sash_length_ratioV">1.00</span></div></div>
+      <div class="field"><label class="field-label">Sash height × (sash_height_ratio)</label>
+        <div class="range-row"><input type="range" id="pp-r-sash_height_ratio" min="0.08" max="0.24" step="0.005" value="0.140"><span class="range-val" id="pp-r-sash_height_ratioV">0.140</span></div></div>
+      <div class="field"><label class="field-label">Notch chip X (sash_chip_x)</label>
+        <div class="range-row"><input type="range" id="pp-r-sash_chip_x" min="0" max="1" step="0.01" value="0"><span class="range-val" id="pp-r-sash_chip_xV">0</span></div></div>
+      <div class="field"><label class="field-label">Notch chip Y (sash_chip_y)</label>
+        <div class="range-row"><input type="range" id="pp-r-sash_chip_y" min="0" max="1" step="0.01" value="0"><span class="range-val" id="pp-r-sash_chip_yV">0</span></div></div>
+      <div class="field"><label class="field-label">Notch edge Y (sash_edge_y)</label>
+        <div class="range-row"><input type="range" id="pp-r-sash_edge_y" min="0" max="1" step="0.01" value="0.50"><span class="range-val" id="pp-r-sash_edge_yV">0.50</span></div></div>
+    </div>
+    <span class="sub-title">Badge Appearance</span>
+    <div class="three-col">
       <div class="field"><label class="field-label">Badge style (sash_badge_style)</label>
         <select class="field-select" id="pp-sash_badge_style">${opts(SASH_STYLES.map(s=>[s,s]))}</select></div>
       <div class="field"><label class="field-label">Badge position (sash_badge_pos)</label>
@@ -792,35 +814,26 @@ function renderSections(){
         <div class="range-row"><input type="range" id="pp-r-sash_badge_font_ratio" min="0.5" max="1.5" step="0.05" value="1.00"><span class="range-val" id="pp-r-sash_badge_font_ratioV">1.00</span></div></div>
       <div class="field"><label class="field-label">Badge opacity (sash_badge_opacity)</label>
         <div class="range-row"><input type="range" id="pp-r-sash_badge_opacity" min="0.2" max="1" step="0.05" value="0.90"><span class="range-val" id="pp-r-sash_badge_opacityV">0.90</span></div></div>
+      <div class="field"><label class="field-label">Frost opacity (sash_badge_frost_opacity)</label>
+        <div class="range-row"><input type="range" id="pp-r-sash_badge_frost_opacity" min="0" max="1" step="0.05" value="0.85"><span class="range-val" id="pp-r-sash_badge_frost_opacityV">0.85</span></div></div>
+      <div class="field"><label class="field-label">Frost saturation (sash_badge_frost_saturation)</label>
+        <div class="range-row"><input type="range" id="pp-r-sash_badge_frost_saturation" min="0" max="2" step="0.05" value="1.20"><span class="range-val" id="pp-r-sash_badge_frost_saturationV">1.20</span></div></div>
       <div class="field"><label class="field-label">Sash text colour (sash_text_color)</label>
         <div class="color-row"><input type="color" id="stcPicker" value="#ffffff"><input class="field-input" id="pp-sash_text_color" placeholder="blank = default"></div></div>
-      <div class="field"><label class="field-label">Sash side (sash_side)</label>
-        <select class="field-select" id="pp-sash_side"><option value="right">Right (default)</option><option value="left">Left</option></select></div>
-      <div class="field"><label class="field-label">Sash length × (sash_length_ratio)</label>
-        <div class="range-row"><input type="range" id="pp-r-sash_length_ratio" min="0.6" max="1.4" step="0.05" value="1.00"><span class="range-val" id="pp-r-sash_length_ratioV">1.00</span></div></div>
-      <div class="field"><label class="field-label">Sash height × (sash_height_ratio)</label>
-        <div class="range-row"><input type="range" id="pp-r-sash_height_ratio" min="0.08" max="0.24" step="0.005" value="0.140"><span class="range-val" id="pp-r-sash_height_ratioV">0.140</span></div></div>
-      <div class="field"><label class="field-label">Chip X offset (sash_chip_x)</label>
-        <div class="range-row"><input type="range" id="pp-r-sash_chip_x" min="0" max="1" step="0.01" value="0"><span class="range-val" id="pp-r-sash_chip_xV">0</span></div></div>
-      <div class="field"><label class="field-label">Chip Y offset (sash_chip_y)</label>
-        <div class="range-row"><input type="range" id="pp-r-sash_chip_y" min="0" max="1" step="0.01" value="0"><span class="range-val" id="pp-r-sash_chip_yV">0</span></div></div>
-      <div class="field"><label class="field-label">Edge Y position (sash_edge_y)</label>
-        <div class="range-row"><input type="range" id="pp-r-sash_edge_y" min="0" max="1" step="0.01" value="0.50"><span class="range-val" id="pp-r-sash_edge_yV">0.50</span></div></div>
-      <div class="field"><label class="field-label">Badge frost opacity (sash_badge_frost_opacity)</label>
-        <div class="range-row"><input type="range" id="pp-r-sash_badge_frost_opacity" min="0" max="1" step="0.05" value="0.85"><span class="range-val" id="pp-r-sash_badge_frost_opacityV">0.85</span></div></div>
-      <div class="field"><label class="field-label">Badge frost saturation (sash_badge_frost_saturation)</label>
-        <div class="range-row"><input type="range" id="pp-r-sash_badge_frost_saturation" min="0" max="2" step="0.05" value="1.20"><span class="range-val" id="pp-r-sash_badge_frost_saturationV">1.20</span></div></div>
     </div>
+    <span class="sub-title">Toggles</span>
     <div class="toggle-row">
       <div class="toggle" id="pp-t-sash_winner_star"><div><div class="tlabel">Winner star (sash_winner_star)</div><div class="tdesc">// Award winner marker on the sash</div></div><div class="switch"></div></div>
       <div class="toggle" id="pp-t-muted"><div><div class="tlabel">Muted sash colours (muted)</div><div class="tdesc">// Desaturated sash palette</div></div><div class="switch"></div></div>
       <div class="toggle" id="pp-t-sash_poster_color"><div><div class="tlabel">Sash from poster colour (sash_poster_color)</div><div class="tdesc">// Sash tint sampled from the artwork</div></div><div class="switch"></div></div>
     </div>
+
     <span class="group-title">Quality Badges</span>
+    <span class="sub-title">Configuration</span>
     <div class="two-col">
-      <div class="field"><label class="field-label">Badge display mode (badge_display_mode)</label>
+      <div class="field"><label class="field-label">Display mode (badge_display_mode)</label>
         <select class="field-select" id="pp-badge_display_mode"><option value="0">0 · Off</option><option value="7">7 · Graphic badges</option></select></div>
-      <div class="field"><label class="field-label">Minimum quality score (badge_min_score)</label>
+      <div class="field"><label class="field-label">Minimum score (badge_min_score)</label>
         <select class="field-select" id="pp-badge_min_score">${opts([0,2,3,4,5,6,7].map(n=>[String(n),String(n)]))}</select></div>
       <div class="field"><label class="field-label">Group 1 (badge_group1)</label><input class="field-input" id="pp-badge_group1"></div>
       <div class="field"><label class="field-label">Group 2 (badge_group2)</label><input class="field-input" id="pp-badge_group2"></div>
@@ -833,17 +846,21 @@ function renderSections(){
           <option value="top_left">Top left</option><option value="top_right">Top right</option>
           <option value="bottom_left">Bottom left</option><option value="bottom_right">Bottom right</option>
         </select></div>
-      <div class="field"><label class="field-label">Legacy style (badge_legacy_style)</label>
+    </div>
+    <span class="sub-title">Per-Badge Styles</span>
+    <div class="three-col">
+      <div class="field"><label class="field-label">Legacy (badge_legacy_style)</label>
         <select class="field-select" id="pp-badge_legacy_style"><option value="notch">Notch</option><option value="badge">Badge</option><option value="hidden">Hidden</option></select></div>
-      <div class="field"><label class="field-label">Quality style (badge_quality_style)</label>
+      <div class="field"><label class="field-label">Quality (badge_quality_style)</label>
         <select class="field-select" id="pp-badge_quality_style"><option value="solid">Solid</option><option value="frosted">Frosted</option><option value="glass">Glass</option></select></div>
-      <div class="field"><label class="field-label">Logo style (badge_logo_style)</label>
+      <div class="field"><label class="field-label">Logo (badge_logo_style)</label>
         <select class="field-select" id="pp-badge_logo_style"><option value="solid">Solid</option><option value="frosted">Frosted</option><option value="glass">Glass</option></select></div>
-      <div class="field"><label class="field-label">Cinema style (badge_cinema_style)</label>
+      <div class="field"><label class="field-label">Cinema (badge_cinema_style)</label>
         <select class="field-select" id="pp-badge_cinema_style"><option value="auto">Auto</option><option value="solid">Solid</option><option value="frosted">Frosted</option><option value="glass">Glass</option></select></div>
-      <div class="field"><label class="field-label">Cert style (badge_cert_style)</label>
+      <div class="field"><label class="field-label">Cert (badge_cert_style)</label>
         <select class="field-select" id="pp-badge_cert_style"><option value="solid">Solid</option><option value="frosted">Frosted</option><option value="glass">Glass</option></select></div>
     </div>
+
     <span class="group-title">Compact Bar (mode 4)</span>
     <div class="three-col">
       <div class="field"><label class="field-label">Bar style (bar_style)</label>
@@ -856,7 +873,7 @@ function renderSections(){
         <div class="range-row"><input type="range" id="pp-r-bar_height_ratio" min="0.04" max="0.18" step="0.005" value="0.080"><span class="range-val" id="pp-r-bar_height_ratioV">0.080</span></div></div>
       <div class="field"><label class="field-label">Bar font × (bar_font_size_ratio)</label>
         <div class="range-row"><input type="range" id="pp-r-bar_font_size_ratio" min="0.15" max="0.70" step="0.01" value="0.55"><span class="range-val" id="pp-r-bar_font_size_ratioV">0.55</span></div></div>
-      <div class="field"><label class="field-label">Bar frost (bar_frost_opacity)</label>
+      <div class="field"><label class="field-label">Frost opacity (bar_frost_opacity)</label>
         <div class="range-row"><input type="range" id="pp-r-bar_frost_opacity" min="0" max="1" step="0.05" value="0.85"><span class="range-val" id="pp-r-bar_frost_opacityV">0.85</span></div></div>
       <div class="field"><label class="field-label">Frost saturation (bar_frost_saturation)</label>
         <div class="range-row"><input type="range" id="pp-r-bar_frost_saturation" min="0" max="2" step="0.05" value="1.20"><span class="range-val" id="pp-r-bar_frost_saturationV">1.20</span></div></div>
@@ -865,6 +882,7 @@ function renderSections(){
       <div class="toggle" id="pp-t-bar_score_out_of_10"><div><div class="tlabel">Bar score out of 10 (bar_score_out_of_10)</div><div class="tdesc">// Print “7.5/10” in the compact bar</div></div><div class="switch"></div></div>
       <div class="toggle" id="pp-t-frost_reference"><div><div class="tlabel">Frost reference colour (frost_reference)</div><div class="tdesc">// Frosted elements sample the artwork</div></div><div class="switch"></div></div>
     </div>
+
     <span class="group-title">Rating Sources &amp; Weights</span>
     <div class="two-col">
       <div class="field"><label class="field-label">IMDb source (imdb_rating_source)</label>
@@ -879,7 +897,9 @@ function renderSections(){
     <div class="toggle-row">
       <div class="toggle on" id="pp-t-fallback_to_imdb"><div><div class="tlabel">Fallback to IMDb rating (fallback_to_imdb)</div><div class="tdesc">// Use IMDb score when MDBList has none</div></div><div class="switch"></div></div>
     </div>
+
     <span class="group-title">Trending Rank Display</span>
+    <span class="sub-title">Style &amp; Position</span>
     <div class="three-col">
       <div class="field"><label class="field-label">Trending style (trending_style)</label>
         <select class="field-select" id="pp-trending_style"><option value="sash_label">Sash label · #N Today</option><option value="number">Number</option><option value="ribbon">Ribbon</option><option value="off">Off</option></select></div>
@@ -887,19 +907,23 @@ function renderSections(){
         <select class="field-select" id="pp-trending_side"><option value="left">Left</option><option value="right">Right</option></select></div>
       <div class="field"><label class="field-label">Trending scale (trending_scale)</label>
         <div class="range-row"><input type="range" id="pp-r-trending_scale" min="0.5" max="1.5" step="0.05" value="1.00"><span class="range-val" id="pp-r-trending_scaleV">1.00</span></div></div>
+      <div class="field"><label class="field-label">Sash behaviour (trending_sash)</label>
+        <select class="field-select" id="pp-trending_sash"><option value="keep">Keep sash</option><option value="replace">Replace sash</option><option value="hide">Hide sash</option></select></div>
+    </div>
+    <span class="sub-title">Ribbon</span>
+    <div class="three-col">
       <div class="field"><label class="field-label">Ribbon style (trending_ribbon_style)</label>
         <select class="field-select" id="pp-trending_ribbon_style">${opts(["charcoal","silver","gold","frosted"].map(s=>[s,s]))}</select></div>
-      <div class="field"><label class="field-label">Ribbon frost (trending_frost_opacity)</label>
+      <div class="field"><label class="field-label">Frost opacity (trending_frost_opacity)</label>
         <div class="range-row"><input type="range" id="pp-r-trending_frost_opacity" min="0" max="1" step="0.05" value="0.85"><span class="range-val" id="pp-r-trending_frost_opacityV">0.85</span></div></div>
-      <div class="field"><label class="field-label">Ribbon frost saturation (trending_frost_saturation)</label>
+      <div class="field"><label class="field-label">Frost saturation (trending_frost_saturation)</label>
         <div class="range-row"><input type="range" id="pp-r-trending_frost_saturation" min="0" max="2" step="0.05" value="1.20"><span class="range-val" id="pp-r-trending_frost_saturationV">1.20</span></div></div>
-      <div class="field"><label class="field-label">Trending sash (trending_sash)</label>
-        <select class="field-select" id="pp-trending_sash"><option value="keep">Keep</option><option value="replace">Replace</option><option value="hide">Hide</option></select></div>
     </div>
     <div class="toggle-row">
       <div class="toggle" id="pp-t-trending_label"><div><div class="tlabel">Ribbon label (trending_label)</div><div class="tdesc">// Print “TOP 10” on the ribbon</div></div><div class="switch"></div></div>
       <div class="toggle" id="pp-t-trending_corner"><div><div class="tlabel">Corner ribbon (trending_corner)</div><div class="tdesc">// Fold the ribbon into the corner</div></div><div class="switch"></div></div>
     </div>
+
     <span class="group-title">Logo Sizing</span>
     <div class="three-col">
       <div class="field"><label class="field-label">Max width ratio (logo_max_w_ratio)</label>
@@ -912,12 +936,17 @@ function renderSections(){
     <div class="toggle-row">
       <div class="toggle" id="pp-t-logo_bottom_anchor"><div><div class="tlabel">Anchor logo to bottom (logo_bottom_anchor)</div><div class="tdesc">// Pin the logo to the canvas bottom edge</div></div><div class="switch"></div></div>
     </div>
+
     <span class="group-title">Release Status</span>
+    <span class="sub-title">Status Flags</span>
     <div class="toggle-row">
       <div class="toggle on" id="pp-t-release_status_cinema_only"><div><div class="tlabel">Cinema-only release status</div><div class="tdesc">// release_status_cinema_only</div></div><div class="switch"></div></div>
       <div class="toggle on" id="pp-t-release_status_dates"><div><div class="tlabel">Show digital release dates</div><div class="tdesc">// release_status_dates</div></div><div class="switch"></div></div>
       <div class="toggle on" id="pp-t-airing_dates"><div><div class="tlabel">Show airing dates</div><div class="tdesc">// airing_dates</div></div><div class="switch"></div></div>
       <div class="toggle" id="pp-t-hide_unreleased_rating"><div><div class="tlabel">Hide rating on unreleased titles</div><div class="tdesc">// hide_unreleased_rating</div></div><div class="switch"></div></div>
+    </div>
+    <span class="sub-title">Cinema Artwork</span>
+    <div class="toggle-row">
       <div class="toggle" id="pp-t-cinema_greyscale"><div><div class="tlabel">Cinema greyscale (cinema_greyscale)</div><div class="tdesc">// Monochrome art for cinema-only releases</div></div><div class="switch"></div></div>
       <div class="toggle" id="pp-t-cinema_greyscale_skip_if_available"><div><div class="tlabel">Skip if art available (cinema_greyscale_skip_if_available)</div><div class="tdesc">// Don’t desaturate when a streaming/poster artwork exists</div></div><div class="switch"></div></div>
     </div>`;
