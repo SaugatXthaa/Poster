@@ -1,16 +1,38 @@
-node_modules/
-data/
-.backups/
-# Sample renders (not referenced by any code — kept out of the repo so
-# Render/GitHub clones stay small; regenerate anytime from the configurator)
-public/examples/
-*.db
-*.db-shm
-*.db-wal
-*.sqlite*
-*.log
-npm-debug.log*
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Environment & secrets
 .env
+.env.*
+!.env.example
+
+# Docker runtime cache volume
+postersplus-cache/
+
+# OS
 .DS_Store
 Thumbs.db
+
+# Editor
+.vscode/
+.idea/
 *.swp
+*.swo
+
+# Claude Code local state (machine-specific permissions)
+.claude/
+
+# Cached Wikipedia/Wikidata responses for tools/audit_festival_winners.py
+tools/.audit-cache/
+
+# Local runs outside the container (PP_CACHE_ROOT)
+.cache/

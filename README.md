@@ -1,264 +1,208 @@
-# TOPX Posters — Combined Stremio / Nuvio Addon
+# TOPX Posters+
 
-**A unified Top 10 poster cover engine** that merges three sources:
+A Posters Plus deployment with the **TOPX** and **BLVCKTOP** poster templates built in.
 
-| Source | Role |
-|---|---|
-| [**blvckTOP**](https://github.com/qwertyuiop8899/blvckTOP) | Node.js + Sharp cover generator (Fresh / Provider Glass / Stremio / Black / Transparent backgrounds; Landscape 1280×720 and Portrait 1000×1500 shapes; classic numbered overlay and banner styles). |
-| [**PostersPlus**](https://github.com/UmbraProjects/PostersPlus) | Poster style/format vocabulary, country-aware language selection (22 languages mapped from 27 countries), title-logo overlay, genre+rating badges. |
-| [**topx.stremio-italia.eu**](https://topx.stremio-italia.eu) | Source of the 27-country / 10-platform matrix (World + 26 countries × Netflix, Prime, Disney+, Apple TV+, HBO Max, Paramount+, Crunchyroll, Discovery+, RaiPlay, NOW). |
+The render pipeline, the configurator, the badges, the ratings and every
+setting are the original [Posters Plus](https://github.com/UmbraProjects/PostersPlus)
+ones — this fork adds two templates on top of it:
 
-The result: **one addon that produces numbered Top 10 covers for any of 27 countries in the user's chosen language, in any of the 5 blvckTOP background styles, in either landscape or portrait shape** — and the two original "poster types" (blvckTOP's banner-vs-classic and PostersPlus's language/badge styling) coexist without conflict because they apply to orthogonal dimensions of the same render pipeline.
+- **TOPX** — the ranked cover on a canvas.  The canvas styles are the topx
+  options: Fresh (the title's backdrop full-bleed behind the cover), Provider
+  Glass, Transparent, Nuvio (solid black) and Stremio.  The genre + rating
+  line stands where topx puts it — bottom, top, or down the left / right
+  edge — with the provider's logo and the quality marks (4K, HDR10+, DV,
+  1080p, Remux, Web) drawn from the same quality facts the classic badges use.
+- **BLVCKTOP** — solid black canvas, monochrome artwork, the neon ranked cover.
+
+The template, canvas style, genre position and the topx toggles live at the
+top of the configurator's Core tab.  The Rating tab's switches (hidden
+rating, out of 10, score colours) drive the topx line the same way they
+drive the classic poster.  Everything else below is the upstream project's
+own README.
 
 ---
+
+# PostersPlus
+
+A self-hosted poster service that puts ratings, award sashes, quality badges and title logos onto movie and TV artwork. It works with AIOMetadata, Nuvio, Bingecat, Plex, Jellyfin, and anything else that can pass an IMDb, TMDB, AniList or Kitsu ID.
+
+Not self-hosting? Use one of the public instances hosted by [Elfhosted](https://postersplus.elfhosted.com), [Slokker](https://postersplus.slokker.cc) or [Kuu.](https://postersplus.stremio.ru) 
+
+---
+
+<p align="center">
+  <a href="https://raw.githubusercontent.com/UmbraProjects/PostersPlus/refs/heads/dev/Showcase/showcase.webp">
+    <img src="Showcase/showcase.webp" width="100%" alt="Nuvio HTPC presets"/>
+  </a>
+  Various presets shown in <a href="https://github.com/UmbraProjects/NuvioDesktop">Nuvio HTPC</a>. Click for full resolution.
+</p>
 
 ## Features
 
-- **27 countries** — World, Italy, Algeria, Australia, Brazil, Canada, Croatia, France, Germany, Greece, Guatemala, Hungary, India, Indonesia, Ireland, Lebanon, Malaysia, Mexico, Morocco, Netherlands, Philippines, Portugal, Romania, Spain, Turkey, United Kingdom, United States.
-- **10 streaming platforms** per country (RaiPlay is Italy-only; the other 9 are global).
-- **5 background styles** (from blvckTOP) — `fresh` (full-bleed artwork with dark glass number + title logo), `provider` (Brand Glass tinted by platform accent), `stremio` (Stremio navy `#1a173e`), `black`, and `transparent`.
-- **2 shapes** (from blvckTOP) — Landscape 1280×720 (for Continue Watching / 16:9 slots) and Portrait 1000×1500 (for vertical poster grids).
-- **9 rank-number fonts** (PostersPlus-inspired) — Inter, Space Grotesk, Bebas Neue, Oswald, Montserrat, Manrope, Fira Sans, Roboto Condensed, Playfair Display. Installed system-wide so sharp's librsvg resolves them by name.
-- **3 rating formats** (PostersPlus-inspired) — `★ star + number` (default), `number only` (drops the star), `hidden` (suppresses the rating entirely).
-- **4 vignette intensities** (PostersPlus-inspired) — off / light / medium / strong. Darkens the top and bottom edges of the artwork card so logos and metadata read more clearly.
-- **22 language mappings** (PostersPlus i18n approach) — each country is mapped to its primary TMDB language code so titles, genres, and posters come back in the user's language. e.g. Italy → `it`, Brazil → `pt-BR`, India → `hi`, Greece → `el`, Turkey → `tr`, Morocco/Algeria/Lebanon → `ar`.
-- **Native language override** — the configurator's Language tab lets the user pick a different language than the country default (e.g. an Italian living in Germany can pick Italian titles while keeping the German Top 10 chart).
-- **Logo priority selector** — Auto / Native first / English first / Textless only. Controls which TMDB logo language wins when multiple are available.
-- **PostersPlus-style configurator UI** — gold-on-black theme with Cormorant Garamond serif headings + Inter mono labels, fine grain texture overlay, two-column grid (config | live preview), 5 tabs (Catalogs, Layout, Language, Style, Generate).
-- **TMDB-driven Top 10** — uses `/trending/{media}/week` for World, `/discover/{media}?watch_region=…&with_watch_providers=…` for platform-specific charts, and `/{media}/popular?region=…` for country-only Top 10.
-- **On-demand render + SQLite persistence** — IMDb→TMDB mappings, TMDB image sets, and rendered cover PNGs/JPEGs are all cached to disk under `data/` (0 ms on subsequent hits). An optional blvckTOP-style scheduler module (`preload.js`, daily 09:00 / 18:00 cron) ships in the repo and can be wired up for warm caches; on Render the lazy path is the right default.
-- **Encrypted config tokens** — the user's selection is encrypted with AES-256-GCM (key derived from `APP_SECRET`) and embedded in the manifest URL, so no server-side session storage is required.
+- **Ratings** - one weighted score from Letterboxd, Trakt, Rotten Tomatoes, IMDb, Metacritic, MyAnimeList and more, in four display styles with custom colour palettes.
+- **Award sashes** - Oscars, Globes, Emmys, festival prizes, notable studios and cast, trending, new seasons, release status and more. You set the order and can turn any of them off.
+- **Quality badges** - 4K, Remux, Dolby Vision, HDR and so on, read from AIOStreams, most Stremio addons, QualiCache, or your own Plex or Jellyfin files.
+- **Title logos** - over textless art, in the language you choose, with automatic checks for posters that already have a title printed on them.
+- **Landscape posters** - a dedicated 16:9 layout for landscape and Continue Watching slots.
+- **Anime support** - AniList and Kitsu IDs work directly.
+- **Web configurator** - tune everything in the browser with a live preview, then copy a ready-made URL for your client.
+- **Admin dashboard** - manage the server from `/admin` instead of your compose file.
+- **Plex and Jellyfin sync** - push the posters straight into your library.
 
----
+## Getting started
 
-## Quick start
+You'll need:
 
-### 1. Install & run
+- Docker
+- A free [TMDB API key](https://www.themoviedb.org/settings/api) (artwork, logos, metadata)
+- A free [MDBList API key](https://mdblist.com/) (ratings, awards, age ratings)
 
-```bash
-cd topx-posters
-npm install
-# Required env (any of these methods):
-export APP_SECRET="your-stable-secret-at-least-24-chars-long"
-export TMDB_API_KEY="439c478a771f35c05022f9feabcca01c"   # or your own TMDB key
-export PORT=3000
-npm start
+Create a `compose.yaml` and pick one of these templates:
+
+Seperate env file:
+
+```yaml
+services:
+  postersplus:
+    image: ghcr.io/umbraprojects/postersplus:dev
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
+    volumes:
+      - ./postersplus-cache:/app/cache
+    env_file:
+      - .env 
 ```
 
-Or with Docker (recommended for production):
+Environment inside the compose:
+
+```yaml
+services:
+  postersplus:
+    image: ghcr.io/umbraprojects/postersplus:dev
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
+    volumes:
+      - ./postersplus-cache:/app/cache
+    environment:
+      - ADMIN_KEY=a-long-random-string   # unlocks /admin, at least 12 characters
+      - ACCESS_KEY=another-secret        # recommended if the instance is on the internet
+```
+
+Start it:
 
 ```bash
+docker compose up -d
+```
+
+Then open `http://your-host:8000/admin` and carry on below.
+
+<details>
+<summary>Building from source</summary>
+
+```bash
+git clone https://github.com/UmbraProjects/PostersPlus.git
+cd PostersPlus
+cp .env.example .env   # set ADMIN_KEY
 docker compose up -d --build
 ```
 
-### 1b. Deploy to Render (free tier works)
+</details>
 
-The repo ships a [`render.yaml`](render.yaml) Blueprint and a Dockerfile tuned for Render (system fonts for librsvg, `sharp`/`better-sqlite3` native builds, `MALLOC_ARENA_MAX=2`).
+## Admin dashboard
 
-**One-click (Blueprint):**
-1. Push this repo to GitHub (it already is: `SaugatXthaa/Poster`).
-2. In the Render dashboard: **New → Blueprint**, pick the `Poster` repo — Render reads `render.yaml` and creates the service.
-3. When prompted, paste your TMDB key into the `TMDB_API_KEY` variable (a free key from [themoviedb.org](https://www.themoviedb.org/settings/api)). `APP_SECRET` is generated automatically and stays stable.
+The dashboard is where you set up and run your instance. Log in with your `ADMIN_KEY`, then:
 
-**Manual (Docker runtime):**
-1. **New → Web Service**, connect the repo.
-2. Runtime: **Docker** (auto-detected from the Dockerfile).
-3. Health check path: `/manifest.json`.
-4. Environment variables:
-   | Key | Value |
-   |---|---|
-   | `APP_SECRET` | any stable secret ≥ 24 chars (**never change it later** — existing manifest tokens would stop decrypting) |
-   | `TMDB_API_KEY` | your TMDB key |
-   | `NODE_ENV` | `production` |
+1. Under **Settings → API keys**, add your TMDB and MDBList keys.
+2. Optionally, pick a **Quality source** so posters get quality badges (see below).
+3. Click **Save**, then **Restart now**. The page reloads when the server is back.
 
-Notes:
-- The app binds to Render's `PORT` automatically (`process.env.PORT || 3000`).
-- Free plan has **no persistent disk** — the SQLite cache + rendered covers in `/app/data` are ephemeral and simply regenerate on demand after a restart. Attach a disk on `mountPath: /app/data` (paid plans) for instant cache hits; `render.yaml` shows the commented block.
-- Free services sleep after ~15 min idle; the first poster after a wake-up takes a few seconds while sharp re-renders, then everything is disk-cached again.
-- The configurator URL is your Render domain (e.g. `https://topx-posters.onrender.com/`) — the AIOMetadata poster URL it produces uses that same origin, so it works out of the box.
+Every setting has its help text next to it, and a chip showing whether its value was **saved** here, comes from your **env**, or is the **default**. Rarely needed options sit behind each group's *Advanced* fold.
 
-### 2. Open the configurator
+The **Overview** tab shows how the instance is doing: cache sizes, renders in progress, remaining MDBList quota, cache warming and the watchlist.
 
-Visit `http://localhost:3000/`. The layout is built for fast tuning: the **live preview is pinned below the 5 tabs and never moves** — only the options area scrolls, so you can sweep through settings and see the poster re-render in place, without scrolling up and down. The bottom bar (summary, Generate button, AIOMetadata URL) is fixed too.
+The **Artwork** tab lets you choose a title's poster or logo for everyone on the instance. Search for the title, then pick from every TMDB, Fanart and TVDB image, for portrait and landscape posters.
 
-Tabs:
+The **Presets** tab adds your own looks to the configurator's **Load preset** gallery. Paste a poster URL from the configurator, name it, and give it a picture (render a title or upload an image). Users see them under **Operator**, beside the **Core** presets that ship with Posters+ and **Mine**, the presets each user saves in their own browser. Keys and the title are stripped from the URL when a preset is saved.
 
-1. **Catalogs tab** — click a country card (27 available, default = World 🌍), then toggle platforms (Netflix, Prime, Disney+, Apple TV+, HBO Max, Paramount+, Crunchyroll, Discovery+, RaiPlay [Italy only], NOW). The generic "Top X" chart is always included. Toggle **Show rank number** (blvckTOP) off for clean per-title posters.
-2. **Layout tab** — pick **Shape** (Landscape 1280×720 / Portrait 1000×1500) and **Background** (Fresh / Provider Glass / Stremio Navy / Black / Transparent). Plus PostersPlus artwork toggles: **Use original art**, **Landscape poster crop**, **Greyscale**.
-3. **Language tab** — **Native Language** + **Logo language** overrides, **Logo Priority** (8 PostersPlus orders), **Custom fallback language**, **Title's own language** (original_labels), and **Label font** (9 fonts, PostersPlus `label_font` values).
-4. **Style tab** — **Rating display mode** (PostersPlus 1–4), **Text colour**, **Glow colour**, all six PostersPlus **font ratio** sliders, **Top/Bottom gradients** with opacity & height overrides, **Resolution**, **Fallback background style**.
-5. **Extras tab** — PostersPlus passthrough settings encoded into the AIOMetadata URL: **Primary client**, **Sash/Notch** (mode, style, position), **Quality badges** (display mode, groups, min score, cert country), **Rating sources & weights** (IMDb/TMDB source, movie/TV weights), **Trending rank display**, **Logo sizing**, **Release status** toggles.
+The **Fonts** tab adds your own label fonts to the configurator's **Font** list, for fonts Posters+ can't ship. Upload a static `.ttf` or `.otf` (one weight; Bold reads best) and give it a name. A font without a ★ gets Inter's, since the rating line draws one. You're responsible for having a licence that allows the font to be used for rendering images on a server.
 
-The preview renders through the exact same `/poster` endpoint AIOMetadata will call, so what you see is exactly what you get. Use `‹` `›` to walk through positions #1–10, click the poster to zoom.
+Good to know:
 
-### 3. Add to AIOMetadata (poster provider)
+- Saved settings live in `settings.json` in the cache volume and take priority over environment variables. Your compose file is never touched.
+- `ADMIN_KEY` can only be set in the environment, and it's separate from `ACCESS_KEY`. Your clients see the access key in every poster URL, so keep the admin key to yourself.
+- Put the instance behind HTTPS before using the dashboard over the internet.
 
-The **AIOMetadata** URL box in the bottom bar holds a PostersPlus-format template with `{tmdb_id}`, `{imdb_id}`, `{type}`, `{shape}`, `{rank}` placeholders. Paste it into AIOMetadata's poster provider field — AIOMetadata substitutes the placeholders per title. The URL works against this server *and* against any full PostersPlus instance (unsupported decoration params — sash, badges, weights — are simply ignored by this renderer and drawn by PostersPlus).
+Prefer environment variables? Everything the dashboard sets can be set that way too. See [CONFIGURATION.md](CONFIGURATION.md).
 
-### 4. Add to Stremio / Nuvio
+## Connecting your client
 
-Click **Generate Manifest**, then the **Install in Stremio** or **Install in Nuvio** button (or copy the manifest URL). Catalogs appear with numbered Top 10 covers.
+Open your instance's address in a browser to get the configurator. Pick a style, then press **Copy config**. A left-click copies the URL for AIOMetadata, Nuvio, Bingecat and Xperience, which all take the same one. Right-click (or long press) to copy it for Discover+ or to share your settings; if you pick Discover+, a left-click keeps copying that until you pick otherwise. The URL is built from whatever address you opened the configurator at, so open it from the address your client will use.
 
----
+**Share settings** removes keys and personal choices and replaces the selected title with generic client placeholders. The shared URL can go directly into AIOMetadata, Nuvio, Bingecat or Xperience. For Discover+, import it into the configurator and use **Copy config → Discover+**. Import already uses the local instance's domain; it does not need the source domain replaced.
 
-## Architecture
+Instances are private for sharing by default: shared URLs use `https://postersplus.cc`, so direct client requests go to that public instance and use its server-side configuration and resources. Public operators can explicitly set **Public share origin** (`PUBLIC_SHARE_ORIGIN`) to their canonical HTTPS origin, such as `https://posters.example.com`. Use an origin only, with no path, credentials, query or fragment, and only for an instance intended for public use without an access key. Blank or invalid values use the fallback. This setting does not change access controls; setting `PUBLIC_URL` alone does not opt in. Opening a public instance through a private address still shares only the configured public origin.
 
-```
-topx-posters/
-├── server.js              ← Express app: 27-country × 10-platform matrix, /api/* endpoints, manifest + catalog + cover routes
-├── cover-generator.js     ← (from blvckTOP, extended) Sharp renderer: 5 bgs × 2 shapes × 9 fonts × 3 rating formats × 4 vignette levels
-├── preload.js             ← (from blvckTOP) optional daily 09:00 / 18:00 cron pre-renderer + cover key hashing (includes font/rating/vignette in key; not auto-activated — covers render lazily on first request)
-├── db.js                  ← (from blvckTOP) better-sqlite3 cache (mappings / images / covers / JSON)
-├── tmdb.js                ← (extended) country-aware image fetcher, 22 language mappings, country-aware artwork sorting
-├── config-token.js        ← (from blvckTOP) AES-256-GCM config encryption
-├── public/
-│   ├── index.html         ← PostersPlus-styled configurator (5 tabs: Catalogs / Layout / Language / Style / Generate) + live preview
-│   ├── fonts/             ← 9 TTF fonts (Inter, Space Grotesk, Bebas Neue, …) used by the rank number renderer
-│   ├── icons/             ← 27 platform / brand SVGs (Netflix, Prime, Disney+, …)
-│   └── networks/          ← 50+ studio/network SVGs (A24, Pixar, HBO, …) used by the classic style
-└── data/                  ← SQLite DB + cached covers (auto-created, safe to delete)
-```
+> **Exposing it safely.** Clients need to reach PostersPlus over **HTTPS**, e.g. behind [Caddy](https://caddyserver.com/) or [Traefik](https://traefik.io/), with `ACCESS_KEY` set. If you use AIOMetadata, you can instead turn on its image proxy and keep PostersPlus off the internet entirely: use `http://postersplus:8000` as the address so the two talk over Docker's internal network. That's a little slower but the most secure option.
 
-### Request flow
+> **Configurator behind its own login.** If you put the configurator behind Authelia, Pangolin or a similar login, turn on **Configurator protected externally** (`CONFIGURATOR_EXTERNAL_AUTH`). The configurator then opens without `?access_key=` and adds the key to previews and copied URLs for you, while poster requests still need it, since clients can't sign in through a browser page. The trade-off: anyone who gets onto the configurator can read the access key, so this is only as secure as that login — and the login has to cover every path the configurator uses, not just `/`: `/`, `/server-caps`, `/search`, `/resolve-imdb`, `/resolve-tmdb` and `/debug/fallback-gallery`. `/server-caps` returns the access key itself, so leaving it outside the login gives the key away. `/poster`, `/logo`, `/trending/…` and `/static/…` stay outside it.
 
-```
-User clicks "Install in Stremio"
-  → stremio://host/c/<token>/manifest.json
-    → server decrypts token, returns manifest with country-specific catalogs
-      → Stremio fetches /c/<token>/catalog/movie/tx.it.topx.movie.json
-        → server calls TMDB (Italian language) → returns 10 metas
-          → for each meta, server builds /c/<token>/top-cover?rank=1&tmdbId=…&shape=…&canvasBackground=…
-            → Stremio fetches the cover image
-              → server checks SQLite cache → if hit, serve from disk (0 ms)
-                → if miss, call createTopCover() → Sharp composites artwork + number + logo + badges
-                  → save PNG/JPEG to disk, return image
-```
+Using Plex or Jellyfin? See [Plex and Jellyfin sync](CONFIGURATION.md#plex-and-jellyfin-sync).
 
-### Country → language mapping (22 languages)
+## Quality badges
 
-| Country | Lang | Country | Lang | Country | Lang |
-|---|---|---|---|---|---|
-| World | en | Italy | it | France | fr |
-| Germany | de | Spain | es | Brazil | pt-BR |
-| Portugal | pt | Greece | el | Turkey | tr |
-| India | hi | Indonesia | id | Malaysia | ms |
-| Hungary | hu | Romania | ro | Croatia | hr |
-| Netherlands | nl | Morocco | ar | Algeria | ar |
-| Lebanon | ar | Mexico | es | Guatemala | es |
-| Philippines | en | Ireland | en | UK | en |
-| US | en | Canada | en | Australia | en |
+Quality badges are optional. Choose a source in the dashboard's **Quality source** group:
 
-These map directly to TMDB `language=` and `include_image_language=` parameters, so:
-- **Movie titles** come back in the user's language (`Odissea` instead of `Odyssey` for Italian users).
-- **Genre names** are localized (e.g. `Sci-Fi` → `Fantascienza` for `it-IT`).
-- **Posters/logos** are sorted with the user's language first, then English, then textless.
+| Source | What you need |
+|---|---|
+| **AIOStreams** | Your own [AIOStreams](https://github.com/Viren070/AIOStreams) instance |
+| **Scraper** | Any standalone Stremio stream addon, such as [Torrentio](https://torrentio.strem.fun) or [Comet](https://comet.elfhosted.com) |
+| **QualiCache** | The hosted instance: URL `https://quality.myaio.xyz`, access key `HN7Aj1Z4CV95k0ZxJJ583nmU`. It checks quality in the background, so posters never wait on a scrape. [More](CONFIGURATION.md#quality-via-qualicache) |
 
----
+Plex and Jellyfin users get quality from their own files through the sync scripts, so they don't need any of these.
 
-## API
+## Documentation
 
-| Method | Endpoint | Returns |
-|---|---|---|
-| `GET` | `/` | Configurator HTML |
-| `GET` | `/manifest.json?country=it` | Default manifest (10 catalogs for the given country) |
-| `GET` | `/c/:token/manifest.json` | User's encrypted manifest (catalogs shaped by their config) |
-| `GET` | `/c/:token/catalog/:type/:catalogId.json` | Top 10 metas with numbered poster URLs |
-| `GET` | `/c/:token/meta/:type/:id.json` | Single meta (TMDB details in the country's language) |
-| `GET` | `/c/:token/top-cover?rank=1&tmdbId=…&shape=…&canvasBackground=…` | Rendered cover PNG/JPEG |
-| `GET` | `/poster` | **PostersPlus-compatible poster render** (AIOMetadata poster provider). Accepts `tmdb_id`/`imdb_id`/`type`/`shape` + all PostersPlus params + TOPX extras (`rank`, `country`, `canvas_background`). |
-| `GET` | `/api/countries` | List of 27 countries |
-| `GET` | `/api/platforms/:country` | Platforms available in the country |
-| `GET` | `/api/catalogs?country=it` | Catalog list (id/type/name) for the country |
-| `POST` | `/api/generate` | Generate manifest URLs from a config payload |
-| `GET` | `/api/stats` | Cache stats (covers, assets, mappings) |
+- [CONFIGURATION.md](CONFIGURATION.md): every setting and environment variable, QualiCache, the watchlist marker, caching and cache warming, and Plex/Jellyfin sync.
+- [URL_REFERENCE.md](URL_REFERENCE.md): poster URL parameters, landscape posters, anime IDs, how sashes and ratings are picked, and translations.
+- [ADVANCED.md](ADVANCED.md): tuning and debugging options you shouldn't need.
+- [CONTRIBUTING.md](CONTRIBUTING.md): working on PostersPlus itself.
 
-### `POST /api/generate` body
+## Support
 
-Two modes are supported:
+Chat, feature requests and bug reports are on [Discord](https://discord.com/invite/wEgTPNXUMU). 
 
-**Mode A — blvckTOP style (per-catalog options):**
-```json
-{
-  "catalogs": [
-    { "id": "tx.it.netflix.movie", "type": "movie", "name": "Netflix Top 10",
-      "shape": "landscape", "canvasBackground": "fresh",
-      "showMeta": true, "showLogo": true }
-  ]
-}
-```
+If you'd like to support development: [Ko-fi](https://ko-fi.com/umbraprojects).
 
-**Mode B — TOPX style (country + global options):**
-```json
-{
-  "country": "it",
-  "platforms": ["top10", "netflix", "disney"],
-  "posterShape": "landscape",
-  "canvasBackground": "fresh",
-  "showMeta": true,
-  "showLogo": true
-}
-```
+## Attribution
 
-Returns:
-```json
-{
-  "ok": true,
-  "manifestUrl": "http://host/c/<token>/manifest.json",
-  "stremioManifestUrl": "http://host/c/<stremio-token>/manifest.json",
-  "nuvioManifestUrl": "http://host/c/<nuvio-token>/manifest.json",
-  "catalogCount": 6,
-  "country": { "code": "it", "name": "Italy", "flag": "🇮🇹" },
-  "posterShape": "landscape",
-  "canvasBackground": "fresh"
-}
-```
+PostersPlus is built on data and images from these services. None of them endorse or certify it.
 
----
+<a href="https://www.themoviedb.org"><img src="static/tmdb-logo.svg" alt="TMDB" height="14"></a>
 
-## Why the two "poster types" don't conflict
+- **[TMDB](https://www.themoviedb.org)**: this product uses the TMDB API but is not endorsed or certified by TMDB. Posters, backdrops, logos, metadata and trending lists.
+- **[TheTVDB](https://thetvdb.com)**: metadata and artwork provided by TheTVDB.
+- **[MDBList](https://mdblist.com)**: ratings (including Letterboxd, Rotten Tomatoes, Metacritic and Trakt scores) and lists.
+- **[IMDb](https://www.imdb.com)**: information courtesy of IMDb. Used with permission. IMDb ratings come from the [IMDb non-commercial datasets](https://developer.imdb.com/non-commercial-datasets/).
+- **[AniList](https://anilist.co)** and **[Kitsu](https://kitsu.app)**: anime art, titles, genres and scores.
+- **[Cinemeta and Metahub](https://www.stremio.com)** (Stremio): metadata and logo fallbacks.
+- **[fanart.tv](https://fanart.tv)**: posters, logos and backgrounds.
+- **[Trakt](https://trakt.tv)**, **[SIMKL](https://simkl.com)** and **[PublicMetaDB](https://publicmetadb.com)**: watchlists for the watchlist marker.
+- **[Arctic Shift](https://arctic-shift.photon-reddit.com)**: Reddit archive used to detect digital releases.
+- **[Wikidata](https://www.wikidata.org)**: festival award winners, and the IMDb ids the Wikipedia lists below are matched by, under [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
+- **[Wikipedia](https://en.wikipedia.org)**: cult film, festival and Best Picture lists derived from Wikipedia ([List of cult films](https://en.wikipedia.org/wiki/List_of_cult_films), the Palme d'Or, Golden Lion, Golden Bear, Golden Leopard and Sundance Grand Jury Prize winners, and the Academy Award for Best Picture), under [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/). They ship in [data/](data) and are rebuilt with `tools/build_award_lists.py`.
+- **[RapidOCR](https://github.com/RapidAI/RapidOCR)**: the PP-OCRv5 text detection model from [PaddleOCR](https://github.com/PaddlePaddle/PaddleOCR), under the Apache License 2.0.
+- **Anime ID mapping**: from [Fribb/anime-lists](https://github.com/Fribb/anime-lists), which is built from [anime-offline-database](https://github.com/cedya77/anime-offline-database) (a continuation of [manami-project](https://github.com/manami-project)'s original) and [Anime-Lists/anime-lists](https://github.com/Anime-Lists/anime-lists). anime-offline-database is made available under the [Open Database License v1.0](https://opendatacommons.org/licenses/odbl/1-0/), and its contents under the [Database Contents License v1.0](https://opendatacommons.org/licenses/dbcl/1-0/).
 
-The previous PostersPlus and blvckTOP plugins both produced "posters" but along **different axes**:
+The bundled fonts are Almarai, Barlow Condensed, Bebas Neue, Creepster, Exo 2, Fira Sans, Inter, Manrope, Montserrat, Noto Serif, Open Sans, Oswald, Pacifico, Playfair Display, Plus Jakarta Sans, Roboto Condensed, Rubik and Space Grotesk under the [SIL Open Font License 1.1](https://openfontlicense.org), and Ubuntu under the [Ubuntu Font Licence 1.0](https://ubuntu.com/legal/font-licence). Each licence, with its copyright notice, is in [fonts/](fonts).
 
-| Plugin | Axis | Options |
-|---|---|---|
-| PostersPlus | Language / region of artwork + ratings/awards badges | 33 languages, 4 rating styles, 12+ award sashes |
-| blvckTOP | Visual layout / background / numbered overlay | 5 backgrounds × 2 shapes × 2 styles |
+### Badge artwork
 
-TOPX Posters combines them by:
+The Graphic Badges mode downloads its marks from Wikimedia Commons at runtime; none ship with PostersPlus. Dolby Vision, Dolby Atmos and the combined Vision • Atmos mark are built from [Dolby Vision 2021 logo.svg](https://commons.wikimedia.org/wiki/File:Dolby_Vision_2021_logo.svg) and [Dolby Cinema 2021 logo.svg](https://commons.wikimedia.org/wiki/File:Dolby_Cinema_2021_logo.svg) (public domain). The DTS:X mark is [DTS X B&W.png](https://commons.wikimedia.org/wiki/File:DTS_X_B%26W.png) by CinemaLover24680, [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/), cut to its "dts" letters and recoloured white. Dolby, Dolby Vision, Dolby Atmos and DTS:X are trademarks of their owners.
 
-1. **Taking blvckTOP's render pipeline as the visual layer** — `cover-generator.js` is unchanged. It still produces 5 backgrounds × 2 shapes × 2 styles exactly as in blvckTOP.
-2. **Taking PostersPlus's i18n approach as the data layer** — `tmdb.js` is extended with the same country→language map that PostersPlus uses (mapped to 22 of PostersPlus's 33 languages — the other 11 are minor variants). The TMDB image fetcher now passes `include_image_language=<country-lang>,en,null` and the artwork sorter prefers the country's language first.
-3. **Taking topx.stremio-italia.eu's country/platform matrix as the catalog layer** — `server.js` exposes 27 countries × 10 platforms and routes the country code through to both the catalog fetcher (so titles/genres come back in the right language) and the cover generator (so artwork/logos are sorted by the user's language).
+Rating badges are downloaded the same way, each pinned to the exact file reviewed. The IMDb, Rotten Tomatoes (tomato, lettered tomato, splat and both Popcornmeter buckets), Metacritic, Letterboxd, Trakt, MyAnimeList and AniList logos come from Wikimedia Commons, all public domain; the TMDB logo from [TMDB's logos page](https://www.themoviedb.org/about/logos-attribution); the Kitsu mark from [Simple Icons](https://simpleicons.org/) (CC0); and Roger Ebert's thumbs-up is [Material Symbols](https://github.com/google/material-design-icons)' `thumb_up` (Apache 2.0). Most are set on round plates in their brand colours. All are trademarks of their owners.
 
-So when an Italian user picks "Italy + Netflix + Fresh + Landscape", they get:
-- The Italian-language TMDB chart for Netflix Italy (titles in Italian where available, e.g. `Odissea`)
-- Italian-language posters/logos sorted first (then English, then textless)
-- A blvckTOP Fresh cover with the rank number in dark glass + the Italian title logo
+## License
 
-When a Brazilian user picks "Brazil + Disney+ + Provider Glass + Portrait", they get:
-- The Brazilian Portuguese TMDB chart for Disney+ Brazil
-- `pt-BR`-tagged posters sorted first
-- A blvckTOP Provider Glass portrait cover with the rank number on a Disney+ purple-tinted glass background
-
-No conflicts, no either/or — both "poster types" are simply different knobs on the same render pipeline.
-
----
-
-## Configuration reference
-
-| Env var | Default | Description |
-|---|---|---|
-| `PORT` | `3000` | HTTP port |
-| `APP_SECRET` | (none, **required**) | Stable string ≥ 24 chars used to derive the AES-256-GCM key. **Never change this after users have generated manifests** — their tokens will become invalid. |
-| `TMDB_API_KEY` | `ad0f7351455041d8c9c0d4370a4b5fa5` | TMDB API key. Override with your own to avoid rate limits. |
-| `DATA_DIR` | `./data` | Where the SQLite DB + cached covers live. |
-| `HTTPS_PROXY` / `HTTP_PROXY` | (none) | Outbound proxy (used by `undici`'s `ProxyAgent`). |
-
----
-
-## License & credits
-
-- Cover generator, scheduler, and DB layer: **blvckTOP** by [@qwertyuiop8899](https://github.com/qwertyuiop8899) — MIT.
-- Country/language i18n approach: **PostersPlus** by [@UmbraProjects](https://github.com/UmbraProjects) — MIT.
-- Country × platform matrix: inspired by **topx.stremio-italia.eu**.
-- Combined plugin assembled by SaugatXthaa.
+[GNU Affero General Public License v3.0](LICENSE). This project and any forks of it should remain open source.

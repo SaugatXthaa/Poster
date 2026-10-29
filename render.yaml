@@ -1,34 +1,34 @@
 # Render.com Blueprint — deploy with one click
 # https://render.com/docs/blueprint-spec
 #
-# Deploys TOPX Posters as a Docker web service. Render auto-detects PORT;
-# the app binds to it (see server.js: process.env.PORT || 3000).
+# TOPX Posters+ runs the Posters Plus render pipeline (Python / FastAPI /
+# Pillow) with the TOPX and BLVCKTOP poster templates added on top.  The
+# image is built from the project's own dockerfile; Render injects PORT and
+# entrypoint.sh binds to it.
 #
 # After the first deploy, set TMDB_API_KEY in the dashboard
 # (Environment → Environment Variables) with your own key from
-# https://www.themoviedb.org/settings/api — the demo key works but is
-# heavily rate-limited.
+# https://www.themoviedb.org/settings/api.  MDBLIST_API_KEY is optional:
+# it drives the weighted score (the ★ rating) and the award data.
+#
+# The free plan has no persistent disk: the render caches in /app/cache are
+# ephemeral and warm up again after a restart.  On a paid plan attach a disk
+# like the commented block below for instant cache hits.
 
 services:
   - type: web
     name: topx-posters
     runtime: docker
+    dockerfilePath: ./dockerfile
     plan: free
     autoDeploy: true
-    healthCheckPath: /manifest.json
+    healthCheckPath: /health
     envVars:
-      - key: APP_SECRET
-        generateValue: true          # long random secret, stable across restarts
       - key: TMDB_API_KEY
         sync: false                  # ← paste your TMDB key in the dashboard
-      - key: NODE_ENV
-        value: production
-      - key: MALLOC_ARENA_MAX
-        value: "2"
-    # Free plan has no persistent disk: the SQLite cache + rendered covers in
-    # /app/data are ephemeral and regenerate on demand after a restart.
-    # On a paid plan you can attach a disk like this for instant cache hits:
+      - key: MDBLIST_API_KEY
+        sync: false                  # optional — weighted score + awards
     # disk:
-    #   name: topx-data
-    #   mountPath: /app/data
+    #   name: topx-cache
+    #   mountPath: /app/cache
     #   sizeGB: 1
