@@ -57,13 +57,8 @@
       linear-gradient(180deg, rgba(201,168,76,0.03), transparent);
     height:38vh; min-height:250px;
   }
-  .preview-stage.bottom-stage{
-    border-bottom:0; border-top:1px solid var(--border);
-    background:linear-gradient(0deg, rgba(201,168,76,0.03), transparent);
-    height:24vh; min-height:180px; padding:6px 10px;
-  }
-  @media (max-width:900px){ .preview-stage{height:32vh; min-height:210px} .preview-stage.bottom-stage{height:20vh; min-height:150px} }
-  @media (max-height:760px){ .preview-stage{height:30vh; min-height:190px} .preview-stage.bottom-stage{height:18vh; min-height:140px} }
+  @media (max-width:900px){ .preview-stage{height:32vh; min-height:210px} }
+  @media (max-height:760px){ .preview-stage{height:30vh; min-height:190px} }
   .preview-side{
     display:flex; flex-direction:column; gap:8px; align-items:center; justify-content:center;
     min-width:150px; max-width:240px;
@@ -340,30 +335,6 @@
     <div class="section" data-tab="extras" id="sec-extras"></div>
   </div>
 
-  <!-- ── LIVE PREVIEW · BOTTOM PIN (never scrolls — glued below the options) ── -->
-  <div class="preview-stage bottom-stage" id="stageBottom">
-    <div class="preview-frame" id="previewFrameBottom" style="height:100%;">
-      <div class="spin">Rendering…</div>
-      <img id="previewImgBottom" alt="Live preview" referrerpolicy="no-referrer">
-    </div>
-    <div class="preview-side">
-      <div class="rank-nav">
-        <button id="prevRankBottom" title="Previous rank">‹</button>
-        <span class="rank-label" id="rankLabelBottom">#1 / 10</span>
-        <button id="nextRankBottom" title="Next rank">›</button>
-      </div>
-      <div class="preview-meta" id="previewMetaBottom">—</div>
-      <div class="preview-quick">
-        <button class="mini-pill" data-qshape="landscape" id="qbLandscape">16:9</button>
-        <button class="mini-pill" data-qshape="poster" id="qbPoster">2:3</button>
-        <select class="quick-bg" id="quickBgBottom" title="Canvas background">
-          <option value="fresh">Fresh</option><option value="provider">Glass</option>
-          <option value="stremio">Navy</option><option value="black">Black</option>
-          <option value="transparent">Clear</option>
-        </select>
-      </div>
-    </div>
-  </div>
   <div class="zoom-overlay" id="zoomOverlay"><img id="zoomImg" alt="Zoomed preview"></div>
 
   <!-- ── BOTTOM BAR (fixed) ── -->
@@ -611,6 +582,26 @@ function renderSections(){
           <option value="">Bullet (default)</option><option value="pipe">Pipe</option>
           <option value="star">Star</option><option value="slash">Slash</option>
         </select></div>
+    </div>
+    <span class="group-title">Landscape Badges (PostersPlus)</span>
+    <div class="three-col">
+      <div class="field"><label class="field-label">Landscape badge style (landscape_badge_style)</label>
+        <select class="field-select" id="pp-landscape_badge_style">
+          <option value="glass">Glass</option><option value="frosted">Frosted</option><option value="solid">Solid</option>
+        </select></div>
+      <div class="field"><label class="field-label">Landscape badge shape (landscape_badge_shape)</label>
+        <select class="field-select" id="pp-landscape_badge_shape">
+          <option value="ribbon">Ribbon</option><option value="pill">Pill</option>
+        </select></div>
+      <div class="field"><label class="field-label">Landscape badge case (landscape_badge_case)</label>
+        <select class="field-select" id="pp-landscape_badge_case">
+          <option value="auto">Auto</option><option value="upper">Upper</option><option value="lower">Lower</option>
+        </select></div>
+      <div class="field"><label class="field-label">Landscape badge scale (landscape_badge_scale)</label>
+        <div class="range-row"><input type="range" id="pp-r-landscape_badge_scale" min="0.5" max="1.5" step="0.05" value="1.00"><span class="range-val" id="pp-r-landscape_badge_scaleV">1.00</span></div></div>
+    </div>
+    <div class="toggle-row">
+      <div class="toggle" id="pp-t-landscape_score_out_of_10"><div><div class="tlabel">Landscape score out of 10 (landscape_score_out_of_10)</div><div class="tdesc">// Print “7.5/10” in landscape numeric mode</div></div><div class="switch"></div></div>
     </div>`;
 
   $("sec-language").innerHTML = `
@@ -809,6 +800,16 @@ function renderSections(){
         <div class="range-row"><input type="range" id="pp-r-sash_length_ratio" min="0.6" max="1.4" step="0.05" value="1.00"><span class="range-val" id="pp-r-sash_length_ratioV">1.00</span></div></div>
       <div class="field"><label class="field-label">Sash height × (sash_height_ratio)</label>
         <div class="range-row"><input type="range" id="pp-r-sash_height_ratio" min="0.08" max="0.24" step="0.005" value="0.140"><span class="range-val" id="pp-r-sash_height_ratioV">0.140</span></div></div>
+      <div class="field"><label class="field-label">Chip X offset (sash_chip_x)</label>
+        <div class="range-row"><input type="range" id="pp-r-sash_chip_x" min="0" max="1" step="0.01" value="0"><span class="range-val" id="pp-r-sash_chip_xV">0</span></div></div>
+      <div class="field"><label class="field-label">Chip Y offset (sash_chip_y)</label>
+        <div class="range-row"><input type="range" id="pp-r-sash_chip_y" min="0" max="1" step="0.01" value="0"><span class="range-val" id="pp-r-sash_chip_yV">0</span></div></div>
+      <div class="field"><label class="field-label">Edge Y position (sash_edge_y)</label>
+        <div class="range-row"><input type="range" id="pp-r-sash_edge_y" min="0" max="1" step="0.01" value="0.50"><span class="range-val" id="pp-r-sash_edge_yV">0.50</span></div></div>
+      <div class="field"><label class="field-label">Badge frost opacity (sash_badge_frost_opacity)</label>
+        <div class="range-row"><input type="range" id="pp-r-sash_badge_frost_opacity" min="0" max="1" step="0.05" value="0.85"><span class="range-val" id="pp-r-sash_badge_frost_opacityV">0.85</span></div></div>
+      <div class="field"><label class="field-label">Badge frost saturation (sash_badge_frost_saturation)</label>
+        <div class="range-row"><input type="range" id="pp-r-sash_badge_frost_saturation" min="0" max="2" step="0.05" value="1.20"><span class="range-val" id="pp-r-sash_badge_frost_saturationV">1.20</span></div></div>
     </div>
     <div class="toggle-row">
       <div class="toggle" id="pp-t-sash_winner_star"><div><div class="tlabel">Winner star (sash_winner_star)</div><div class="tdesc">// Award winner marker on the sash</div></div><div class="switch"></div></div>
@@ -832,6 +833,16 @@ function renderSections(){
           <option value="top_left">Top left</option><option value="top_right">Top right</option>
           <option value="bottom_left">Bottom left</option><option value="bottom_right">Bottom right</option>
         </select></div>
+      <div class="field"><label class="field-label">Legacy style (badge_legacy_style)</label>
+        <select class="field-select" id="pp-badge_legacy_style"><option value="notch">Notch</option><option value="badge">Badge</option><option value="hidden">Hidden</option></select></div>
+      <div class="field"><label class="field-label">Quality style (badge_quality_style)</label>
+        <select class="field-select" id="pp-badge_quality_style"><option value="solid">Solid</option><option value="frosted">Frosted</option><option value="glass">Glass</option></select></div>
+      <div class="field"><label class="field-label">Logo style (badge_logo_style)</label>
+        <select class="field-select" id="pp-badge_logo_style"><option value="solid">Solid</option><option value="frosted">Frosted</option><option value="glass">Glass</option></select></div>
+      <div class="field"><label class="field-label">Cinema style (badge_cinema_style)</label>
+        <select class="field-select" id="pp-badge_cinema_style"><option value="auto">Auto</option><option value="solid">Solid</option><option value="frosted">Frosted</option><option value="glass">Glass</option></select></div>
+      <div class="field"><label class="field-label">Cert style (badge_cert_style)</label>
+        <select class="field-select" id="pp-badge_cert_style"><option value="solid">Solid</option><option value="frosted">Frosted</option><option value="glass">Glass</option></select></div>
     </div>
     <span class="group-title">Compact Bar (mode 4)</span>
     <div class="three-col">
@@ -880,6 +891,10 @@ function renderSections(){
         <select class="field-select" id="pp-trending_ribbon_style">${opts(["charcoal","silver","gold","frosted"].map(s=>[s,s]))}</select></div>
       <div class="field"><label class="field-label">Ribbon frost (trending_frost_opacity)</label>
         <div class="range-row"><input type="range" id="pp-r-trending_frost_opacity" min="0" max="1" step="0.05" value="0.85"><span class="range-val" id="pp-r-trending_frost_opacityV">0.85</span></div></div>
+      <div class="field"><label class="field-label">Ribbon frost saturation (trending_frost_saturation)</label>
+        <div class="range-row"><input type="range" id="pp-r-trending_frost_saturation" min="0" max="2" step="0.05" value="1.20"><span class="range-val" id="pp-r-trending_frost_saturationV">1.20</span></div></div>
+      <div class="field"><label class="field-label">Trending sash (trending_sash)</label>
+        <select class="field-select" id="pp-trending_sash"><option value="keep">Keep</option><option value="replace">Replace</option><option value="hide">Hide</option></select></div>
     </div>
     <div class="toggle-row">
       <div class="toggle" id="pp-t-trending_label"><div><div class="tlabel">Ribbon label (trending_label)</div><div class="tdesc">// Print “TOP 10” on the ribbon</div></div><div class="switch"></div></div>
@@ -904,6 +919,7 @@ function renderSections(){
       <div class="toggle on" id="pp-t-airing_dates"><div><div class="tlabel">Show airing dates</div><div class="tdesc">// airing_dates</div></div><div class="switch"></div></div>
       <div class="toggle" id="pp-t-hide_unreleased_rating"><div><div class="tlabel">Hide rating on unreleased titles</div><div class="tdesc">// hide_unreleased_rating</div></div><div class="switch"></div></div>
       <div class="toggle" id="pp-t-cinema_greyscale"><div><div class="tlabel">Cinema greyscale (cinema_greyscale)</div><div class="tdesc">// Monochrome art for cinema-only releases</div></div><div class="switch"></div></div>
+      <div class="toggle" id="pp-t-cinema_greyscale_skip_if_available"><div><div class="tlabel">Skip if art available (cinema_greyscale_skip_if_available)</div><div class="tdesc">// Don’t desaturate when a streaming/poster artwork exists</div></div><div class="switch"></div></div>
     </div>`;
 }
 
@@ -990,33 +1006,26 @@ function wireControls(){
   $("ratingModePills").addEventListener("click",e=>{ const b=e.target.closest(".pill"); if(!b)return; state.pp.rating_display_mode=b.dataset.rm; [...e.currentTarget.children].forEach(p=>p.classList.toggle("active",p===b)); updateAll(); });
   // Preview quick switchers (both strips)
   const setShape = s => { state.shape = s;
-    [["qpLandscape","qpPoster"],["qbLandscape","qbPoster"]].forEach(([l,p])=>{
-      $(l).classList.toggle("active", s==="landscape"); $(p).classList.toggle("active", s==="poster");
-    });
+    $("qpLandscape").classList.toggle("active", s==="landscape"); $("qpPoster").classList.toggle("active", s==="poster");
     $("shapePills").querySelectorAll(".pill").forEach(p=>p.classList.toggle("active", p.dataset.shape===s));
   };
   document.querySelectorAll("[data-qshape]").forEach(b=>b.addEventListener("click",()=>{ setShape(b.dataset.qshape); updateAll(); }));
-  const bindQuickBg = (sel, mirror) => {
+  const bindQuickBg = (sel) => {
     $(sel).addEventListener("change", e=>{
       state.bg = e.target.value;
-      $(mirror).value = e.target.value;
       $("bgPills").querySelectorAll(".pill").forEach(p=>p.classList.toggle("active", p.dataset.bg===state.bg));
       updateAll();
     });
   };
-  bindQuickBg("quickBg","quickBgBottom");
-  bindQuickBg("quickBgBottom","quickBg");
+  bindQuickBg("quickBg");
   // Rank navigation — both strips, synced
   const nav = d => { const n = state.previewRank + d;
     if (n>=1 && n<=state.previewMetas.length){ state.previewRank = n; renderPreview(); } };
   $("prevRankTop").addEventListener("click",()=>nav(-1));
   $("nextRankTop").addEventListener("click",()=>nav(1));
-  $("prevRankBottom").addEventListener("click",()=>nav(-1));
-  $("nextRankBottom").addEventListener("click",()=>nav(1));
-  // Zoom from both frames
+  // Zoom from preview frame
   const zoom = src => { const img=$(src); if(img.src && img.naturalWidth){ $("zoomImg").src=img.src; $("zoomOverlay").classList.add("show"); } };
   $("previewFrameTop").addEventListener("click",()=>zoom("previewImgTop"));
-  $("previewFrameBottom").addEventListener("click",()=>zoom("previewImgBottom"));
   $("zoomOverlay").addEventListener("click",()=>$("zoomOverlay").classList.remove("show"));
   document.addEventListener("keydown",e=>{ if(e.key==="Escape") $("zoomOverlay").classList.remove("show"); });
   // Generate + copy
@@ -1238,28 +1247,24 @@ async function loadPreviewMetas(){
   }catch(err){
     setPreviewSrc("");
     $("previewMetaTop").textContent = `// preview error: ${err.message}`;
-    $("previewMetaBottom").textContent = `// preview error`;
   }
 }
 function setPreviewSrc(url){
-  for (const id of ["previewImgTop","previewImgBottom"]) {
-    const img = $(id), frame = $(id.replace("Img","Frame"));
-    frame.classList.add("loading");
-    img.onload = () => { frame.classList.remove("loading"); img.dataset.ok = "1"; };
-    img.onerror = () => { frame.classList.remove("loading"); img.dataset.ok = ""; };
-    if (url) { img.src = url; } else { img.removeAttribute("src"); img.dataset.ok = ""; frame.classList.remove("loading"); }
-  }
+  const img = $("previewImgTop"), frame = $("previewFrameTop");
+  frame.classList.add("loading");
+  img.onload = () => { frame.classList.remove("loading"); img.dataset.ok = "1"; };
+  img.onerror = () => { frame.classList.remove("loading"); img.dataset.ok = ""; };
+  if (url) { img.src = url; } else { img.removeAttribute("src"); img.dataset.ok = ""; frame.classList.remove("loading"); }
 }
 function renderPreview(){
   const m = state.previewMetas[state.previewRank-1];
   const total = Math.max(state.previewMetas.length, 10);
-  for (const id of ["rankLabelTop","rankLabelBottom"]) $(id).textContent = `#${state.previewRank} / ${total}`;
-  $("prevRankTop").disabled = $("prevRankBottom").disabled = state.previewRank<=1;
-  $("nextRankTop").disabled = $("nextRankBottom").disabled = state.previewRank>=state.previewMetas.length;
-  if(!m){ $("previewMetaTop").textContent="—"; $("previewMetaBottom").textContent="—"; return; }
+  $("rankLabelTop").textContent = `#${state.previewRank} / ${total}`;
+  $("prevRankTop").disabled = state.previewRank<=1;
+  $("nextRankTop").disabled = state.previewRank>=state.previewMetas.length;
+  if(!m){ $("previewMetaTop").textContent="—"; return; }
   const metaHtml = `<b>#${state.previewRank}</b> ${m.name}${m.genre?` · ${m.genre}`:""}${m.imdbRating?` · ★ ${m.imdbRating}`:""}`;
   $("previewMetaTop").innerHTML = metaHtml;
-  $("previewMetaBottom").innerHTML = metaHtml;
   setPreviewSrc(buildPosterUrl({ concrete:true, meta:m }));
 }
 
