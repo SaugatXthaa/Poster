@@ -2350,6 +2350,184 @@
   }
   html.light-mode .sash-disable-btn:hover      { color: #b04a44; border-color: #b04a44; }
 </style>
+<style id="topx-strip-style">
+  /* ═══ TOPX LOCKED PREVIEW STRIP — occupies the announcement/ad area.
+     Options on the LEFT, the locked live preview on the RIGHT. The strip is
+     sticky, so the preview stays pinned while the configuration scrolls. ═══ */
+  .topx-strip {
+    position: sticky; top: 0; z-index: 40;
+    background: var(--black);
+    padding: 12px 0 16px;
+    margin-bottom: 20px;
+  }
+  .topx-strip::after {
+    content: ''; position: absolute; left: -28px; right: -28px; bottom: 0;
+    height: 1px; background: var(--border);
+  }
+  .topx-strip-inner {
+    width: 864px;
+    height: 424px;
+    display: grid; grid-template-columns: 430px 414px; gap: 20px;
+    align-items: stretch;
+  }
+  /* LEFT — topx poster options */
+  .topx-options {
+    background: var(--black1);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    display: flex; flex-direction: column;
+    overflow: hidden; min-height: 0;
+  }
+  .topx-opt-head {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 13px 16px 11px; border-bottom: 1px solid var(--border); flex: 0 0 auto;
+  }
+  .topx-opt-title { font-family: var(--serif); font-size: 17px; font-weight: 400; color: var(--cream); letter-spacing: 0.015em; }
+  .topx-opt-status {
+    font-size: 8px; letter-spacing: 0.16em; color: var(--silver-dim);
+    padding: 3px 9px; border: 1px solid var(--border); border-radius: 999px; background: var(--black2);
+  }
+  .topx-opt-status.ok  { color: var(--gold-bright); border-color: var(--gold-dim); }
+  .topx-opt-status.err { color: #c0443a; border-color: #8a2a26; }
+  .topx-scroll {
+    flex: 1; min-height: 0; overflow-y: auto;
+    padding: 12px 14px 14px;
+    display: flex; flex-direction: column; gap: 11px;
+    scrollbar-width: none;
+  }
+  .topx-scroll::-webkit-scrollbar { width: 0; height: 0; }
+  .topx-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .topx-row.topx-col { flex-direction: column; align-items: stretch; gap: 6px; }
+  .topx-label {
+    font-size: 8.5px; letter-spacing: calc(0.18em * var(--track)); text-transform: uppercase;
+    color: var(--text-muted); flex: 0 0 62px;
+  }
+  .topx-col .topx-label, .topx-cell .topx-label { flex: none; }
+  .topx-pills { display: flex; gap: 5px; flex-wrap: wrap; flex: 1; min-width: 0; }
+  .topx-cell { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 5px; }
+  .mini-pill {
+    padding: 5px 10px; border-radius: 999px; border: 1px solid var(--border); background: var(--black2);
+    color: var(--silver-dim); font-size: 9px; font-weight: 600; cursor: pointer; letter-spacing: 0.06em;
+    font-family: var(--mono); transition: all 0.15s;
+  }
+  .mini-pill:hover { border-color: var(--black5); color: var(--silver); }
+  .mini-pill.active {
+    border-color: var(--gold-dim); color: var(--gold-bright);
+    background: linear-gradient(180deg, rgba(201,168,76,0.10), rgba(201,168,76,0.03));
+  }
+  .mini-pill:disabled { opacity: 0.4; cursor: not-allowed; }
+  .quick-bg {
+    padding: 7px 9px; border-radius: var(--radius-sm); border: 1px solid var(--border);
+    background: var(--black2); color: var(--silver); font-size: 10px; cursor: pointer;
+    font-family: var(--mono); width: 100%; box-sizing: border-box;
+  }
+  .quick-bg:focus { outline: none; border-color: var(--gold-dim); }
+  .topx-rank { display: flex; gap: 6px; align-items: center; font-size: 10px; color: var(--silver-dim); }
+  .topx-rank button {
+    width: 26px; height: 26px; border-radius: 5px; border: 1px solid var(--border);
+    background: var(--black2); color: var(--silver); cursor: pointer; font-size: 13px; transition: all 0.15s;
+  }
+  .topx-rank button:hover:not(:disabled) { border-color: var(--gold-dim); color: var(--gold-bright); }
+  .topx-rank button:disabled { opacity: 0.35; cursor: not-allowed; }
+  .rank-label { letter-spacing: 0.06em; min-width: 52px; text-align: center; }
+  .country-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(88px, 1fr)); gap: 5px; }
+  .country-card {
+    display: flex; align-items: center; gap: 6px; padding: 6px 8px;
+    border: 1px solid var(--border); border-radius: 6px; background: var(--black2);
+    cursor: pointer; font-size: 9.5px; color: var(--silver); font-family: var(--mono);
+    text-align: left; transition: all 0.15s; min-width: 0;
+  }
+  .country-card .flag { font-size: 12px; flex: 0 0 auto; }
+  .country-card .name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .country-card:hover { border-color: var(--black5); }
+  .country-card.active {
+    border-color: var(--gold-dim); color: var(--gold-bright);
+    background: linear-gradient(180deg, rgba(201,168,76,0.10), rgba(201,168,76,0.03));
+  }
+  .platforms-grid { display: flex; flex-wrap: wrap; gap: 5px; }
+  .platform-chip {
+    display: flex; align-items: center; gap: 6px; padding: 5px 10px;
+    border: 1px solid var(--border); border-radius: 999px; background: var(--black2);
+    cursor: pointer; font-size: 9px; color: var(--silver-dim); font-family: var(--mono); transition: all 0.15s;
+  }
+  .platform-chip .pdot { width: 7px; height: 7px; border-radius: 50%; flex: 0 0 auto; }
+  .platform-chip .pcheck { display: none; color: var(--gold-bright); }
+  .platform-chip:hover { border-color: var(--black5); }
+  .platform-chip.active { border-color: var(--gold-dim); color: var(--gold-bright); }
+  .platform-chip.active .pcheck { display: inline; }
+  .tx-manifest { display: flex; gap: 6px; }
+  .tx-manifest input {
+    flex: 1; min-width: 0; padding: 7px 9px; border-radius: 6px; border: 1px solid var(--border);
+    background: var(--black2); color: var(--gold-bright); font-size: 9.5px; font-family: var(--mono);
+  }
+  .tx-manifest input:focus { outline: none; border-color: var(--gold-dim); }
+  .tx-manifest button {
+    padding: 7px 12px; border-radius: 6px; border: 1px solid var(--gold-dim);
+    background: linear-gradient(180deg, rgba(201,168,76,0.14), rgba(201,168,76,0.04));
+    color: var(--gold-bright); font-size: 8.5px; letter-spacing: 0.14em; cursor: pointer; font-family: var(--mono);
+  }
+  .tx-install { display: flex; gap: 8px; }
+  .tx-install-btn {
+    flex: 1; text-align: center; padding: 8px 6px; border: 1px solid var(--gold-dim);
+    border-radius: var(--radius-sm); color: var(--gold-bright); font-size: 9px; letter-spacing: 0.12em;
+    text-transform: uppercase; text-decoration: none;
+    background: linear-gradient(180deg, rgba(201,168,76,0.12), rgba(201,168,76,0.03));
+  }
+  .tx-install-btn:hover { border-color: var(--gold); }
+  .tx-manifest.hidden, .tx-install.hidden { display: none; }
+  /* RIGHT — locked live preview */
+  .topx-preview {
+    background: var(--black1);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    display: flex; flex-direction: column;
+    overflow: hidden; position: relative; min-height: 0;
+  }
+  .topx-preview .panel-header { border-bottom: 1px solid var(--border); padding: 13px 16px 11px; flex: 0 0 auto; }
+  .topx-preview .panel-title { font-size: 17px; }
+  .topx-preview .preview-frame { flex: 1; min-height: 0; padding: 12px; cursor: zoom-in; }
+  .topx-preview .preview-poster { height: 100%; width: auto; max-width: 100%; max-height: 100%; }
+  .topx-preview .preview-frame.is-landscape .preview-poster { width: 100%; height: auto; max-height: 100%; }
+  .topx-preview .preview-empty { padding: 10px; }
+  .tx-meta {
+    flex: 0 0 auto; padding: 0 16px 8px; text-align: center;
+    font-size: 9.5px; color: var(--silver-dim); letter-spacing: 0.04em;
+  }
+  .tx-meta b { color: var(--gold-bright); }
+  .topx-preview .preview-actions { padding: 0 16px 12px; }
+  .topx-preview .preview-controls { padding: 0 16px 12px; }
+  /* zoom overlay */
+  .tx-zoom {
+    position: fixed; inset: 0; z-index: 3500; background: rgba(4,4,6,0.93);
+    display: none; align-items: center; justify-content: center; cursor: zoom-out; padding: 3vh;
+  }
+  .tx-zoom.show { display: flex; }
+  .tx-zoom img { max-width: 96vw; max-height: 94vh; object-fit: contain; border-radius: 8px; }
+  /* light mode — the gold tints go blue, like every other hardcoded fill */
+  html.light-mode .mini-pill.active,
+  html.light-mode .country-card.active,
+  html.light-mode .tx-install-btn,
+  html.light-mode .tx-manifest button {
+    background: linear-gradient(180deg, rgba(16,53,120,0.13), rgba(16,53,120,0.04));
+  }
+  html.light-mode .tx-zoom { background: rgba(240,238,230,0.93); }
+  /* layout: the configuration keeps its own width, centred under the strip */
+  @media (min-width: 961px) {
+    .main-layout { grid-template-columns: 430px; justify-content: center; }
+  }
+  @media (max-height: 860px) and (min-width: 961px) {
+    .topx-strip-inner { height: 372px; }
+  }
+  @media (max-width: 960px) {
+    .topx-strip { position: static; padding: 0 0 0; }
+    .topx-strip::after { display: none; }
+    .topx-strip-inner { width: 100%; height: auto; grid-template-columns: minmax(0, 1fr); }
+    .topx-preview { order: -1; }
+    .topx-preview .preview-frame { min-height: 240px; }
+    .topx-preview .preview-poster { height: auto; max-height: 52vh; }
+    .topx-scroll { max-height: 420px; }
+  }
+</style>
 <script>/* apply saved theme before first paint to avoid flash */
 try{if(localStorage.getItem('postersplus_theme')==='light')document.documentElement.classList.add('light-mode')}catch(e){}</script>
 </head>
@@ -2393,6 +2571,187 @@ try{if(localStorage.getItem('postersplus_theme')==='light')document.documentElem
       </a>
     </div>
   </header>
+
+  <!-- ═══ TOP: LOCKED LIVE PREVIEW STRIP (topx) ════════════════════════════
+       Occupies the announcement/ad area: topx poster options on the LEFT,
+       the locked live preview on the RIGHT. Sticky, so it stays pinned while
+       the configuration scrolls beneath it — like the real topx website. -->
+  <div class="topx-strip" id="topx-strip">
+    <div class="topx-strip-inner">
+
+      <!-- LEFT: TOPX POSTER OPTIONS -->
+      <div class="topx-options">
+        <div class="topx-opt-head">
+          <span class="topx-opt-title">Preview Options</span>
+          <span class="topx-opt-status" id="tx-status">BOOT</span>
+        </div>
+        <div class="topx-scroll">
+
+          <div class="topx-row">
+            <span class="topx-label">Catalog</span>
+            <div class="topx-pills">
+              <button type="button" class="mini-pill tx-cat active" data-txcat="movie">Movies</button>
+              <button type="button" class="mini-pill tx-cat" data-txcat="series">Series</button>
+            </div>
+          </div>
+
+          <div class="topx-row">
+            <span class="topx-label">Rank</span>
+            <div class="topx-rank">
+              <button type="button" id="prevRankTop" title="Previous rank">‹</button>
+              <span class="rank-label" id="rankLabelTop">#1 / 10</span>
+              <button type="button" id="nextRankTop" title="Next rank">›</button>
+            </div>
+          </div>
+
+          <div class="topx-row">
+            <span class="topx-label">Shape</span>
+            <div class="topx-pills">
+              <button type="button" class="mini-pill tx-shape" data-qshape="landscape">16:9 Landscape</button>
+              <button type="button" class="mini-pill tx-shape" data-qshape="poster">2:3 Portrait</button>
+            </div>
+          </div>
+
+          <div class="topx-row">
+            <div class="topx-cell">
+              <span class="topx-label">Canvas</span>
+              <select class="quick-bg" id="quickBg" title="Canvas background">
+                <option value="fresh">Fresh · full-bleed</option>
+                <option value="provider">Provider Glass</option>
+                <option value="stremio">Stremio Navy</option>
+                <option value="black">Black</option>
+                <option value="transparent">Transparent</option>
+              </select>
+            </div>
+            <div class="topx-cell">
+              <span class="topx-label">Language</span>
+              <select class="quick-bg" id="tx-lang" title="Poster language — mirrors the Core tab's Native Language, every language supported"></select>
+            </div>
+          </div>
+
+          <div class="topx-row">
+            <span class="topx-label">Overlays</span>
+            <div class="topx-pills">
+              <button type="button" class="mini-pill tx-tog active" data-txtog="showRank" data-tip="Numbered Top 10 cover — off = clean poster (AIOMetadata per-title mode)">Rank #</button>
+              <button type="button" class="mini-pill tx-tog active" data-txtog="showMeta" data-tip="Genre · year · rating meta line on the cover">Meta</button>
+              <button type="button" class="mini-pill tx-tog active" data-txtog="showLogo" data-tip="Title logo on the cover">Logo</button>
+              <button type="button" class="mini-pill tx-tog" data-txtog="useOriginalArt" data-tip="Prefer art with the title baked in">Original art</button>
+              <button type="button" class="mini-pill tx-tog" data-txtog="posterCrop" data-tip="Crop portrait art to fill the 16:9 canvas">Crop 16:9</button>
+              <button type="button" class="mini-pill tx-tog" data-txtog="greyscale" data-tip="Greyscale landscape artwork">Greyscale</button>
+            </div>
+          </div>
+
+          <div class="topx-row topx-col">
+            <span class="topx-label">Country</span>
+            <div class="country-grid" id="countryGrid"></div>
+          </div>
+
+          <div class="topx-row topx-col">
+            <span class="topx-label">Platforms</span>
+            <div class="platforms-grid" id="platformsGrid"></div>
+          </div>
+
+          <div class="topx-row topx-col">
+            <span class="topx-label">Install · Stremio / Nuvio</span>
+            <div class="topx-pills">
+              <button type="button" class="mini-pill" id="tx-generate">Generate Manifest</button>
+            </div>
+            <div class="tx-manifest hidden" id="tx-manifest-box">
+              <input id="tx-manifest-url" readonly placeholder="manifest URL…">
+              <button type="button" id="tx-copy-manifest">COPY</button>
+            </div>
+            <div class="tx-install hidden" id="tx-install-row">
+              <a class="tx-install-btn" id="tx-stremio" href="#" target="_blank" rel="noopener">▶ Stremio</a>
+              <a class="tx-install-btn" id="tx-nuvio" href="#" target="_blank" rel="noopener">◆ Nuvio</a>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- RIGHT: LOCKED LIVE PREVIEW -->
+      <div class="topx-preview">
+        <div class="notch"></div>
+        <div class="panel-header">
+          <span class="panel-title">Live preview</span>
+          <div class="panel-header-actions">
+            <!-- Portrait / landscape preview.  The checkbox is the state — it
+                 rides through build() as shape=landscape, and so through the
+                 saved settings and Reset like every other tog- control; the
+                 button only mirrors it. -->
+            <input type="checkbox" id="tog-landscape" hidden>
+            <!-- Into the admin dashboard's artwork editor for this title.  Only
+                 when the operator turned it on there (off by default). -->
+            <!-- Report this poster to the operator (REPORTS_ENABLED). -->
+            <button type="button" class="icon-btn" id="report-poster" hidden
+                    aria-label="Report a problem with this poster"
+                    data-tip="Report a problem with this poster to whoever runs this instance: text on a textless poster, the wrong art or logo, wrong details."
+                    onclick="openReportModal()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 20.5v-17"/><path d="M6.5 3.5h11l-2 4.25 2 4.25h-11"/></svg>
+            </button>
+            <a class="icon-btn" id="artwork-edit-link" hidden
+               aria-label="Edit this title's artwork in the admin dashboard"
+               data-tip="Choose this title's poster, logo and landscape art for everyone, in the admin dashboard.">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><g transform="translate(1.5 0)"><rect x="3" y="3" width="13" height="18" rx="2"/><path d="M3 15l4-4 4 4"/><path d="M14.5 13.5l6-6a1.4 1.4 0 0 0-2-2l-6 6-.8 2.8z"/></g></svg>
+            </a>
+            <button type="button" class="icon-btn" id="shape-toggle"
+                    aria-pressed="false"
+                    aria-label="Switch the preview between portrait and landscape"
+                    data-tip="Preview the 16:9 landscape poster. Copy config then copies the landscape URL, for clients with a landscape poster slot."
+                    onclick="toggleShape()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M3 14h18"/></svg>
+            </button>
+            <!-- Opens #external-menu; hidden until a title is selected. -->
+            <button type="button" class="icon-btn" id="external-link" hidden
+                    aria-haspopup="true" aria-expanded="false"
+                    aria-label="Open this title on IMDB or TMDB"
+                    data-tip="Open this title on IMDB or TMDB."
+                    onclick="toggleExternalMenu(event)">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6"/><path d="M20 4l-8.5 8.5"/><path d="M19 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h5"/></svg>
+            </button>
+            <!-- Last, so it keeps a fixed spot at the panel edge while the
+                 external-link button appears and disappears to its left. -->
+            <button type="button" class="icon-btn" id="import-url-btn"
+                    aria-label="Import settings from a config URL"
+                    data-tip="Import settings from a config URL."
+                    onclick="toggleImportBar()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1"/><path d="M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/></svg>
+            </button>
+            <span class="panel-index" id="preview-status" hidden>IDLE</span>
+          </div>
+        </div>
+        <div class="preview-frame" id="preview-frame">
+          <div class="preview-empty preview-placeholder" id="preview-empty">
+            <span class="preview-placeholder-title">Poster preview</span>
+            <span class="preview-placeholder-dim" id="preview-placeholder-dim">1000 &times; 1500</span>
+          </div>
+        </div>
+        <!-- Errors surface here, directly under where the poster renders. -->
+        <div class="preview-error" id="preview-error" hidden></div>
+        <div class="tx-meta" id="tx-meta">—</div>
+        <div class="preview-actions">
+          <button class="btn btn-preview" id="copy-config-btn" onclick="copyUrl()"
+            oncontextmenu="return openCopyMenu(event)"
+            aria-haspopup="true" aria-expanded="false"
+            data-tip="Left-click to copy the URL for AIOMetadata, Nuvio, Bingecat and Xperience — one URL covers portrait and landscape. Right-click or long press to copy the config for Discover+, share your config securely, or send it straight to AIOMetadata.">Copy config</button>
+          <button class="btn btn-primary" onclick="openPresetModal()"
+            data-tip="Replace the current settings with a saved preset.">Load preset</button>
+          <button class="btn btn-reset" onclick="resetDefaults(); build(); queuePreviewReload(); saveApiKeys()"
+            data-tip="Return every setting to its default. Your API keys, language and selected title are kept. To reset one tab or group, right-click (or press and hold) its tab or heading.">Reset config</button>
+        </div>
+        <div class="preview-controls">
+          <div id="url-display-row">
+            <input type="text" id="url-display-input" readonly
+                   onclick="this.select()"
+                   title="Click to select all, then Ctrl+C to copy">
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="tx-zoom" id="tx-zoom"><img id="tx-zoom-img" alt="Zoomed preview" referrerpolicy="no-referrer"></div>
 
   <div class="main-layout">
 
@@ -4413,85 +4772,6 @@ try{if(localStorage.getItem('postersplus_theme')==='light')document.documentElem
       </div><!-- /panel-body -->
     </div>
 
-    <!-- RIGHT: PREVIEW -->
-    <div class="right-col">
-      <div class="preview-panel panel">
-        <div class="notch"></div>
-        <div class="panel-header">
-          <span class="panel-title">Live preview</span>
-          <div class="panel-header-actions">
-            <!-- Portrait / landscape preview.  The checkbox is the state — it
-                 rides through build() as shape=landscape, and so through the
-                 saved settings and Reset like every other tog- control; the
-                 button only mirrors it. -->
-            <input type="checkbox" id="tog-landscape" hidden>
-            <!-- Into the admin dashboard's artwork editor for this title.  Only
-                 when the operator turned it on there (off by default). -->
-            <!-- Report this poster to the operator (REPORTS_ENABLED). -->
-            <button type="button" class="icon-btn" id="report-poster" hidden
-                    aria-label="Report a problem with this poster"
-                    data-tip="Report a problem with this poster to whoever runs this instance: text on a textless poster, the wrong art or logo, wrong details."
-                    onclick="openReportModal()">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 20.5v-17"/><path d="M6.5 3.5h11l-2 4.25 2 4.25h-11"/></svg>
-            </button>
-            <a class="icon-btn" id="artwork-edit-link" hidden
-               aria-label="Edit this title's artwork in the admin dashboard"
-               data-tip="Choose this title's poster, logo and landscape art for everyone, in the admin dashboard.">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><g transform="translate(1.5 0)"><rect x="3" y="3" width="13" height="18" rx="2"/><path d="M3 15l4-4 4 4"/><path d="M14.5 13.5l6-6a1.4 1.4 0 0 0-2-2l-6 6-.8 2.8z"/></g></svg>
-            </a>
-            <button type="button" class="icon-btn" id="shape-toggle"
-                    aria-pressed="false"
-                    aria-label="Switch the preview between portrait and landscape"
-                    data-tip="Preview the 16:9 landscape poster. Copy config then copies the landscape URL, for clients with a landscape poster slot."
-                    onclick="toggleShape()">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M3 14h18"/></svg>
-            </button>
-            <!-- Opens #external-menu; hidden until a title is selected. -->
-            <button type="button" class="icon-btn" id="external-link" hidden
-                    aria-haspopup="true" aria-expanded="false"
-                    aria-label="Open this title on IMDB or TMDB"
-                    data-tip="Open this title on IMDB or TMDB."
-                    onclick="toggleExternalMenu(event)">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6"/><path d="M20 4l-8.5 8.5"/><path d="M19 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h5"/></svg>
-            </button>
-            <!-- Last, so it keeps a fixed spot at the panel edge while the
-                 external-link button appears and disappears to its left. -->
-            <button type="button" class="icon-btn" id="import-url-btn"
-                    aria-label="Import settings from a config URL"
-                    data-tip="Import settings from a config URL."
-                    onclick="toggleImportBar()">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1"/><path d="M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/></svg>
-            </button>
-            <span class="panel-index" id="preview-status" hidden>IDLE</span>
-          </div>
-        </div>
-        <div class="preview-frame" id="preview-frame">
-          <div class="preview-empty preview-placeholder" id="preview-empty">
-            <span class="preview-placeholder-title">Poster preview</span>
-            <span class="preview-placeholder-dim" id="preview-placeholder-dim">1000 &times; 1500</span>
-          </div>
-        </div>
-        <!-- Errors surface here, directly under where the poster renders. -->
-        <div class="preview-error" id="preview-error" hidden></div>
-        <div class="preview-actions">
-          <button class="btn btn-preview" id="copy-config-btn" onclick="copyUrl()"
-            oncontextmenu="return openCopyMenu(event)"
-            aria-haspopup="true" aria-expanded="false"
-            data-tip="Left-click to copy the URL for AIOMetadata, Nuvio, Bingecat and Xperience — one URL covers portrait and landscape. Right-click or long press to copy the config for Discover+, share your config securely, or send it straight to AIOMetadata.">Copy config</button>
-          <button class="btn btn-primary" onclick="openPresetModal()"
-            data-tip="Replace the current settings with a saved preset.">Load preset</button>
-          <button class="btn btn-reset" onclick="resetDefaults(); build(); queuePreviewReload(); saveApiKeys()"
-            data-tip="Return every setting to its default. Your API keys, language and selected title are kept. To reset one tab or group, right-click (or press and hold) its tab or heading.">Reset config</button>
-        </div>
-        <div class="preview-controls">
-          <div id="url-display-row">
-            <input type="text" id="url-display-input" readonly
-                   onclick="this.select()"
-                   title="Click to select all, then Ctrl+C to copy">
-          </div>
-        </div>
-      </div>
-    </div>
   </div>
 
 </div>
@@ -4848,6 +5128,7 @@ const _MOBILE_MQ = window.matchMedia('(max-width: 960px)');
 function _isMobileViewport() { return _MOBILE_MQ.matches; }
 
 function expandPreview() {
+  if (!previewPanel) return;   // the floating panel is gone — the preview lives in the locked top strip
   if (!_isMobileViewport()) return;
   previewPanel.classList.add('expanded');
   _lockScroll();
@@ -4855,6 +5136,7 @@ function expandPreview() {
 }
 
 function collapsePreview() {
+  if (!previewPanel) return;   // floating panel gone — nothing to collapse
   if (!previewPanel.classList.contains('expanded')) return;
   previewPanel.classList.remove('expanded');
   _unlockScroll();
@@ -4889,7 +5171,7 @@ window.addEventListener('popstate', () => {
   // A modal's own close pops its entry too, landing back on the preview's —
   // which is not a request to collapse it.
   if (history.state && history.state.previewExpanded) return;
-  if (previewPanel.classList.contains('expanded')) {
+  if (previewPanel && previewPanel.classList.contains('expanded')) {
     previewPanel.classList.remove('expanded');
     _unlockScroll();
   }
@@ -4900,20 +5182,20 @@ window.addEventListener('popstate', () => {
 // "expanded" CSS becomes a no-op but the body scroll lock would persist.
 // Collapse + unlock on the transition so the user is never stranded.
 _MOBILE_MQ.addEventListener('change', (ev) => {
-  if (!ev.matches && previewPanel.classList.contains('expanded')) {
+  if (previewPanel && !ev.matches && previewPanel.classList.contains('expanded')) {
     previewPanel.classList.remove('expanded');
     _unlockScroll();
   }
 });
 
 // Tapping the collapsed thumbnail expands it.
-previewPanel.addEventListener('click', () => {
+if (previewPanel) previewPanel.addEventListener('click', () => {
   if (!previewPanel.classList.contains('expanded')) expandPreview();
 });
 
 // Tapping the poster frame when expanded collapses it (alternative to the minimize bar).
 document.getElementById('preview-frame').addEventListener('click', () => {
-  if (previewPanel.classList.contains('expanded')) collapsePreview();
+  if (previewPanel && previewPanel.classList.contains('expanded')) collapsePreview();
 });
 
 // At the bottom of the page the collapsed preview moves to the top right, if
@@ -4924,6 +5206,7 @@ document.getElementById('preview-frame').addEventListener('click', () => {
 // was the viewport, no scroll event came, and the preview sat on the last
 // controls until the mobile toolbar happened to resize the viewport.
 function placePreview() {
+  if (!previewPanel) return;   // floating panel gone — the locked strip needs no placement
   if (!_isMobileViewport() || previewPanel.classList.contains('expanded')) {
     previewPanel.classList.remove('preview-at-top');
     return;
@@ -11653,6 +11936,385 @@ initCustomMobileSliders();
   new MutationObserver(() => initCustomMobileSliders())
     .observe(document.getElementById(id), { childList: true, subtree: true });
 });
+</script>
+
+<script>
+/* ═══════════════════════════════════════════════════════════════════════════
+   TOPX LOCKED LIVE PREVIEW — grafted onto the PostersPlus configurator.
+   Options on the LEFT of the strip, the locked preview on the RIGHT.
+
+   Every control here drives the same pipeline as the tabs:
+     resolvedTmdbId / mediaType ← the ranked Top X meta
+     buildPreviewUrl()          ← the full PostersPlus parameter set
+     + topx extras              ← country, canvas_background, rank, show_meta,
+                                  show_logo, use_original_art,
+                                  landscape_poster_crop, landscape_greyscale
+   The copied AIOMetadata template (buildTemplateUrl) carries the same extras,
+   with rank={rank} so AIOMetadata numbers each row itself.
+   ═══════════════════════════════════════════════════════════════════════════ */
+(function () {
+  'use strict';
+  const $ = id => document.getElementById(id);
+  const esc = s => String(s ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+
+  const TX = {
+    country: 'world',
+    platforms: new Set(['top10']),
+    catType: 'movie',
+    bg: 'fresh',
+    showRank: true, showMeta: true, showLogo: true,
+    useOriginalArt: false, posterCrop: false, greyscale: false,
+    countries: [], platformsForCountry: [],
+    previewMetas: [], previewRank: 1,
+    metasCache: new Map(), loadingMetas: false, loaded: false,
+  };
+  let txDebounceTimer = null, txSwapSeq = 0;
+
+  function txStatus(t, cls) {
+    const el = $('tx-status'); if (!el) return;
+    el.textContent = t;
+    el.className = 'topx-opt-status' + (cls ? ' ' + cls : '');
+  }
+
+  /* ── Language — a 1:1 mirror of the Core tab's Native Language select, so
+        every language option is available in the strip and the two never
+        disagree about what the poster is rendered in. ── */
+  function fillLangSelect() {
+    const sel = $('tx-lang'), core = $('cfg-language');
+    if (!sel || !core) return;
+    sel.innerHTML = [...core.options].map(o => `<option value="${esc(o.value)}">${o.textContent}</option>`).join('');
+    sel.value = core.value;
+    sel.addEventListener('change', () => {
+      core.value = sel.value;
+      buildLogoPriorityList(); build(); queuePreviewReload(); saveApiKeys();
+    });
+    core.addEventListener('change', () => {
+      if ([...sel.options].some(o => o.value === core.value)) sel.value = core.value;
+    });
+  }
+
+  /* ── Shape pills ↔ tog-landscape (the tabs' own shape switch) ── */
+  function txShape() { return $('tog-landscape')?.checked ? 'landscape' : 'poster'; }
+  function syncShapePills() {
+    const s = txShape();
+    document.querySelectorAll('.tx-shape').forEach(p => p.classList.toggle('active', p.dataset.qshape === s));
+  }
+  document.querySelectorAll('.tx-shape').forEach(p => p.addEventListener('click', () => {
+    if (!p.classList.contains('active')) toggleShape();   // stash, fields, build, preview reload
+  }));
+  // The shape toggle can also move from the header icon or an imported URL.
+  const _txUpdateShapeFields = updateShapeFields;
+  updateShapeFields = function () { _txUpdateShapeFields.apply(this, arguments); syncShapePills(); };
+  syncShapePills();
+
+  /* ── Catalog: movies / series ── */
+  document.querySelectorAll('.tx-cat').forEach(b => b.addEventListener('click', async () => {
+    if (TX.catType === b.dataset.txcat) return;
+    TX.catType = b.dataset.txcat;
+    document.querySelectorAll('.tx-cat').forEach(x => x.classList.toggle('active', x === b));
+    TX.previewRank = 1;
+    await loadTxMetas();
+  }));
+
+  /* ── Rank navigation ── */
+  const txNav = d => {
+    const n = TX.previewRank + d;
+    if (n >= 1 && n <= TX.previewMetas.length) { TX.previewRank = n; renderTxPreview(); }
+  };
+  $('prevRankTop')?.addEventListener('click', () => txNav(-1));
+  $('nextRankTop')?.addEventListener('click', () => txNav(1));
+
+  /* ── Canvas background ── */
+  $('quickBg')?.addEventListener('change', e => { TX.bg = e.target.value; build(); renderTxPreview(); });
+
+  /* ── Overlay toggles (topx extras) ── */
+  document.querySelectorAll('.tx-tog').forEach(b => b.addEventListener('click', () => {
+    const k = b.dataset.txtog;
+    TX[k] = !TX[k];
+    b.classList.toggle('active', TX[k]);
+    build();               // the copied template picks up the extras
+    renderTxPreview();     // the preview picks them up too
+  }));
+
+  /* ── Zoom ── */
+  $('preview-frame')?.addEventListener('click', () => {
+    const img = document.querySelector('#preview-frame .preview-poster');
+    if (img && img.src && img.naturalWidth) { $('tx-zoom-img').src = img.src; $('tx-zoom').classList.add('show'); }
+  });
+  $('tx-zoom')?.addEventListener('click', () => $('tx-zoom').classList.remove('show'));
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') $('tx-zoom')?.classList.remove('show'); });
+
+  /* ── Countries × platforms (the topx catalog options) ── */
+  function renderCountries() {
+    const grid = $('countryGrid'); if (!grid) return;
+    grid.innerHTML = '';
+    for (const c of TX.countries) {
+      const card = document.createElement('button');
+      card.type = 'button';
+      card.className = 'country-card' + (c.code === TX.country ? ' active' : '');
+      card.innerHTML = `<span class="flag">${esc(c.flag)}</span><span class="name">${esc(c.name)}</span>`;
+      card.addEventListener('click', () => txSelectCountry(c.code));
+      grid.append(card);
+    }
+  }
+  async function txSelectCountry(code) {
+    if (TX.country === code) return;
+    TX.country = code; TX.previewRank = 1;
+    [...$('countryGrid').children].forEach((card, i) => card.classList.toggle('active', TX.countries[i]?.code === code));
+    await loadTxPlatforms();
+    await loadTxMetas();
+    build();               // template's country= follows the chart
+  }
+  async function loadTxPlatforms() {
+    try {
+      const res = await fetch(`/api/platforms/${TX.country}`);
+      const data = await res.json();
+      TX.platformsForCountry = data.platforms || [];
+      const all = [{ code: 'top10', name: 'Top X (Generic)', accent: '#8C75FF' }, ...TX.platformsForCountry];
+      TX.platforms = new Set([...TX.platforms].filter(p => all.some(ap => ap.code === p)));
+      if (!TX.platforms.size) TX.platforms.add('top10');
+      renderPlatforms();
+    } catch (e) { /* keep whatever platforms were last shown */ }
+  }
+  function renderPlatforms() {
+    const grid = $('platformsGrid'); if (!grid) return;
+    grid.innerHTML = '';
+    const all = [{ code: 'top10', name: 'Top X (Generic)', accent: '#8C75FF' }, ...TX.platformsForCountry];
+    for (const p of all) {
+      const chip = document.createElement('button');
+      chip.type = 'button';
+      chip.className = 'platform-chip' + (TX.platforms.has(p.code) ? ' active' : '');
+      chip.innerHTML = `<span class="pdot" style="background:${p.accent}"></span><span class="pname">${esc(p.name)}</span><span class="pcheck">✓</span>`;
+      chip.addEventListener('click', () => {
+        if (TX.platforms.has(p.code)) { if (TX.platforms.size > 1) TX.platforms.delete(p.code); }
+        else TX.platforms.add(p.code);
+        renderPlatforms();
+        loadTxMetas();
+      });
+      grid.append(chip);
+    }
+  }
+
+  /* ── Preview metas: the chart behind the rank navigation ── */
+  async function txToken() {
+    const res = await fetch('/api/generate', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ country: TX.country, platforms: [...TX.platforms], posterShape: 'landscape', canvasBackground: 'fresh' })
+    });
+    const d = await res.json();
+    if (!d.ok) throw new Error(d.error || 'generate failed');
+    return d.manifestUrl.split('/c/')[1].split('/')[0];
+  }
+  async function loadTxMetas() {
+    if (TX.loadingMetas) return;
+    TX.loadingMetas = true;
+    const platform = TX.platforms.has('top10') ? 'topx' : [...TX.platforms][0];
+    const key = `${TX.country}|${platform}|${TX.catType}`;
+    txStatus('LIST');
+    try {
+      let metas = TX.metasCache.get(key);
+      if (!metas) {
+        const token = await txToken();
+        const res = await fetch(`/c/${token}/catalog/${TX.catType}/tx.${TX.country}.${platform}.${TX.catType}.json`);
+        if (!res.ok) throw new Error(`catalog HTTP ${res.status}`);
+        const cd = await res.json();
+        metas = cd.metas || [];
+        TX.metasCache.set(key, metas);
+      }
+      TX.previewMetas = metas;
+      TX.loaded = true;
+      if (TX.previewRank > metas.length) TX.previewRank = 1;
+      renderTxPreview();
+      txStatus('LIVE', 'ok');
+    } catch (err) {
+      TX.previewMetas = [];
+      renderTxPreview();
+      txStatus('ERROR', 'err');
+      setStatus(`Top X preview error: ${err.message}`, 'err');
+    } finally { TX.loadingMetas = false; }
+  }
+
+  /* ── Render: the ranked meta drives the configurator's own identity
+        globals, so every tab setting applies to exactly the title on screen
+        — the selected card, external links and Copy config included. ── */
+  function renderTxPreview() {
+    const m = TX.previewMetas[TX.previewRank - 1];
+    const total = Math.max(TX.previewMetas.length, 10);
+    const lbl = $('rankLabelTop');
+    if (lbl) lbl.textContent = `#${TX.previewRank} / ${total}`;
+    const prev = $('prevRankTop'), next = $('nextRankTop');
+    if (prev) prev.disabled = TX.previewRank <= 1;
+    if (next) next.disabled = TX.previewRank >= TX.previewMetas.length;
+    const meta = $('tx-meta');
+    if (!m) { if (meta) meta.textContent = '—'; return; }
+    if (meta) meta.innerHTML =
+      `<b>#${TX.previewRank}</b> ${esc(m.name)}` +
+      (m.year ? ` · ${esc(m.year)}` : '') +
+      (m.genre ? ` · ${esc(m.genre)}` : '') +
+      (m.imdbRating ? ` · ★ ${esc(m.imdbRating)}` : '');
+    try {
+      resolvedTmdbId = m.tmdbId || '';
+      resolvedImdbId = '';
+      resolvedAnimeId = '';
+      mediaType = m.type === 'tv' ? 'tv' : 'movie';
+      $('cfg-tmdb-resolved').value = resolvedTmdbId;
+      $('cfg-media-type').value = mediaType;
+      $('cfg-imdb').value = '';
+      const card = $('selected-card');
+      if (card) {
+        card.classList.add('visible');
+        const th = $('selected-thumb'); if (th) th.style.display = 'none';
+        $('selected-title').textContent = m.name || '';
+        $('selected-year').textContent = m.year || '';
+        const badge = $('selected-type-badge');
+        badge.textContent = mediaType === 'tv' ? 'SERIES' : 'MOVIE';
+        badge.className = 'result-type-badge ' + (mediaType === 'tv' ? 'tv' : 'movie');
+        $('selected-tmdb-id').textContent = resolvedTmdbId;
+        $('selected-imdb-id').textContent = 'None — using IMDb';
+        $('selected-resolving').style.display = 'none';
+      }
+    } catch (e) { /* identity sync is best-effort */ }
+    txSwapImage();
+  }
+
+  function txPreviewUrl() {
+    try {
+      const u = new URL(buildPreviewUrl());   // every tab setting, concrete title
+      u.searchParams.set('country', TX.country);
+      if (TX.bg !== 'fresh') u.searchParams.set('canvas_background', TX.bg);
+      if (!TX.showMeta) u.searchParams.set('show_meta', 'false');
+      if (!TX.showLogo) u.searchParams.set('show_logo', 'false');
+      if (TX.showRank) u.searchParams.set('rank', String(TX.previewRank));
+      if (TX.useOriginalArt) u.searchParams.set('use_original_art', 'true');
+      if (TX.posterCrop) u.searchParams.set('landscape_poster_crop', 'true');
+      if (TX.greyscale) u.searchParams.set('landscape_greyscale', 'true');
+      u.searchParams.set('pp_ts', String(Date.now()));
+      return u.toString();
+    } catch (e) { return buildPreviewUrl(); }
+  }
+
+  function txSwapImage() {
+    const frame = $('preview-frame');
+    if (!frame) return;
+    const m = TX.previewMetas[TX.previewRank - 1];
+    if (!m) return;
+    const url = txPreviewUrl();
+    const seq = ++txSwapSeq;
+    const existing = frame.querySelector('.preview-poster');
+    const probe = new Image();
+    probe.onload = () => {
+      if (seq !== txSwapSeq) return;          // a newer render took the frame
+      if (existing && existing.parentNode === frame) {
+        existing.src = url; existing.style.opacity = '1';
+      } else {
+        frame.innerHTML = '';
+        probe.className = 'preview-poster';
+        probe.style.opacity = '1';
+        frame.appendChild(probe);
+      }
+      setStatus('');
+      const st = $('preview-status'); if (st) st.textContent = 'OK';
+    };
+    probe.onerror = () => {
+      if (seq !== txSwapSeq) return;
+      const st = $('preview-status'); if (st) st.textContent = 'ERROR';
+      setStatus('Poster render failed — the /poster endpoint returned an error.', 'err');
+    };
+    if (existing && existing.parentNode === frame) existing.style.opacity = '0.3';
+    else frame.innerHTML = `<div class="preview-empty"><div class="preview-spinner"></div>Rendering…</div>`;
+    probe.src = url;
+  }
+
+  /* ── The configurator's own debounce entry point now drives this preview:
+        every tab control's oninput="build(); queuePreviewReload()" lands here
+        with zero changes to the verbatim handlers. ── */
+  queuePreviewReload = function () {
+    clearTimeout(txDebounceTimer);
+    txDebounceTimer = setTimeout(() => {
+      if (TX.loaded) txSwapImage();
+      else loadTxMetas();
+    }, 250);
+  };
+  // The old search-driven loader no longer owns the frame; the topx preview does.
+  loadPreview = function () { };
+
+  /* ── Copied AIOMetadata templates carry the topx extras too ── */
+  const _txBuildTemplateUrl = buildTemplateUrl;
+  buildTemplateUrl = function (templateId) {
+    const url = _txBuildTemplateUrl.apply(this, arguments);
+    try {
+      let tid = templateId;
+      if (tid === undefined || tid === null) tid = displayedTemplate().id;
+      if (tid === 'share') return url;        // the share form stays canonical
+      const u = new URL(url);
+      u.searchParams.set('country', TX.country);
+      if (TX.bg !== 'fresh') u.searchParams.set('canvas_background', TX.bg);
+      if (!TX.showMeta) u.searchParams.set('show_meta', 'false');
+      if (!TX.showLogo) u.searchParams.set('show_logo', 'false');
+      if (TX.showRank) u.searchParams.set('rank', '{rank}');
+      if (TX.useOriginalArt) u.searchParams.set('use_original_art', 'true');
+      if (TX.posterCrop) u.searchParams.set('landscape_poster_crop', 'true');
+      if (TX.greyscale) u.searchParams.set('landscape_greyscale', 'true');
+      // searchParams re-encoded the placeholder braces; AIOMetadata substitutes
+      // by raw string match, so decode just those chars back — the same idiom
+      // decodePlaceholders uses for {tmdb_id?} / {shape} above.
+      return u.toString().replace(/%7B/g, '{').replace(/%7D/g, '}').replace(/%3F\}/g, '?}');
+    } catch (e) { return url; }
+  };
+
+  /* ── Manifest generation — Stremio / Nuvio install, as on topx ── */
+  async function txGenerate() {
+    const box = $('tx-manifest-box'), row = $('tx-install-row');
+    box?.classList.add('hidden'); row?.classList.add('hidden');
+    const btn = $('tx-generate');
+    const old = btn.textContent;
+    btn.disabled = true; btn.textContent = 'Generating…';
+    try {
+      const body = {
+        country: TX.country,
+        platforms: [...TX.platforms],
+        posterShape: txShape(),
+        canvasBackground: TX.bg,
+        showMeta: TX.showMeta,
+        showLogo: TX.showLogo,
+        fontFamily: vEl('cfg-label-font') || 'inter',
+        ratingFormat: ({ '1': 'star', '2': 'number', '3': 'number', '4': 'hidden' })[String(ni('cfg-rating-mode') || 1)] || 'star',
+        vignette: 0,
+      };
+      const res = await fetch('/api/generate', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Generation failed');
+      $('tx-manifest-url').value = data.manifestUrl;
+      $('tx-stremio').href = 'stremio://' + data.stremioManifestUrl.replace(/^https?:\/\//, '');
+      $('tx-nuvio').href = 'nuvio://' + data.nuvioManifestUrl.replace(/^https?:\/\//, '');
+      box?.classList.remove('hidden'); row?.classList.remove('hidden');
+      setStatus(`Manifest ready · ${data.catalogCount} catalogs`, 'ok');
+    } catch (err) {
+      setStatus(`Manifest error: ${err.message}`, 'err');
+    } finally { btn.disabled = false; btn.textContent = old; }
+  }
+  $('tx-generate')?.addEventListener('click', txGenerate);
+  $('tx-copy-manifest')?.addEventListener('click', async () => {
+    const inp = $('tx-manifest-url');
+    try { await navigator.clipboard.writeText(inp.value); }
+    catch { inp.select(); document.execCommand('copy'); }
+    const b = $('tx-copy-manifest'); b.textContent = 'COPIED!';
+    setTimeout(() => { b.textContent = 'COPY'; }, 1500);
+  });
+
+  /* ── Init ── */
+  fillLangSelect();
+  (async () => {
+    try {
+      const res = await fetch('/api/countries');
+      const data = await res.json();
+      TX.countries = data.countries || [];
+      renderCountries();
+    } catch (e) { /* the cards stay empty; the preview still works */ }
+    await loadTxPlatforms();
+    if (!TX.loaded) loadTxMetas();   // fetchServerCaps' queue call also lands here
+  })();
+})();
 </script>
 
 </body>
