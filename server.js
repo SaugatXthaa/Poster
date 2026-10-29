@@ -343,7 +343,7 @@ async function buildCoverUrl(req, token, meta, rank, type, catalog) {
 
 /* ─── API: Countries ──────────────────────────────────────────────────────── */
 app.get("/api/countries", (_req, res) => {
-  res.setHeader("Cache-Control", "public, max-age=3600");
+  res.setHeader("Cache-Control", "public, max-age=604800");
   res.json({ countries: COUNTRIES });
 });
 
@@ -688,13 +688,13 @@ app.get(["/c/:token/top-cover", "/top-cover"], async (req, res) => {
     const existingFilePath = getCoverFilePath(coverKey);
     if (existingFilePath) {
       res.setHeader("X-Cover-Cache", "HIT-DISK");
-      res.setHeader("Cache-Control", "public, max-age=3600");
+      res.setHeader("Cache-Control", "public, max-age=604800");
       return res.sendFile(existingFilePath);
     }
     if (pendingCovers.has(coverKey)) {
       const png = await pendingCovers.get(coverKey);
       res.setHeader("Content-Type", coverMime(png));
-      res.setHeader("Cache-Control", "public, max-age=3600");
+      res.setHeader("Cache-Control", "public, max-age=604800");
       res.setHeader("X-Cover-Cache", "SHARED");
       return res.send(png);
     }
@@ -703,7 +703,7 @@ app.get(["/c/:token/top-cover", "/top-cover"], async (req, res) => {
     try {
       const png = await generationPromise;
       res.setHeader("Content-Type", coverMime(png));
-      res.setHeader("Cache-Control", "public, max-age=3600");
+      res.setHeader("Cache-Control", "public, max-age=604800");
       res.setHeader("X-Cover-Cache", "GENERATED");
       res.send(png);
     } finally {
@@ -967,13 +967,13 @@ app.get(["/poster", "/poster/"], async (req, res) => {
     const existingFilePath = getCoverFilePath(coverKey);
     if (existingFilePath) {
       res.setHeader("X-Cover-Cache", "HIT-DISK");
-      res.setHeader("Cache-Control", "public, max-age=3600");
+      res.setHeader("Cache-Control", "public, max-age=604800");
       return res.sendFile(existingFilePath);
     }
     if (pendingCovers.has(coverKey)) {
       const png = await pendingCovers.get(coverKey);
       res.setHeader("Content-Type", coverMime(png));
-      res.setHeader("Cache-Control", "public, max-age=3600");
+      res.setHeader("Cache-Control", "public, max-age=604800");
       return res.send(png);
     }
     const generationPromise = enqueueRender(() => createTopCover({
@@ -988,7 +988,7 @@ app.get(["/poster", "/poster/"], async (req, res) => {
     try {
       const png = await generationPromise;
       res.setHeader("Content-Type", coverMime(png));
-      res.setHeader("Cache-Control", "public, max-age=3600");
+      res.setHeader("Cache-Control", "public, max-age=604800");
       res.setHeader("X-Cover-Cache", "GENERATED");
       res.send(png);
     } finally {
@@ -1056,6 +1056,94 @@ app.get(["/logo", "/logo/"], async (req, res) => {
   }
 });
 
+/* ─── API: Server caps ─────────────────────────────────────────────────────
+   The configurator probes this on load (PostersPlus upstream contract);
+   returning it kills the console 404 and lets the page enable the fields
+   this instance actually supports. */
+app.get("/server-caps", (_req, res) => {
+  res.setHeader("Cache-Control", "no-cache");
+  res.json({
+    access_key_required: false,
+    admin_link: false,
+    tmdb_key_set: !!TMDB_KEY,
+    mdblist_key_set: false,
+    mdblist_key_count: 0,
+    aiostreams_configured: false,
+    quality_configured: false,
+    imdb_dataset_enabled: false,
+    imdb_dataset_titles: 0,
+    max_poster_resolution: 2000,
+    preview_at_resolution: true,
+    random_posters: false,
+    anime_sources: false,
+    tvdb_posters: false,
+    fanart_posters: false,
+    custom_fonts: [],
+    operator_presets: [],
+    trending_lists: { enabled: false,
+      lists: { movie: { default: "imdb" }, tv: { default: "imdb" }, anime: { default: "kitsu" }, anime_movie: { default: "kitsu" } },
+      languages: [], max_picks: 8, top: "", home_default: false },
+    trending_fetch_count: 0,
+    trending_fetch_time: null,
+    param_defaults: {},
+    param_defaults_landscape: {},
+    param_aliases: {},
+    weight_source_aliases: {},
+    sash_priority_default: null,
+    sash_priority_diff_seed: null,
+  });
+});
+
+/* ─── API: Configurator title search ───────────────────────────────────────
+   TMDB multi-search with the user's key or the server's own; without any
+   key it falls back to Cinemeta (IMDb-keyed, key-less) exactly like
+   PostersPlus upstream, so Search always returns something. */
+app.get("/search", async (req, res) => {
+  try {
+    const q = String(req.query.q || "").trim();
+    if (!q) return res.status(400).json({ detail: "Empty query" });
+    if (q.length > 200) return res.status(400).json({ detail: "Query too long" });
+    const userKey = String(req.query.tmdb_key || "").trim();
+    const effKey = userKey || TMDB_KEY;
+    if (effKey) {
+      try {
+        const d = await fetchJson(
+          `https://api.themoviedb.org/3/search/multi?api_key=${encodeURIComponent(effKey)}` +
+          `&query=${encodeURIComponent(q)}&include_adult=false&page=1`,
+          10 * 60 * 1000
+        );
+        const results = (d.results || []).filter(r => r.media_type === "movie" || r.media_type === "tv");
+        return res.json({ results, source: "tmdb" });
+      } catch (e) {
+        console.error(`[search] TMDB failed, falling back to Cinemeta: ${e.message}`);
+      }
+    }
+    // Key-less fallback — Cinemeta top-search per type, shaped like TMDB's
+    // response so the configurator reads it unchanged (id is null; renders
+    // resolve through the IMDb id).
+    const perType = await Promise.all(["movie", "series"].map(async (t) => {
+      try {
+        const d = await fetchJson(`https://v3-cinemeta.strem.io/catalog/${t}/top/search=${encodeURIComponent(q)}.json`, 30 * 60 * 1000);
+        const year = m => (m.releaseInfo || "").split(/\D/)[0] || "";
+        return (d.metas || []).slice(0, 10).map(m => ({
+          id: null,
+          imdb_id: m.imdb_id || m.id || "",
+          media_type: t === "series" ? "tv" : "movie",
+          title: m.name,
+          name: m.name,
+          release_date: year(m) ? `${year(m)}-01-01` : "",
+          first_air_date: year(m) ? `${year(m)}-01-01` : "",
+          poster_url: m.poster || null,
+        }));
+      } catch (e) { return []; }
+    }));
+    res.json({ results: [...perType[0], ...perType[1]], source: "cinemeta" });
+  } catch (err) {
+    console.error("[search] error:", err);
+    res.status(500).json({ detail: "search failed" });
+  }
+});
+
 /* ─── API: Stats ──────────────────────────────────────────────────────────── */
 app.get("/api/stats", (_req, res) => {
   res.json({ ...getDbStats(), countries: COUNTRIES.length, platforms: PLATFORMS.length });
@@ -1074,3 +1162,19 @@ app.listen(PORT, () => {
   console.log(`  Styles: ${STYLES.join(", ")}`);
   console.log(`  Manifest: http://localhost:${PORT}/manifest.json\n`);
 });
+
+/* ─── Boot warm-up: pull the default world chart artwork (top 3 of both
+       types) into getTmdbImages' memory cache so the first configurator
+       visit renders composite-only instead of paying the TMDB round trips.
+       Fire-and-forget — failures are harmless. ─── */
+(async () => {
+  for (const t of ["movie", "series"]) {
+    try {
+      const metas = await fetchTop10("world", "topx", t);
+      for (const m of metas.slice(0, 3)) {
+        try { await getTmdbImages(t === "series" ? "tv" : "movie", m.tmdbId, TMDB_KEY, "world"); } catch (e) { /* skip */ }
+      }
+    } catch (e) { /* warm-up best effort */ }
+  }
+  console.log("  [warmup] default chart artwork cached");
+})();
