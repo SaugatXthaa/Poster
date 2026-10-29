@@ -1,8 +1,12 @@
 import crypto from "node:crypto";
 import zlib from "node:zlib";
 
+// Same fallback as server.js — keeps the addon runnable locally and on any
+// host that hasn't set APP_SECRET, so /api/generate (and therefore the live
+// preview's chart fetch) never 500s just because the env var is absent.
+const _APP_SECRET_FALLBACK = "topx-posters-combined-secret-key-2026";
 function getKey() {
-  const secret = process.env.APP_SECRET;
+  const secret = process.env.APP_SECRET || _APP_SECRET_FALLBACK;
   if (!secret || secret.length < 24) {
     throw new Error(
       "APP_SECRET mancante o troppo corto. Imposta una stringa lunga e stabile nelle variabili d'ambiente (minimo 24 caratteri)."

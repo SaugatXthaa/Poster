@@ -11815,12 +11815,14 @@ initCustomMobileSliders();
       renderTxPreview();
       txStatus('LIVE', 'ok');
     } catch (err) {
-      TX.previewMetas = [];
-      renderTxPreview();
-      // Quiet recovery: the chart re-fetches on the next interaction, and the
-      // preview area never prints a red failure for a background list refresh.
-      // A cold-started free-tier instance can also just be slow — one silent
-      // retry covers that without ever showing a failure state.
+      // Don't blank the preview on a chart-fetch failure — if a previous rank
+      // is already on screen, keep it. Clearing previewMetas here used to wipe
+      // the poster every 12s during the retry loop, which looked like the
+      // preview was "keeps reloading and rendering". Now the retry is silent:
+      // the status pill flips to RETRY, the chart re-fetches in the background,
+      // and whatever poster was rendered stays put until a fresh chart lands.
+      if (!TX.loaded) TX.previewMetas = [];
+      if (!TX.loaded) renderTxPreview();
       txStatus('RETRY', '');
       console.warn('Top X chart unavailable:', err && err.message);
       if (!TX.retryTimer) TX.retryTimer = setTimeout(() => {
@@ -11922,27 +11924,38 @@ initCustomMobileSliders();
     const url = txPreviewUrl();
     const seq = ++txSwapSeq;
     const existing = frame.querySelector('.preview-poster');
+    // Clean swap: load the new image in a hidden probe, then replace the old
+    // one in a single DOM step. No opacity dim, no double-fetch on the visible
+    // img — the old poster stays at full opacity until the new one is ready,
+    // so config changes feel instant instead of flickering.
     const probe = new Image();
     probe.onload = () => {
       if (seq !== txSwapSeq) return;          // a newer render took the frame
-      if (existing && existing.parentNode === frame) {
-        existing.src = url; existing.style.opacity = '1';
-      } else {
-        frame.innerHTML = '';
-        probe.className = 'preview-poster';
-        probe.style.opacity = '1';
-        frame.appendChild(probe);
-      }
+      probe.className = 'preview-poster';
+      probe.style.opacity = '1';
+      frame.innerHTML = '';
+      frame.appendChild(probe);
       setStatus('');
       const st = $('preview-status'); if (st) st.textContent = 'OK';
     };
     probe.onerror = () => {
       if (seq !== txSwapSeq) return;
-      const st = $('preview-status'); if (st) st.textContent = 'RETRY';
-      setStatus('Poster did not render — check the instance URL or access key.', 'err');
+      // Keep whatever poster is already on screen — a transient render failure
+      // (cold server, a single bad title) should never blank the preview or
+      // print a red error. Only the very first load shows the empty state.
+      if (existing && existing.parentNode === frame) {
+        // old poster stays; just flag status quietly
+        const st = $('preview-status'); if (st) st.textContent = 'OK';
+      } else {
+        frame.innerHTML = `<div class="preview-empty preview-placeholder"><span class="preview-placeholder-title">Poster preview</span><span class="preview-placeholder-dim" id="preview-placeholder-dim">1000 &times; 1500</span></div>`;
+        const st = $('preview-status'); if (st) st.textContent = 'IDLE';
+      }
+      setStatus('');
     };
-    if (existing && existing.parentNode === frame) existing.style.opacity = '0.3';
-    else frame.innerHTML = `<div class="preview-empty"><div class="preview-spinner"></div>Rendering…</div>`;
+    // Only show the "Rendering…" placeholder when there's nothing to show yet.
+    if (!existing || existing.parentNode !== frame) {
+      frame.innerHTML = `<div class="preview-empty"><div class="preview-spinner"></div>Rendering…</div>`;
+    }
     probe.src = url;
   }
 
