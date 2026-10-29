@@ -82,9 +82,12 @@
   .shell {
     position: relative;
     z-index: 1;
-    width: fit-content;
-    min-width: 920px;
-    padding: 0 28px 28px;
+    /* Single-column page: the preview leads, the configuration flows under it,
+       one centred column on every screen size (the body flex centres it). */
+    width: 100%;
+    max-width: 552px;
+    min-width: 0;
+    padding: 0 16px 28px;
   }
 
   /* ── HEADER ── */
@@ -275,14 +278,18 @@
   /* ── LAYOUT ── */
   .main-layout {
     display: grid;
-    /* Preview column ~15% wider than the 360px poster so it's a tight frame
-       with a small border, not a sea of empty space. */
-    grid-template-columns: 430px 414px;
-    grid-template-rows: minmax(0, 1fr);
+    /* One column, and the live preview leads it: the poster and its changes
+       are the first thing on screen, the configuration flows below. The old
+       side-by-side grid locked both panels to the viewport height with inner
+       scroll areas — on a phone the preview sat at the very bottom, a full
+       scroll away from the settings that change it. */
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto;
     gap: 20px;
-    align-items: stretch;
-    height: max(680px, calc(100vh - 144px));
-    max-height: max(680px, calc(100vh - 144px));
+    align-items: start;
+    width: 100%;
+    height: auto;
+    max-height: none;
   }
 
   /* ── PANEL ── */
@@ -295,8 +302,8 @@
        the tracks are fixed px; on mobile's 1fr it is what shifted the whole
        config panel sideways. Same idiom as the rows' minmax(0, 1fr) above. */
     min-width: 0;
-    height: 100%;
-    overflow: hidden;
+    height: auto;
+    overflow: visible;
     display: flex;
     flex-direction: column;
     border: 1px solid var(--border);
@@ -309,7 +316,7 @@
     min-height: 0;
     display: flex;
     flex-direction: column;
-    overflow: hidden;
+    overflow: visible;
     overscroll-behavior: contain;
     scrollbar-width: none !important;
     scrollbar-color: var(--black4) transparent;
@@ -1451,12 +1458,14 @@
   .right-col {
     min-height: 0;
     min-width: 0;          /* see .left-col */
-    height: 100%;
-    overflow: hidden;
-    position: sticky;
-    top: 0;
+    height: auto;
+    overflow: visible;
+    position: static;
     display: flex;
     flex-direction: column;
+    /* The config panel is first in the DOM; the preview always paints above
+       it, on every screen size. */
+    order: -1;
   }
 
   .preview-panel {
@@ -1468,7 +1477,7 @@
     position: relative;
     display: flex;
     flex-direction: column;
-    flex: 1;
+    flex: 0 0 auto;
     min-height: 0;
     overflow: hidden;
   }
@@ -1492,10 +1501,10 @@
   .preview-empty { position: relative; z-index: 1; }
 
   .preview-poster {
-    max-height: 100%;
+    max-height: 70vh;
     max-width: 100%;
-    height: 540px;
-    width: auto;
+    height: auto;
+    width: 100%;
     object-fit: contain;
     border: 1px solid var(--border);
     display: block;
@@ -1581,7 +1590,7 @@
     font-size: 10px;
     line-height: 1.6;
     letter-spacing: calc(0.02em * var(--track));
-    color: #c0443a;
+    color: var(--silver-dim);
   }
   .preview-error[hidden] { display: none; }
 
@@ -2167,89 +2176,12 @@
     .toggle-switch { width: 46px; height: 24px; }
     .toggle-thumb { width: 16px; height: 16px; top: 3px; left: 3px; }
     .toggle-switch input:checked ~ .toggle-track .toggle-thumb { transform: translateX(22px); }
-    .preview-panel {
-      position: fixed;
-      right: 12px; bottom: 12px;
-      width: 100px;
-      z-index: 1000;
-      background: rgba(10,10,11,0.94);
-      backdrop-filter: blur(12px);
-      border: 1px solid var(--border);
-      box-shadow: 0 16px 48px rgba(0,0,0,0.6);
-      overflow: hidden;
-      transition: width 0.25s ease, height 0.25s ease, top 0.25s ease, bottom 0.25s ease;
-    }
-    .preview-panel.preview-at-top {
-      bottom: auto;
-      top: 12px;
-    }
-    .preview-panel .panel-header,
-    .preview-panel .preview-actions,
-    .preview-panel .preview-error,
-    .preview-panel .preview-controls { display: none; }
-    .preview-frame { min-height: unset; height: auto; padding: 5px; }
-    .preview-poster { width: 100%; height: auto; max-height: none; border: none; }
-    .preview-empty { padding: 16px 6px; font-size: 8px; }
-    /* The collapsed preview is already poster-shaped, so the placeholder just
-       needs its typography scaled down to fit. */
-    .preview-placeholder { padding: 0; border-radius: 8px; gap: 6px; }
-    .preview-placeholder-title { font-size: 7px; letter-spacing: calc(0.16em * var(--track)); }
-    .preview-placeholder-dim { font-size: 8px; }
-    .preview-panel.expanded {
-      width: 100vw;
-      height: 100vh;
-      height: 100dvh;
-      top: 0; left: 0; right: 0; bottom: 0;
-      border-radius: 0;
-      border: none;
-      display: flex; flex-direction: column;
-      overflow: hidden;
-    }
-    .preview-panel.expanded .panel-header,
-    .preview-panel.expanded .preview-controls { display: flex; }
-    .preview-panel.expanded .preview-actions { display: grid; }
-    /* :not([hidden]) so expanding never reveals an error that isn't set. */
-    .preview-panel.expanded .preview-error:not([hidden]) { display: block; }
-    /* The poster takes whatever height the buttons leave, and the buttons sit
-       in one row directly under it.  Shrinks but never grows: when the
-       browser's toolbar hides, the screen is taller than a full-width poster
-       needs, and a growing frame opened a gap between poster and buttons.  The
-       spare height goes below the buttons instead, so nothing moves as the
-       toolbar comes and goes. */
-    .preview-panel.expanded .preview-frame {
-      flex: 0 1 auto;
-      min-height: 0;
-      padding: 12px 12px 0;
-      overflow: hidden;
-    }
-    .preview-panel.expanded .preview-poster {
-      width: auto;
-      height: 100%;
-      max-width: 100%;
-      max-height: 100%;
-      object-fit: contain;
-    }
-    .preview-panel.expanded .preview-actions {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 8px;
-      padding: 10px 12px calc(12px + env(safe-area-inset-bottom, 0px));
-    }
-    .preview-panel.expanded .preview-actions .btn { padding: 8px 4px; white-space: normal; text-align: center; letter-spacing: calc(0.08em * var(--track)); }
-    .preview-panel.expanded .preview-controls {
-      flex: none;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-    }
-    /* Expanded preview panel — button tweaks */
-    .preview-panel.expanded .btn-row {
-      padding: 8px 12px;
-      gap: 6px;
-    }
-    .preview-panel.expanded .btn {
-      font-size: 11px;
-      letter-spacing: calc(0.14em * var(--track));
-    }
+    /* The preview sits at the top of the page in normal flow — never a
+       floating thumbnail, never an overlay: the poster and its changes stay
+       visible right above the configuration that draws them. */
+    .preview-panel { width: 100%; }
+    .preview-frame { height: auto; min-height: 240px; padding: 12px; }
+    .preview-poster { width: 100%; height: auto; max-height: 70vh; object-fit: contain; }
     /* Import modal — top-biased so keyboard doesn't obscure it */
     .import-modal { align-items: flex-start; padding: 14vh 24px 24px; }
     /* Trending lists is tall: the whole screen, its middle scrolling. */
@@ -2264,10 +2196,6 @@
     .sash-drag-handle {
       font-size: 16px;
       padding: 0 10px;
-    }
-    html.light-mode .preview-panel {
-      background: rgba(238,235,227,0.97);
-      box-shadow: 0 16px 48px rgba(0,0,0,0.12);
     }
   }
 
@@ -4729,6 +4657,22 @@ const qs = new URLSearchParams(window.location.search);
 // ---------------------------------------------------------------------------
 const _LAN_IP        = /^192\.168\.\d+\.\d+$/.test(window.location.hostname);
 const _REWRITE_DOMAIN = _LAN_IP || window.location.hostname === '127.0.0.1';
+// ── API origin ────────────────────────────────────────────────────────────────
+// Same-origin ("") when this page is served by the addon itself — the
+// deployment or localhost. Inside embedded HTML previews and other sandboxed
+// frames the page origin is NOT the addon's server and relative URLs cannot
+// resolve at all ("… cannot be parsed as a URL"), so every API call — and the
+// instance domain the generated URLs carry — falls back to the deployment,
+// whose CORS is open to all origins. Images load cross-origin anyway.
+const _DEPLOY_ORIGIN  = 'https://topx-posters.onrender.com';
+const _OWN_API_HOSTS  = ['topx-posters.onrender.com', 'localhost', '127.0.0.1', '0.0.0.0'];
+const _API_ORIGIN = (() => {
+  try {
+    const p = window.location.protocol;
+    if (p !== 'http:' && p !== 'https:') return _DEPLOY_ORIGIN;   // sandboxed / opaque frame
+    return _OWN_API_HOSTS.includes(window.location.hostname) ? '' : _DEPLOY_ORIGIN;
+  } catch (_) { return _DEPLOY_ORIGIN; }
+})();
 // navigator.clipboard exists only in a secure context — HTTPS, localhost or
 // 127.0.0.1.  Feature-test rather than matching 192.168.x: a plain-HTTP 10.x,
 // 172.16-31.x, Tailscale address or bare hostname is equally insecure, and
@@ -4744,7 +4688,7 @@ const _SHOW_URL_BOX   = _NO_CLIPBOARD || qs.get('urlbox') === '1';
   const port   = window.location.port || '8000';
   const domain = _REWRITE_DOMAIN
     ? `http://postersplus:${port}`
-    : window.location.origin;
+    : (_API_ORIGIN || window.location.origin);
   document.getElementById('cfg-domain').value = domain;
   // The URL is the only source: when the server has an ACCESS_KEY this page
   // can't load without the right one in it.  A copy remembered in localStorage
@@ -4902,22 +4846,8 @@ function _unlockScroll() {
 const _MOBILE_MQ = window.matchMedia('(max-width: 960px)');
 function _isMobileViewport() { return _MOBILE_MQ.matches; }
 
-function expandPreview() {
-  if (!_isMobileViewport()) return;
-  previewPanel.classList.add('expanded');
-  _lockScroll();
-  history.pushState({ previewExpanded: true }, '');
-}
-
-function collapsePreview() {
-  if (!previewPanel.classList.contains('expanded')) return;
-  previewPanel.classList.remove('expanded');
-  _unlockScroll();
-  if (history.state && history.state.previewExpanded) {
-    history.back();
-  }
-}
-
+// The old expand-to-overlay preview is gone: the panel lives at the top of
+// the page in normal flow, so there is nothing to expand or collapse.
 // A modal opened over the page (or over the expanded preview) gets its own
 // history entry, so Back closes the modal first and only a second Back
 // collapses the preview.  Closing it any other way pops that entry again.
@@ -4941,59 +4871,8 @@ window.addEventListener('popstate', () => {
   for (const [id, close] of Object.entries(_BACK_MODALS)) {
     if (document.getElementById(id)?.classList.contains('open')) { close(); return; }
   }
-  // A modal's own close pops its entry too, landing back on the preview's —
-  // which is not a request to collapse it.
-  if (history.state && history.state.previewExpanded) return;
-  if (previewPanel.classList.contains('expanded')) {
-    previewPanel.classList.remove('expanded');
-    _unlockScroll();
-  }
 });
 
-// If the viewport crosses into desktop while the panel is expanded (e.g.
-// device rotated to landscape past 960px, or browser window resized), the
-// "expanded" CSS becomes a no-op but the body scroll lock would persist.
-// Collapse + unlock on the transition so the user is never stranded.
-_MOBILE_MQ.addEventListener('change', (ev) => {
-  if (!ev.matches && previewPanel.classList.contains('expanded')) {
-    previewPanel.classList.remove('expanded');
-    _unlockScroll();
-  }
-});
-
-// Tapping the collapsed thumbnail expands it.
-previewPanel.addEventListener('click', () => {
-  if (!previewPanel.classList.contains('expanded')) expandPreview();
-});
-
-// Tapping the poster frame when expanded collapses it (alternative to the minimize bar).
-document.getElementById('preview-frame').addEventListener('click', () => {
-  if (previewPanel.classList.contains('expanded')) collapsePreview();
-});
-
-// At the bottom of the page the collapsed preview moves to the top right, if
-// down in its corner it would cover the end of the config panel.  A tab that
-// ends clear of it keeps it at the bottom, off the header's buttons.
-// Measured against the document's scroll height and run on tab switches too:
-// body has min-height 100vh, so on a tab too short to scroll its offsetHeight
-// was the viewport, no scroll event came, and the preview sat on the last
-// controls until the mobile toolbar happened to resize the viewport.
-function placePreview() {
-  if (!_isMobileViewport() || previewPanel.classList.contains('expanded')) {
-    previewPanel.classList.remove('preview-at-top');
-    return;
-  }
-  const doc = document.documentElement;
-  const atBottom = window.innerHeight + window.scrollY >= doc.scrollHeight - 50;
-  // The panel's bottom against where the thumbnail's top edge sits when it is
-  // down in the corner (12px off the edge, like the CSS).
-  const panel = document.querySelector('.left-col');
-  const covers = panel && panel.getBoundingClientRect().bottom >
-                 window.innerHeight - 12 - previewPanel.offsetHeight;
-  previewPanel.classList.toggle('preview-at-top', atBottom && !!covers);
-}
-window.addEventListener('scroll', placePreview, { passive: true });
-window.addEventListener('resize', placePreview);
 
 function showTab(tab) {
   document.querySelectorAll('.section').forEach(s => {
@@ -5004,9 +4883,6 @@ function showTab(tab) {
   });
   const host = document.getElementById('tab-host');
   if (host) host.scrollTop = 0;
-  // A shorter tab can leave the page scrolled to its new bottom without a
-  // scroll event firing.
-  placePreview();
 }
 
 function updateRange(el, outId) {
@@ -5189,7 +5065,7 @@ async function fetchServerCaps() {
   try {
     const ak = vEl('cfg-access-key');
     const url = ak ? `/server-caps?access_key=${encodeURIComponent(ak)}` : '/server-caps';
-    const resp = await fetch(url);
+    const resp = await fetch(_API_ORIGIN + url);
     if (!resp.ok) return;
     serverCaps = await resp.json();
     serverCapsLoaded = true;
@@ -6017,7 +5893,7 @@ async function fetchTmdbId(imdbId, type) {
     const params = new URLSearchParams({ imdb_id: imdbId, type });
     if (userTmdbKey) params.set('tmdb_key', userTmdbKey);
     if (accKey)      params.set('access_key', accKey);
-    const resp = await fetch(`${window.location.origin}/resolve-tmdb?${params}`);
+    const resp = await fetch(`${_API_ORIGIN || window.location.origin}/resolve-tmdb?${params}`);
     if (!resp.ok) return '';
     const data = await resp.json();
     if (data.media_type && data.media_type !== mediaType) {
@@ -6157,7 +6033,7 @@ async function doSearch() {
   try {
     // Use the actual server origin for API calls — not the rewritten AIOMetadata
     // hostname (postersplus:port) which is only valid inside the Docker network.
-    const apiOrigin = window.location.origin;
+    const apiOrigin = _API_ORIGIN || window.location.origin;
     const accKey = vEl('cfg-access-key');
     const params = new URLSearchParams({ q });
     if (userTmdbKey) params.set('tmdb_key', userTmdbKey);
@@ -6369,7 +6245,7 @@ async function fetchImdbId(tmdbId, type) {
       // Fall back to server proxy — use actual origin, not the rewritten AIOMetadata hostname.
       const params = new URLSearchParams({ tmdb_id: tmdbId, type });
       if (accKey) params.set('access_key', accKey);
-      const resp = await fetch(`${window.location.origin}/resolve-imdb?${params}`);
+      const resp = await fetch(`${_API_ORIGIN || window.location.origin}/resolve-imdb?${params}`);
       if (!resp.ok) return null;
       const data = await resp.json();
       return data.imdb_id || null;
@@ -7132,7 +7008,7 @@ async function _tlTop10Load() {
   try {
     if (!_tlTop10Menu) {
       const ak = vEl('cfg-access-key');
-      const resp = await fetch(`/trending-top10${ak ? '?access_key=' + encodeURIComponent(ak) : ''}`);
+      const resp = await fetch(_API_ORIGIN + `/trending-top10${ak ? '?access_key=' + encodeURIComponent(ak) : ''}`);
       if (!resp.ok) throw new Error(resp.status);
       _tlTop10Menu = await resp.json();
     }
@@ -8942,7 +8818,6 @@ function resetDefaults() {
   // only once that has settled.
   _shapeStash = { portrait: null, landscape: null };
   try { localStorage.removeItem(SHAPE_STASH_KEY); } catch (e) {}
-  collapsePreview();
   setStatus('Reset to defaults. API keys preserved.', 'info');
 }
 
@@ -10951,7 +10826,7 @@ async function sendReport() {
   const ak = vEl('cfg-access-key');
   let ok = false, text;
   try {
-    const resp = await fetch('/report' + (ak ? `?access_key=${encodeURIComponent(ak)}` : ''), {
+    const resp = await fetch(_API_ORIGIN + '/report' + (ak ? `?access_key=${encodeURIComponent(ak)}` : ''), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({

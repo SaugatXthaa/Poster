@@ -25,6 +25,7 @@ from functools import lru_cache, partial
 from html import escape as _html_escape
 from urllib.parse import parse_qsl, quote, urlencode
 from fastapi import FastAPI, Header, HTTPException, Request
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, Response, HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from PIL import Image, ImageChops, ImageDraw, ImageFilter, ImageFont, ImageOps
@@ -7584,6 +7585,17 @@ async def _run_background_jobs() -> None:
 
 
 app = FastAPI(lifespan=lifespan)
+# Any origin may call the API: the configurator is also previewed inside
+# sandboxed frames (chat embeds, HTML previews) where the page origin is not
+# this server's and relative URLs cannot resolve — those frames fall back to
+# the deployment origin for every call. Poster images load cross-origin
+# regardless; this covers the JSON endpoints.
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 _FONTS_DIR = os.path.join(BASE_DIR, "fonts")
 
