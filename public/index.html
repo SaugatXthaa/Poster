@@ -2400,7 +2400,7 @@ try{if(localStorage.getItem('postersplus_theme')==='light')document.documentElem
     </div>
   </header>
 
-  <!-- ═══ TOP: LOCKED POSTER PREVIEW + MOVIES SECTION (topx, elfhosted-style) ══       The two ranked covers and their rank nav lock (sticky) to the top of the       viewport, so scrolling through the settings never hides the preview.       Card A keeps the verbatim #preview-frame wiring; card B is the next       rank of the same chart with the same settings. Below: the MOVIES block       (catalog type, shape pills, canvas chips + the topx Genre & Rating /       Provider Logo / Brand Tint chips), then the verbatim action rows. -->  </div>  <div class="topx-pin" id="topx-pin">    <div class="topx-posters" id="topx-posters">      <!-- Card A: the locked live preview (verbatim frame + wiring). -->      <div class="topx-poster-card" id="tx-card-a">        <div class="preview-frame" id="preview-frame">          <div class="preview-empty preview-placeholder" id="preview-empty">            <span class="preview-placeholder-title">Poster preview</span>            <span class="preview-placeholder-dim" id="preview-placeholder-dim">1000 &times; 1500</span>          </div>        </div>      </div>      <!-- Card B: the next rank of the same chart, same settings. -->      <div class="topx-poster-card" id="tx-card-b">        <div class="preview-frame topx-frame-b" id="tx-frame-b">          <img id="tx-poster-b" alt="Next rank preview" referrerpolicy="no-referrer" hidden>          <div class="topx-b-ph" id="tx-b-ph">Next rank</div>        </div>      </div>    </div>    <!-- Portrait / landscape state.  The checkbox is the state — it rides         through build() as shape=landscape, and so through the saved settings         and Reset like every other tog- control; the MOVIES shape pills below         only mirror and flip it. -->    <input type="checkbox" id="tog-landscape" hidden>    <!-- Errors + the verbatim header actions, locked with the posters. -->    <div class="topx-hero-meta">      <!-- Errors surface here, directly under where the poster renders. -->      <div class="preview-error" id="preview-error" hidden></div>      <div class="topx-hero-icons">        <!-- Into the admin dashboard's artwork editor for this title.  Only             when the operator turned it on there (off by default). -->        <a class="icon-btn" id="artwork-edit-link" hidden           aria-label="Edit this title's artwork in the admin dashboard"           data-tip="Choose this title's poster, logo and landscape art for everyone, in the admin dashboard.">          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><g transform="translate(1.5 0)"><rect x="3" y="3" width="13" height="18" rx="2"/><path d="M3 15l4-4 4 4"/><path d="M14.5 13.5l6-6a1.4 1.4 0 0 0-2-2l-6 6-.8 2.8z"/></g></svg>        </a>        <!-- Report this poster to the operator (REPORTS_ENABLED). -->        <button type="button" class="icon-btn" id="report-poster" hidden                aria-label="Report a problem with this poster"                data-tip="Report a problem with this poster to whoever runs this instance: text on a textless poster, the wrong art or logo, wrong details."                onclick="openReportModal()">          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 20.5v-17"/><path d="M6.5 3.5h11l-2 4.25 2 4.25h-11"/></svg>        </button>        <!-- Opens #external-menu; hidden until a title is selected. -->        <button type="button" class="icon-btn" id="external-link" hidden                aria-haspopup="true" aria-expanded="false"                aria-label="Open this title on IMDB or TMDB"                data-tip="Open this title on IMDB or TMDB."                onclick="toggleExternalMenu(event)">          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6"/><path d="M20 4l-8.5 8.5"/><path d="M19 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h5"/></svg>        </button>        <button type="button" class="icon-btn" id="import-url-btn"                aria-label="Import settings from a config URL"                data-tip="Import settings from a config URL."                onclick="toggleImportBar()">          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1"/><path d="M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/></svg>        </button>        <span class="panel-index" id="preview-status" hidden>IDLE</span>      </div>    </div>  </div>  <div class="shell">  <div class="topx-hero" id="topx-hero">    <!-- MOVIES: catalog type, shape pills, canvas chips — as on topx.  Both         cards follow them live. -->    <div class="topx-movies">      <div class="topx-movies-label" id="tx-movies-label">MOVIES</div>      <div class="topx-type-row">        <button type="button" class="tx-type active" data-txtype="movie"                data-tip="Preview the Top X movies chart — both posters follow it.">          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M10.5 9.5l4 2.5-4 2.5z"/></svg>          <span class="txcheck">✓</span>          MOVIES        </button>        <button type="button" class="tx-type" data-txtype="series"                data-tip="Preview the Top X series chart — both posters follow it.">          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="5" width="19" height="13" rx="2"/><path d="M8 21h8M12 18v3"/></svg>          <span class="txcheck">✓</span>          SERIES        </button>      </div>      <div class="topx-shape-row">        <button type="button" class="topx-shape-pill tx-shape" data-qshape="landscape"                data-tip="Preview the 16:9 landscape poster. Copy config then copies the landscape URL, for clients with a landscape poster slot.">          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M3 14h18"/></svg>          Landscape&ensp;16:9        </button>        <span class="topx-shape-divider"></span>        <button type="button" class="topx-shape-pill tx-shape" data-qshape="poster"                data-tip="Preview the 2:3 portrait poster.">          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="2.5" width="10" height="19" rx="2"/><path d="M11 18.5h2"/></svg>          Poster&ensp;2:3        </button>      </div>      <div class="topx-canvas-row" id="txCanvasRow">        <button type="button" class="topx-canvas-chip active" data-canvas="fresh"                data-tip="Full-bleed fresh artwork behind the ranked cover."><span class="txdot" style="background:#4caf7d"></span>Fresh</button>        <button type="button" class="topx-canvas-chip" data-canvas="provider"                data-tip="The streaming provider's own art, behind a glass tint."><span class="txdot" style="background:#59b7ff"></span>Provider Glass</button>        <button type="button" class="topx-canvas-chip" data-canvas="transparent"                data-tip="Transparent canvas — the ranked cover floats on the client's own background."><span class="txdot txdot-transparent"></span>Transparent</button>        <button type="button" class="topx-canvas-chip" data-canvas="stremio"                data-tip="Stremio navy canvas."><span class="txdot" style="background:#8c75ff"></span>Stremio</button>        <button type="button" class="topx-canvas-chip" data-canvas="black"                data-tip="Solid black canvas."><span class="txdot" style="background:#1a1a1a"></span>Black</button>      </div>      <div class="topx-canvas-row tx-extra-row" id="txExtraRow">        <button type="button" class="topx-canvas-chip tx-extra active" data-txextra="showMeta"                data-tip="Genre and rating line on the covers — the topx Genre & Rating chip.">          <span style="color:var(--gold-bright)">★</span>&ensp;Genre &amp; Rating        </button>        <button type="button" class="topx-canvas-chip tx-extra active" data-txextra="providerLogo"                data-tip="The streaming provider's own logo on the covers — the topx Provider Logo chip.">          <span style="color:#59b7ff">◆</span>&ensp;Provider Logo        </button>        <button type="button" class="topx-canvas-chip tx-extra" data-txextra="brandTint"                data-tip="Glow the covers with the provider's brand colour — the topx Brand Tint chip.">          🎨&ensp;Brand Tint        </button>      </div>    </div>    <!-- Output: the verbatim action buttons and URL box, unchanged. -->    <div class="preview-actions">      <button class="btn btn-preview" id="copy-config-btn" onclick="copyUrl()"        oncontextmenu="return openCopyMenu(event)"        aria-haspopup="true" aria-expanded="false"        data-tip="Left-click to copy the URL for AIOMetadata, Nuvio, Bingecat and Xperience — one URL covers portrait and landscape. Right-click or long press to copy the config for Discover+, share your config securely, or send it straight to AIOMetadata.">Copy config</button>      <button class="btn btn-primary" onclick="openPresetModal()"        data-tip="Replace the current settings with a saved preset.">Load preset</button>      <button class="btn btn-reset" onclick="resetDefaults(); build(); queuePreviewReload(); saveApiKeys()"        data-tip="Return every setting to its default. Your API keys, language and selected title are kept. To reset one tab or group, right-click (or press and hold) its tab or heading.">Reset config</button>    </div>    <div class="preview-controls">      <div id="url-display-row">        <input type="text" id="url-display-input" readonly               onclick="this.select()"               title="Click to select all, then Ctrl+C to copy">      </div>    </div>  </div>
+  <!-- ═══ TOP: LOCKED POSTER PREVIEW + MOVIES SECTION (topx, elfhosted-style) ══       The two ranked covers and their rank nav lock (sticky) to the top of the       viewport, so scrolling through the settings never hides the preview.       Card A keeps the verbatim #preview-frame wiring; card B is the next       rank of the same chart with the same settings. Below: the MOVIES block       (catalog type, shape pills, canvas chips + the topx Genre & Rating /       Provider Logo / Brand Tint chips), then the verbatim action rows. -->  </div>  <div class="topx-pin" id="topx-pin">    <div class="topx-posters" id="topx-posters">      <!-- Card A: the locked live preview (verbatim frame + wiring). -->      <div class="topx-poster-card" id="tx-card-a">        <div class="preview-frame" id="preview-frame">          <div class="preview-empty preview-placeholder" id="preview-empty">            <span class="preview-placeholder-title">Poster preview</span>            <span class="preview-placeholder-dim" id="preview-placeholder-dim">1000 &times; 1500</span>          </div>        </div>      </div>      <!-- Card B: the next rank of the same chart, same settings. -->      <div class="topx-poster-card" id="tx-card-b">        <div class="preview-frame topx-frame-b" id="tx-frame-b">          <img id="tx-poster-b" alt="Next rank preview" referrerpolicy="no-referrer" hidden>          <div class="topx-b-ph" id="tx-b-ph">Next rank</div>        </div>      </div>    </div>    <!-- Portrait / landscape state.  The checkbox is the state — it rides         through build() as shape=landscape, and so through the saved settings         and Reset like every other tog- control; the MOVIES shape pills below         only mirror and flip it. -->    <input type="checkbox" id="tog-landscape" hidden>    <!-- Errors + the verbatim header actions, locked with the posters. -->    <div class="topx-hero-meta">      <!-- Errors surface here, directly under where the poster renders. -->      <div class="preview-error" id="preview-error" hidden></div>      <div class="topx-hero-icons">        <!-- Into the admin dashboard's artwork editor for this title.  Only             when the operator turned it on there (off by default). -->        <a class="icon-btn" id="artwork-edit-link" hidden           aria-label="Edit this title's artwork in the admin dashboard"           data-tip="Choose this title's poster, logo and landscape art for everyone, in the admin dashboard.">          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><g transform="translate(1.5 0)"><rect x="3" y="3" width="13" height="18" rx="2"/><path d="M3 15l4-4 4 4"/><path d="M14.5 13.5l6-6a1.4 1.4 0 0 0-2-2l-6 6-.8 2.8z"/></g></svg>        </a>        <!-- Report this poster to the operator (REPORTS_ENABLED). -->        <button type="button" class="icon-btn" id="report-poster" hidden                aria-label="Report a problem with this poster"                data-tip="Report a problem with this poster to whoever runs this instance: text on a textless poster, the wrong art or logo, wrong details."                onclick="openReportModal()">          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 20.5v-17"/><path d="M6.5 3.5h11l-2 4.25 2 4.25h-11"/></svg>        </button>        <!-- Opens #external-menu; hidden until a title is selected. -->        <button type="button" class="icon-btn" id="external-link" hidden                aria-haspopup="true" aria-expanded="false"                aria-label="Open this title on IMDB or TMDB"                data-tip="Open this title on IMDB or TMDB."                onclick="toggleExternalMenu(event)">          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6"/><path d="M20 4l-8.5 8.5"/><path d="M19 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h5"/></svg>        </button>        <button type="button" class="icon-btn" id="import-url-btn"                aria-label="Import settings from a config URL"                data-tip="Import settings from a config URL."                onclick="toggleImportBar()">          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1"/><path d="M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/></svg>        </button>        <span class="panel-index" id="preview-status" hidden>IDLE</span>      </div>    </div>  </div>  <div class="shell">  <div class="topx-hero" id="topx-hero">    <!-- MOVIES: catalog type, shape pills, canvas chips — as on topx.  Both         cards follow them live. -->    <div class="topx-movies">      <div class="topx-movies-label" id="tx-movies-label">MOVIES</div>      <div class="topx-type-row">        <button type="button" class="tx-type active" data-txtype="movie"                data-tip="Preview the Top X movies chart — both posters follow it.">          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M10.5 9.5l4 2.5-4 2.5z"/></svg>          <span class="txcheck">✓</span>          MOVIES        </button>        <button type="button" class="tx-type" data-txtype="series"                data-tip="Preview the Top X series chart — both posters follow it.">          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="5" width="19" height="13" rx="2"/><path d="M8 21h8M12 18v3"/></svg>          <span class="txcheck">✓</span>          SERIES        </button>      </div>      <div class="topx-shape-row">        <button type="button" class="topx-shape-pill tx-shape" data-qshape="landscape"                data-tip="Preview the 16:9 landscape poster. Copy config then copies the landscape URL, for clients with a landscape poster slot.">          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M3 14h18"/></svg>          Landscape&ensp;16:9        </button>        <span class="topx-shape-divider"></span>        <button type="button" class="topx-shape-pill tx-shape" data-qshape="poster"                data-tip="Preview the 2:3 portrait poster.">          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="2.5" width="10" height="19" rx="2"/><path d="M11 18.5h2"/></svg>          Poster&ensp;2:3        </button>      </div>      <div class="topx-canvas-row" id="txCanvasRow">        <button type="button" class="topx-canvas-chip active" data-canvas="fresh"                data-tip="Full-bleed fresh artwork behind the ranked cover."><span class="txdot" style="background:#4caf7d"></span>Fresh</button>        <button type="button" class="topx-canvas-chip" data-canvas="provider"                data-tip="The streaming provider's own art, behind a glass tint."><span class="txdot" style="background:#59b7ff"></span>Provider Glass</button>        <button type="button" class="topx-canvas-chip" data-canvas="transparent"                data-tip="Transparent canvas — the ranked cover floats on the client's own background."><span class="txdot txdot-transparent"></span>Transparent</button>        <button type="button" class="topx-canvas-chip" data-canvas="black"                data-tip="The Nuvio template — the solid black canvas the Nuvio app uses, straight from the topx options."><span class="txdot" style="background:#000;box-shadow:inset 0 0 0 1px rgba(255,255,255,0.35)"></span>Nuvio</button>        <button type="button" class="topx-canvas-chip" data-canvas="stremio"                data-tip="Stremio navy canvas."><span class="txdot" style="background:#8c75ff"></span>Stremio</button>      </div>      <div class="topx-canvas-row tx-extra-row" id="txExtraRow">        <button type="button" class="topx-canvas-chip tx-extra active" data-txextra="showMeta"                data-tip="Genre and rating line on the covers — the topx Genre & Rating chip.">          <span style="color:var(--gold-bright)">★</span>&ensp;Genre &amp; Rating        </button>        <button type="button" class="topx-canvas-chip tx-extra active" data-txextra="providerLogo"                data-tip="The streaming provider's own logo on the covers — the topx Provider Logo chip.">          <span style="color:#59b7ff">◆</span>&ensp;Provider Logo        </button>        <button type="button" class="topx-canvas-chip tx-extra" data-txextra="brandTint"                data-tip="Glow the covers with the provider's brand colour — the topx Brand Tint chip.">          🎨&ensp;Brand Tint        </button>      </div>    </div>    <!-- Output: the verbatim action buttons and URL box, unchanged. -->    <div class="preview-actions">      <button class="btn btn-preview" id="copy-config-btn" onclick="copyUrl()"        oncontextmenu="return openCopyMenu(event)"        aria-haspopup="true" aria-expanded="false"        data-tip="Left-click to copy the URL for AIOMetadata, Nuvio, Bingecat and Xperience — one URL covers portrait and landscape. Right-click or long press to copy the config for Discover+, share your config securely, or send it straight to AIOMetadata.">Copy config</button>      <button class="btn btn-primary" onclick="openPresetModal()"        data-tip="Replace the current settings with a saved preset.">Load preset</button>      <button class="btn btn-reset" onclick="resetDefaults(); build(); queuePreviewReload(); saveApiKeys()"        data-tip="Return every setting to its default. Your API keys, language and selected title are kept. To reset one tab or group, right-click (or press and hold) its tab or heading.">Reset config</button>    </div>    <div class="preview-controls">      <div id="url-display-row">        <input type="text" id="url-display-input" readonly               onclick="this.select()"               title="Click to select all, then Ctrl+C to copy">      </div>    </div>  </div>
 </div>
 
   <div class="main-layout">
@@ -7664,7 +7664,12 @@ function buildBaseParams({ usePlaceholders = false, domainOverride = null, full 
   if (!emitAll || ((full || dualShape) && ratingMode === 0)) emitWeights();
 
   // ── Rating / Genre Label ───────────────────────────────────────────────────
-  if (emitAll) params.set('rating_display_mode', ratingMode);
+  if (emitAll) {
+    // A select restored to a value its option list no longer holds reads as
+    // NaN here (parseInt('')) — emit the Rating Bar default instead of a
+    // param the server cannot parse.
+    params.set('rating_display_mode', Number.isInteger(ratingMode) && ratingMode >= 0 ? ratingMode : 1);
+  }
   // Global frosted colour mode (bar, notch and sash share it).
   if (emitAll && pShared['tog-bar-frost-reference'] === true) params.set('frost_reference', 'true');
   if (emitAll && ratingMode !== 0) {
@@ -10885,7 +10890,12 @@ function _setEl(id, value) {
   if (el.type === 'checkbox') {
     el.checked = (value === 'true' || value === true || value === '1');
   } else if (el.tagName === 'SELECT') {
-    el.value = String(value);
+    // Only accept a value the select actually offers. Writing a stale or
+    // unknown one (a param renamed between builds, say) leaves select.value
+    // as '' — every later read then emits NaN into the URL and the setting
+    // silently dies. Keeping the current value keeps the setting alive.
+    const v = String(value);
+    if (v !== '' && [...el.options].some(o => o.value === v)) el.value = v;
   } else {
     el.value = value;
     // Re-fire input so range display values update
@@ -11588,6 +11598,107 @@ initCustomMobileSliders();
 });
 </script>
 
+<style id="topx-zoom-style">
+/* ═══ Per-template preview backdrops — the topx preview-card look.  Each
+   canvas paints the frame behind the cover exactly as the topx site does:
+   a checkerboard for transparent (so the alpha is actually visible),
+   solid black for the Nuvio template, the Stremio navy radial, the
+   provider brand radial, plain dark under Fresh. ═══ */
+.topx-poster-card .preview-frame { cursor: zoom-in; }
+.topx-poster-card.canvas-fresh .preview-frame     { background: var(--black2); }
+.topx-poster-card.canvas-provider .preview-frame  { background: radial-gradient(circle at 50% 30%, #38060a, #080309 85%); }
+.topx-poster-card.canvas-transparent .preview-frame {
+  background: conic-gradient(#171920 25%, #20232c 0 50%, #171920 0 75%, #20232c 0) 0 0 / 8px 8px;
+}
+.topx-poster-card.canvas-black .preview-frame     { background: #000000; }
+.topx-poster-card.canvas-stremio .preview-frame   { background: radial-gradient(circle at 50% 32%, #2a235c, #1d1945 45%, #120f2e 100%); }
+/* ═══ Zoom modal — the topx preview modal, same-to-same. ═══ */
+.preview-modal {
+  position: fixed; inset: 0; z-index: 99999;
+  display: flex; align-items: center; justify-content: center;
+  padding: 16px; box-sizing: border-box;
+  opacity: 0; pointer-events: none;
+  transition: opacity .22s ease;
+}
+.preview-modal.open { opacity: 1; pointer-events: auto; }
+.preview-modal .modal-backdrop {
+  position: absolute; inset: 0;
+  background: rgba(4, 6, 10, 0.88);
+  backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+}
+.preview-modal .modal-dialog {
+  position: relative; z-index: 1;
+  background: #0d0f15;
+  border: 1px solid rgba(201, 168, 76, 0.4);
+  border-radius: 12px;
+  box-shadow: 0 28px 80px rgba(0,0,0,0.95), 0 0 45px rgba(201,168,76,0.18);
+  max-width: min(92vw, 860px); max-height: 90vh;
+  display: flex; flex-direction: column; overflow: hidden;
+  transform: scale(0.95);
+  transition: transform .22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.preview-modal.open .modal-dialog { transform: scale(1); }
+.tx-modal-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 14px;
+  background: rgba(255,255,255,0.03);
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+}
+.tx-modal-title-wrap { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.tx-modal-badge {
+  font-family: var(--mono); font-size: 11px; font-weight: 700; letter-spacing: .08em;
+  background: rgba(201, 168, 76, 0.15); color: var(--gold-bright, #c9a84c);
+  border: 1px solid rgba(201, 168, 76, 0.4); border-radius: 4px;
+  padding: 2px 7px; flex: 0 0 auto;
+}
+.tx-modal-source {
+  font-family: var(--mono); font-size: 11.5px; font-weight: 600; letter-spacing: .08em;
+  color: #e0e0e0; text-transform: uppercase;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.tx-modal-close {
+  background: transparent; border: 1px solid rgba(255,255,255,0.14);
+  color: var(--silver-dim, #9a9a9a); width: 32px; height: 32px; border-radius: 6px;
+  font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+  transition: all .18s; flex: 0 0 auto;
+}
+.tx-modal-close:hover { background: rgba(255,255,255,0.1); color: #fff; border-color: rgba(255,255,255,0.3); }
+.tx-modal-img-container { position: relative; display: flex; align-items: center; justify-content: center; padding: 12px; }
+.tx-modal-img-container img {
+  max-width: min(92vw, 860px); max-height: calc(90vh - 120px);
+  width: auto; height: auto; display: block; object-fit: contain; cursor: zoom-out;
+  background: conic-gradient(#171920 25%, #20232c 0 50%, #171920 0 75%, #20232c 0) 0 0 / 8px 8px;
+}
+.tx-modal-footer {
+  display: flex; align-items: center; justify-content: center;
+  padding: 7px 12px; background: rgba(0,0,0,0.5);
+  border-top: 1px solid rgba(255,255,255,0.05);
+}
+.tx-modal-hint { font-family: var(--mono); font-size: 10px; color: var(--text-muted, #8a8a8a); letter-spacing: 0.08em; }
+.tx-modal-hint kbd { border: 1px solid rgba(255,255,255,0.2); border-radius: 3px; padding: 1px 5px; font-size: 9px; }
+body.tx-modal-open { overflow: hidden; }
+</style>
+
+<!-- ═══ Zoom modal — the topx preview modal, same-to-same. ═══ -->
+<div id="preview-modal" class="preview-modal" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Poster zoom">
+  <div class="modal-backdrop"></div>
+  <div class="modal-dialog">
+    <div class="tx-modal-header">
+      <div class="tx-modal-title-wrap">
+        <span id="tx-modal-rank" class="tx-modal-badge">TOP 1</span>
+        <span id="tx-modal-source" class="tx-modal-source"></span>
+      </div>
+      <button id="tx-modal-close" class="tx-modal-close" type="button" aria-label="Close zoom">✕</button>
+    </div>
+    <div class="tx-modal-img-container">
+      <img id="tx-modal-img" src="" alt="Zoomed poster preview" />
+    </div>
+    <div class="tx-modal-footer">
+      <span class="tx-modal-hint">Press <kbd>ESC</kbd> or click to close</span>
+    </div>
+  </div>
+</div>
+
 <script>
 /* ═══════════════════════════════════════════════════════════════════════════
    TOPX LOCKED LIVE PREVIEW — grafted onto the PostersPlus configurator.
@@ -11618,8 +11729,29 @@ initCustomMobileSliders();
     countries: [], platformsForCountry: [],
     previewMetas: [], previewRank: 1,
     metasCache: new Map(), loadingMetas: false, loaded: false,
+    // manual: the preview follows the title the user searched/selected
+    // (selectResult / loadPreview) instead of the chart — cleared by any
+    // chart-browsing action (catalog type, country, platform).
+    manual: false,
+    retries: 0,
   };
-  let txDebounceTimer = null, txSwapSeq = 0;
+  let txDebounceTimer = null, txSwapSeq = 0, txRetryTimer = null;
+
+  /* ── Fallback titles: the preview is alive from the first paint.  Until
+        the real chart arrives (or if it fails) the frame shows these two
+        ranked covers and every setting on every tab applies to them live —
+        the configurator never goes dark and no control is ever dropped. ── */
+  const TX_FALLBACK = {
+    movie: [
+      { tmdbId: '155',   type: 'movie', name: 'The Dark Knight', year: '2008' },
+      { tmdbId: '27205', type: 'movie', name: 'Inception',       year: '2010' },
+    ],
+    series: [
+      { tmdbId: '1396', type: 'tv', name: 'Breaking Bad',     year: '2008' },
+      { tmdbId: '1399', type: 'tv', name: 'Game of Thrones',  year: '2011' },
+    ],
+  };
+  function txFallbackMetas() { return TX_FALLBACK[TX.catType] || TX_FALLBACK.movie; }
 
   function txStatus(t, cls) {
     const el = $('tx-status'); if (!el) return;
@@ -11649,12 +11781,18 @@ initCustomMobileSliders();
   function txSetCat(t) {
     if (TX.catType === t) return;
     TX.catType = t;
+    TX.manual = false;                          // chart browsing resumes
     document.querySelectorAll('.tx-cat').forEach(x => x.classList.toggle('active', x.dataset.txcat === t));
     document.querySelectorAll('.tx-type').forEach(x => x.classList.toggle('active', x.dataset.txtype === t));
     // the MOVIES label above the shape pills follows the catalog
     const ml = $('tx-movies-label');
     if (ml) ml.textContent = t === 'series' ? 'SERIES' : 'MOVIES';
     TX.previewRank = 1;
+    // Flip to the new catalog's fallback pair on this tick — the frame never
+    // shows a movies meta under the SERIES label while the chart loads (a
+    // cached real chart replaces it within the same tick via loadTxMetas).
+    TX.previewMetas = txFallbackMetas();
+    renderTxPreview();
     loadTxMetas();
   }
   document.querySelectorAll('.tx-cat').forEach(b => b.addEventListener('click', () => txSetCat(b.dataset.txcat)));
@@ -11666,9 +11804,23 @@ initCustomMobileSliders();
     if (TX.bg === ch.dataset.canvas) return;
     TX.bg = ch.dataset.canvas;
     _txCanvasChips.forEach(c => c.classList.toggle('active', c === ch));
+    syncCanvasCards();
     build();               // the copied template picks the canvas up
     queuePreviewReload();  // both posters pick it up too
   }));
+
+  /* ── Per-template card backdrops — the topx preview-card look.  Each
+        canvas paints the frame behind the cover exactly as the topx site
+        does: a checkerboard for transparent (so the alpha is visible),
+        solid black for Nuvio, the Stremio navy radial, the provider brand
+        radial and plain dark for Fresh. ── */
+  function syncCanvasCards() {
+    const bg = ['fresh', 'provider', 'transparent', 'black', 'stremio'].includes(TX.bg) ? TX.bg : 'fresh';
+    document.querySelectorAll('.topx-poster-card').forEach(c => {
+      c.classList.remove('canvas-fresh', 'canvas-provider', 'canvas-transparent', 'canvas-black', 'canvas-stremio');
+      c.classList.add('canvas-' + bg);
+    });
+  }
 
   /* ── Overlay toggles (topx extras) ── */
   document.querySelectorAll('.tx-tog').forEach(b => b.addEventListener('click', () => {
@@ -11714,6 +11866,7 @@ initCustomMobileSliders();
   async function txSelectCountry(code) {
     if (TX.country === code) return;
     TX.country = code; TX.previewRank = 1;
+    TX.manual = false;                          // chart browsing resumes
     [...$('countryGrid').children].forEach((card, i) => card.classList.toggle('active', TX.countries[i]?.code === code));
     await loadTxPlatforms();
     await loadTxMetas();
@@ -11742,6 +11895,7 @@ initCustomMobileSliders();
       chip.addEventListener('click', () => {
         if (TX.platforms.has(p.code)) { if (TX.platforms.size > 1) TX.platforms.delete(p.code); }
         else TX.platforms.add(p.code);
+        TX.manual = false;                      // chart browsing resumes
         renderPlatforms();
         loadTxMetas();
       });
@@ -11792,7 +11946,7 @@ initCustomMobileSliders();
     if (cached) {
       if (!TX.metasCache.has(key)) TX.metasCache.set(key, cached);
       TX.previewMetas = cached;
-      TX.loaded = true;
+      TX.loaded = true; TX.retries = 0;
       if (TX.previewRank > cached.length) TX.previewRank = 1;
       renderTxPreview();
       txWarmAhead();
@@ -11800,6 +11954,7 @@ initCustomMobileSliders();
       return;
     }
     TX.loadingMetas = true;
+    TX.loaded = false;                 // the on-screen chart is now stale
     txStatus('LIST');
     try {
       const token = await txToken();
@@ -11807,20 +11962,33 @@ initCustomMobileSliders();
       if (!res.ok) throw new Error(`catalog HTTP ${res.status}`);
       const cd = await res.json();
       const metas = cd.metas || [];
+      if (!metas.length) throw new Error('empty chart');
       TX.metasCache.set(key, metas);
       txMetasDiskSet(key, metas);
       TX.previewMetas = metas;
-      TX.loaded = true;
+      TX.loaded = true; TX.retries = 0;
       if (TX.previewRank > metas.length) TX.previewRank = 1;
       renderTxPreview();
       txWarmAhead();
       txStatus('LIVE', 'ok');
     } catch (err) {
-      TX.previewMetas = [];
+      // The frame never goes dark: the fallback pair (or the last chart)
+      // keeps rendering and every setting keeps applying. Retry the chart
+      // in the background with backoff — a cold free-tier instance or a
+      // rate-limited TMDB call recovers without the user doing anything.
       renderTxPreview();
-      txStatus('ERROR', 'err');
-      setStatus(`Top X preview error: ${err.message}`, 'err');
+      txStatus('RETRY', 'err');
+      setStatus(`Top X chart: ${err.message} — the preview keeps running on fallback titles.`, 'err');
+      txScheduleRetry();
     } finally { TX.loadingMetas = false; }
+  }
+  function txScheduleRetry() {
+    clearTimeout(txRetryTimer);
+    if (TX.retries >= 3) return;       // three strikes — the fallback stays on duty
+    const n = Math.min(3, TX.retries + 1);
+    TX.retries = n;
+    const delay = [1500, 4000, 10000][n - 1] || 10000;
+    txRetryTimer = setTimeout(() => { if (!TX.loaded) loadTxMetas(); }, delay);
   }
 
   /* ── Render: the ranked meta drives the configurator's own identity
@@ -11829,6 +11997,10 @@ initCustomMobileSliders();
   function renderTxPreview() {
     const m = TX.previewMetas[TX.previewRank - 1];
     if (!m) { txSwapSecondary(); return; }
+    // Manual title mode: the searched/selected title owns the identity —
+    // the chart must not overwrite the user's pick. Card B still rides the
+    // chart, so only card A's URL is refreshed here.
+    if (TX.manual) { txSwapImage(); return; }
     try {
       resolvedTmdbId = m.tmdbId || '';
       resolvedImdbId = '';
@@ -11867,8 +12039,11 @@ initCustomMobileSliders();
       const u = new URL(buildPreviewUrl());   // every tab setting
       // pin the chart title — stable, cacheable per-rank URLs (no pp_ts:
       // same settings → same URL → the browser and the server's disk cache
-      // answer instantly instead of re-rendering)
-      if (m) {
+      // answer instantly instead of re-rendering).  Manual title mode: card
+      // A keeps buildPreviewUrl's own identity (the user's selection); the
+      // chart only pins card B and the warm-ups.
+      const pinChart = m && (!TX.manual || !!rankOverride);
+      if (pinChart) {
         if (m.tmdbId) u.searchParams.set('tmdb_id', String(m.tmdbId));
         u.searchParams.set('type', m.type === 'tv' ? 'tv' : 'movie');
       }
@@ -12007,16 +12182,20 @@ initCustomMobileSliders();
 
   /* ── The configurator's own debounce entry point now drives this preview:
         every tab control's oninput="build(); queuePreviewReload()" lands here
-        with zero changes to the verbatim handlers. ── */
+        with zero changes to the verbatim handlers.  The fallback pair keeps
+        previewMetas non-empty from boot, so EVERY control re-renders the
+        frame even while the chart is loading or failing — nothing is ever
+        silently dropped, which is exactly how the real topx site behaves. ── */
   queuePreviewReload = function () {
     clearTimeout(txDebounceTimer);
     txDebounceTimer = setTimeout(() => {
-      if (TX.loaded) txSwapImage();
+      if (TX.previewMetas.length) txSwapImage();
       else loadTxMetas();
     }, 100);
   };
-  // The old search-driven loader no longer owns the frame; the topx preview does.
-  loadPreview = function () { };
+  // Search selections and the import flow own the preview identity from here
+  // on: manual title mode, the user's pick replaces the chart on card A.
+  loadPreview = function () { TX.manual = true; txSwapImage(); };
 
   /* ── Copied AIOMetadata templates carry the topx extras too ── */
   const _txBuildTemplateUrl = buildTemplateUrl;
@@ -12050,7 +12229,64 @@ initCustomMobileSliders();
     } catch (e) { return url; }
   };
 
+  /* ── Zoom (the topx preview modal, same-to-same): click a poster card to
+        open it enlarged in a modal — TOP N badge, chart source, backdrop
+        blur, ESC / click / ✕ to close. ── */
+  function txChartLabel() {
+    const platform = txChartPlatform();
+    const pName = platform
+      ? ((TX.platformsForCountry.find(p => p.code === platform) || {}).name || platform).toUpperCase()
+      : 'TOP X';
+    return `${pName} · ${TX.catType === 'series' ? 'SERIES' : 'MOVIES'}`;
+  }
+  function openTxZoom(imgSrc, rank, source) {
+    const modal = $('preview-modal'); const img = $('tx-modal-img');
+    if (!modal || !img || !imgSrc) return;
+    img.src = imgSrc;
+    $('tx-modal-rank').textContent = `TOP ${rank}`;
+    $('tx-modal-source').textContent = source || txChartLabel();
+    modal.classList.add('open');
+    modal.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('tx-modal-open');
+  }
+  function closeTxZoom() {
+    const modal = $('preview-modal');
+    if (!modal) return;
+    modal.classList.remove('open');
+    modal.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('tx-modal-open');
+  }
+  $('tx-card-a').addEventListener('click', () => {
+    const img = $('preview-frame')?.querySelector('.preview-poster');
+    if (img) openTxZoom(img.getAttribute('src'), TX.previewRank, txChartLabel());
+  });
+  $('tx-card-b').addEventListener('click', () => {
+    const img = $('tx-poster-b');
+    if (img && !img.hidden && img.getAttribute('src'))
+      openTxZoom(img.getAttribute('src'), TX.previewRank + 1, txChartLabel());
+  });
+  $('tx-modal-close').addEventListener('click', closeTxZoom);
+  $('preview-modal').addEventListener('click', (e) => {
+    if (e.target.classList.contains('modal-backdrop') ||
+        e.target.id === 'tx-modal-img' ||
+        e.target.classList.contains('tx-modal-img-container') ||
+        e.target.id === 'preview-modal') closeTxZoom();
+  });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeTxZoom(); });
+
+  /* ── Search selections switch the preview to manual title mode.  The
+        verbatim selectResult already sets the identity globals and calls
+        build() + queuePreviewReload(); wrapping it just flags the mode so
+        txPreviewUrl keeps the user's pick instead of re-pinning the chart. ── */
+  const _txSelectResult = selectResult;
+  selectResult = async function () { TX.manual = true; return _txSelectResult.apply(this, arguments); };
+
   /* ── Init ── */
+  // Seed the frame with the fallback pair before any network round trip:
+  // the preview renders on this tick and every control affects it live.
+  TX.previewMetas = txFallbackMetas();
+  renderTxPreview();
+  syncCanvasCards();
   // the locked preview bar's height drives the config tab bar's sticky top,
   // so the tabs stack below the posters instead of sliding underneath them
   const txPin = $('topx-pin');

@@ -343,7 +343,7 @@ async function buildCoverUrl(req, token, meta, rank, type, catalog) {
 
 /* ─── API: Countries ──────────────────────────────────────────────────────── */
 app.get("/api/countries", (_req, res) => {
-  res.setHeader("Cache-Control", "public, max-age=604800");
+  res.setHeader("Cache-Control", "public, max-age=31536000, immutable");
   res.json({ countries: COUNTRIES });
 });
 
@@ -688,13 +688,13 @@ app.get(["/c/:token/top-cover", "/top-cover"], async (req, res) => {
     const existingFilePath = getCoverFilePath(coverKey);
     if (existingFilePath) {
       res.setHeader("X-Cover-Cache", "HIT-DISK");
-      res.setHeader("Cache-Control", "public, max-age=604800");
+      res.setHeader("Cache-Control", "public, max-age=31536000, immutable");
       return res.sendFile(existingFilePath);
     }
     if (pendingCovers.has(coverKey)) {
       const png = await pendingCovers.get(coverKey);
       res.setHeader("Content-Type", coverMime(png));
-      res.setHeader("Cache-Control", "public, max-age=604800");
+      res.setHeader("Cache-Control", "public, max-age=31536000, immutable");
       res.setHeader("X-Cover-Cache", "SHARED");
       return res.send(png);
     }
@@ -703,7 +703,7 @@ app.get(["/c/:token/top-cover", "/top-cover"], async (req, res) => {
     try {
       const png = await generationPromise;
       res.setHeader("Content-Type", coverMime(png));
-      res.setHeader("Cache-Control", "public, max-age=604800");
+      res.setHeader("Cache-Control", "public, max-age=31536000, immutable");
       res.setHeader("X-Cover-Cache", "GENERATED");
       res.send(png);
     } finally {
@@ -967,13 +967,13 @@ app.get(["/poster", "/poster/"], async (req, res) => {
     const existingFilePath = getCoverFilePath(coverKey);
     if (existingFilePath) {
       res.setHeader("X-Cover-Cache", "HIT-DISK");
-      res.setHeader("Cache-Control", "public, max-age=604800");
+      res.setHeader("Cache-Control", "public, max-age=31536000, immutable");
       return res.sendFile(existingFilePath);
     }
     if (pendingCovers.has(coverKey)) {
       const png = await pendingCovers.get(coverKey);
       res.setHeader("Content-Type", coverMime(png));
-      res.setHeader("Cache-Control", "public, max-age=604800");
+      res.setHeader("Cache-Control", "public, max-age=31536000, immutable");
       return res.send(png);
     }
     const generationPromise = enqueueRender(() => createTopCover({
@@ -988,7 +988,7 @@ app.get(["/poster", "/poster/"], async (req, res) => {
     try {
       const png = await generationPromise;
       res.setHeader("Content-Type", coverMime(png));
-      res.setHeader("Cache-Control", "public, max-age=604800");
+      res.setHeader("Cache-Control", "public, max-age=31536000, immutable");
       res.setHeader("X-Cover-Cache", "GENERATED");
       res.send(png);
     } finally {

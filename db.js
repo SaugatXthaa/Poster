@@ -183,6 +183,11 @@ export function getCoverFilePath(coverKey) {
     return null;
   }
 
+  // LRU bookkeeping: a cache hit is a fresh access. Touching the file's
+  // mtime (no schema change) is what the size-cap eviction orders by, so
+  // covers actually being served outlive covers nobody asks for.
+  try { const now = new Date(); fs.utimesSync(filePath, now, now); } catch { /* best effort */ }
+
   return filePath;
 }
 
@@ -204,7 +209,55 @@ export function saveCoverBuffer(coverKey, buffer) {
 
   fs.writeFileSync(filePath, buffer);
   stmts.setCover.run(coverKey, filename, Date.now());
+  enforceCoverCacheLimit();
   return filePath;
+}
+
+/* ---------------- Cover cache size cap (LRU) ----------------
+   Covers are permanent: the same settings key always rebuilds the same
+   image, so entries never expire and every user is served the one saved
+   copy. The only bound is disk: when the covers directory grows past
+   COVER_CACHE_MAX_MB (default 400), the least-recently-used files are
+   evicted first — a hit refreshes the file's mtime (getCoverFilePath),
+   so hot covers are never evicted and cold ones stop costing storage.
+   Quality is untouched: files are deleted or kept, never re-encoded. */
+const COVER_CACHE_MAX_BYTES = Math.max(50, Number(process.env.COVER_CACHE_MAX_MB) || 400) * 1024 * 1024;
+let lastCacheSweep = 0;
+export function enforceCoverCacheLimit() {
+  const now = Date.now();
+  if (now - lastCacheSweep < 60_000) return;   // sweep at most once a minute
+  lastCacheSweep = now;
+  try {
+    let files;
+    try { files = fs.readdirSync(COVERS_DIR); } catch { return; }
+    const stats = [];
+    let total = 0;
+    for (const f of files) {
+      try {
+        const st = fs.statSync(path.join(COVERS_DIR, f));
+        if (!st.isFile()) continue;
+        stats.push({ f, size: st.size, mtime: st.mtimeMs });
+        total += st.size;
+      } catch { /* raced delete — ignore */ }
+    }
+    if (total <= COVER_CACHE_MAX_BYTES) return;
+    stats.sort((a, b) => a.mtime - b.mtime);   // oldest access first
+    const doomed = new Set();
+    for (const s of stats) {
+      if (total <= COVER_CACHE_MAX_BYTES) break;
+      doomed.add(s.f); total -= s.size;
+    }
+    if (!doomed.size) return;
+    for (const f of doomed) { try { fs.unlinkSync(path.join(COVERS_DIR, f)); } catch { /* gone */ } }
+    // Drop exactly the evicted files' rows; every surviving file keeps its
+    // row and stays servable. Missing files are self-healing on read anyway.
+    try {
+      const del = db.prepare("DELETE FROM covers WHERE filename = ?");
+      const tx = db.transaction((names) => { for (const n of names) del.run(n); });
+      tx([...doomed]);
+    } catch { /* rows self-heal on read */ }
+    console.log(`[cache] LRU evicted ${doomed.size} covers (limit ${Math.round(COVER_CACHE_MAX_BYTES / 1048576)}MB)`);
+  } catch { /* the cache is best-effort by design */ }
 }
 
 /* ---------------- JSON Cache (Manifests and Catalog sources) ---------------- */
@@ -249,11 +302,27 @@ export function pruneStaleCovers(activeTuples, currentVersion = "v7.5.0", freshV
       continue;
     }
 
+    // Configurator covers (/poster) are content-addressed by their full
+    // settings key — they belong to no chart, so the chart's active-tuple
+    // sweep must never touch them. Their storage is bounded by the LRU
+    // size cap instead (enforceCoverCacheLimit).
+    if (parts[5] && String(parts[5]).startsWith("poster.")) continue;
+
     const [version, rank, type, _shape, tmdbId, catalogId] = parts;
 
-    // 1. Purge older versions
-    if (version !== currentVersion || Number(rank) > 10 || parts[12] === "banner"
-      || (parts[6] === "full" && parts[12] !== freshVersion)) {
+    // Key layout (computeCoverKey, preload.js):
+    //   0 version | 1 rank | 2 type | 3 shape | 4 tmdbId | 5 catalogId |
+    //   6 bg ("full" = banner/fresh) | ... | 12 fontFamily | ... | 19 extras |
+    //   banner rows only: 20 FRESH_VERSION | 21 logoUrl
+    // 1. Purge older engine versions and out-of-range ranks
+    if (version !== currentVersion || Number(rank) > 10) {
+      toDelete.push(row);
+      continue;
+    }
+    // 2. Purge banner rows whose fresh-art version is out of date (the fresh
+    //    version rides at index 20 since the key gained the extras suffix;
+    //    rows without it are from an older format and are rebuilt anyway)
+    if (parts[6] === "full" && parts[20] !== freshVersion) {
       toDelete.push(row);
       continue;
     }
