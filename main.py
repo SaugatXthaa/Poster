@@ -8359,6 +8359,73 @@ async def trending_top10(access_key: str = ""):
     return JSONResponse(menu, headers={"Cache-Control": "public, max-age=3600"})
 
 
+@app.get("/trending-top")
+async def trending_top(count: int = 2, ctype: str = "movie", access_key: str = ""):
+    """The configurator's ranked preview: the chart's top rows with the facts
+    its caption prints — rank, ids, name, year, genre and score.
+
+    Each row also carries its TMDB id, because the preview's /poster renders
+    resolve the rank to print from the same snapshot this reads: a row and the
+    number on its cover can never disagree.  Rows come back in rank order;
+    the count is capped so the endpoint stays a two-poster fetch whatever a
+    caller asks for."""
+    if not _configurator_key_ok(access_key):
+        raise HTTPException(status_code=403, detail="Unauthorized")
+    try:
+        count = max(1, min(int(count), 10))
+    except (TypeError, ValueError):
+        count = 2
+    endpoint = "tv" if ctype in ("tv", "series") else "movie"
+    meta_type = "series" if endpoint == "tv" else "movie"
+    lists = trending_lists.default()
+    entry = await ensure_trending_snapshot(_HTTP_CLIENT, _cfg.SERVER_TMDB_KEY, endpoint, lists)
+    if entry is None:
+        # No snapshot to rank against right now: an empty answer the preview
+        # keeps its current art over, never an error page over a working one.
+        return JSONResponse({"rows": [], "version": ""})
+    rankings, _expires_at = entry
+    ordered = [eid for eid, _r in sorted(rankings.items(), key=lambda kv: kv[1])][:count]
+    version = _list_version(rankings)
+    details = get_cached_trending_details(lists.key(endpoint))
+    sem = asyncio.Semaphore(4)
+    rows: "list[dict]" = []
+    for rank, entry_id in enumerate(ordered, 1):
+        try:
+            meta = await _trending_catalog_meta(_HTTP_CLIENT, entry_id, meta_type, endpoint,
+                                                details, sem)
+        except Exception:
+            meta = {"id": entry_id, "type": meta_type}
+        by_anilist = str(entry_id).startswith("anilist:")
+        row = {
+            "rank": rank,
+            "id": meta.get("id") or entry_id,
+            "tmdb_id": "" if by_anilist else entry_id,
+            "type": meta_type,
+            "name": meta.get("name") or "",
+            "year": meta.get("releaseInfo") or "",
+            "genre": "",
+            "rating": "",
+        }
+        # The caption's genre and score ride the TMDB metadata the poster
+        # renders cache anyway — for the chart's top rows that is warm cache,
+        # not new calls.  No server key: the rows still answer, minus those.
+        if _cfg.SERVER_TMDB_KEY and row["tmdb_id"]:
+            try:
+                (_g, _tx, _lg, _yr, _ti, _pp, _bd, tmdb_data) = await _coalesced_fetch_poster_metadata(
+                    _HTTP_CLIENT, row["tmdb_id"], _cfg.SERVER_TMDB_KEY, endpoint,
+                    _cfg.DEFAULT_LOGO_LANGUAGE,
+                )
+                genre = _cfg.genre_label(_g, _cfg.GENRE_PRIORITY)
+                row["genre"] = genre if genre and genre != "Unknown" else ""
+                va = tmdb_data.get("vote_average") if isinstance(tmdb_data, dict) else None
+                row["rating"] = f"{float(va):.1f}" if va else ""
+            except Exception:
+                pass
+        rows.append(row)
+    return JSONResponse({"rows": rows, "version": version},
+                        headers={"Cache-Control": "public, max-age=120"})
+
+
 @app.get("/server-caps")
 async def server_caps(request: Request, access_key: str = ""):
     if not _configurator_key_ok(access_key):

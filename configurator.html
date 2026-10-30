@@ -1497,44 +1497,28 @@
     background: transparent;
   }
 
-  /* ── The style strip ─────────────────────────────────────────────────────
-     The preview leads the page the way the TOPX site's example strip does:
-     one row per style, a landscape cover and a portrait cover side by side,
-     every tile a live render of the selected title under the current
-     settings.  A tile ring marks the template & canvas in use; tapping a
-     tile applies its style. */
-  .preview-frame.style-strip {
+
+  /* ── The ranked hero ─────────────────────────────────────────────────────
+     The preview is the TOPX site's opening pair, made live: the chart's #1
+     and #2 side by side, each a real /poster render under the current
+     settings, the caption beneath reading like the addon's own catalog row.
+     Every control below the posters writes the controls the Core tab owns,
+     so the hero is a face of the configuration, never a copy of it. */
+  .preview-frame.topx-hero {
     display: block;
-    padding: 16px 18px 6px;
+    padding: 16px 16px 0;
     min-height: 0;
-    overflow-y: auto;
+    overflow: visible;
   }
-  .style-strip-grid {
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-    width: 100%;
-  }
-  .style-row {
+  .topx-posters {
     display: grid;
-    /* minmax(0, …): a plain fr track is minmax(auto, 1fr), so the caption's
-       longest word would distort the split.  The landscape cover leads the
-       row and the portrait fills the rest, the way the TOPX strip lays out. */
-    grid-template-columns: minmax(0, 2.4fr) minmax(0, 1fr);
-    gap: 14px;
-    align-items: stretch;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 12px;
   }
-  .style-tile {
+  .topx-card {
     margin: 0;
-    cursor: pointer;
-    display: flex;
-    flex-direction: column;
-    -webkit-tap-highlight-color: transparent;
-  }
-  .style-tile .tile-media {
     position: relative;
-    width: 100%;
-    min-height: 88px;
+    aspect-ratio: 2 / 3;
     border-radius: 14px;
     overflow: hidden;
     background:
@@ -1542,30 +1526,11 @@
       #0c0c0f;
     border: 1px solid var(--border);
     box-shadow: 0 10px 28px rgba(0, 0, 0, 0.45);
-    transition: border-color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
+    cursor: zoom-in;
+    -webkit-tap-highlight-color: transparent;
   }
-  /* The landscape cover sizes the row: its height is its 16:9 from the
-     column width.  The portrait tile stretches to meet it. */
-  .style-tile.is-landscape .tile-media {
-    height: auto;
-    aspect-ratio: 16 / 9;
-  }
-  .style-tile.is-portrait .tile-media {
-    flex: 1 1 auto;
-    height: auto;
-    min-height: 88px;
-  }
-  .style-tile:hover .tile-media {
-    border-color: var(--gold-dim);
-    transform: translateY(-1px);
-  }
-  .style-tile.active .tile-media {
-    border-color: var(--gold);
-    box-shadow: 0 0 0 1px var(--gold), 0 10px 30px rgba(0, 0, 0, 0.55);
-  }
-  img.tile-img {
-    position: absolute;
-    inset: 0;
+  .preview-frame.is-landscape .topx-card { aspect-ratio: 16 / 9; }
+  .topx-card img {
     width: 100%;
     height: 100%;
     object-fit: cover;
@@ -1574,8 +1539,8 @@
     transition: opacity 0.25s ease;
     background: #0c0c0f;
   }
-  img.tile-img.on { opacity: 1; }
-  .tile-hint {
+  .topx-card img.on { opacity: 1; }
+  .tx-hint {
     position: absolute;
     inset: 0;
     display: none;
@@ -1586,26 +1551,189 @@
     font-size: 9px;
     letter-spacing: calc(0.1em * var(--track));
   }
-  .tile-hint.on { display: flex; }
-  .tile-hint .preview-spinner { width: 14px; height: 14px; }
-  .style-caption {
-    text-align: center;
-    margin-top: 7px;
-    line-height: 1.45;
+  .tx-hint.on { display: flex; }
+  .tx-hint .preview-spinner { width: 14px; height: 14px; margin: 0; }
+
+  /* ── Caption: #1 Name · 2026 · Genre · ★ Score — LIVE — link actions ── */
+  .tx-caption {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 11px 6px 0;
+    min-width: 0;
+  }
+  .tx-caption-rank {
+    color: var(--gold-bright);
+    font-size: 11px;
+    font-weight: 700;
+    flex: 0 0 auto;
+    letter-spacing: calc(0.04em * var(--track));
+  }
+  .tx-caption-name {
+    color: var(--text);
+    font-size: 11.5px;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex: 0 1 auto;
+    min-width: 0;
+  }
+  .tx-caption-dim {
+    color: var(--text-muted);
+    font-size: 10.5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+  .tx-live {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    flex: 0 0 auto;
+    padding: 3px 10px;
+    border-radius: 999px;
+    border: 1px solid var(--gold-dim);
+    color: var(--gold-bright);
+    font-size: 8.5px;
+    font-weight: 700;
+    letter-spacing: calc(0.16em * var(--track));
+  }
+  .tx-live i {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--gold-bright);
+    animation: txPulse 1.6s ease-in-out infinite;
+  }
+  @keyframes txPulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+  .tx-caption .icon-btn {
+    width: 27px;
+    height: 27px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    background: transparent;
     flex: 0 0 auto;
   }
-  .style-caption b {
-    display: block;
-    font-size: 12.5px;
-    font-weight: 600;
-    color: var(--text);
-    letter-spacing: calc(0.02em * var(--track));
+  .tx-caption .icon-btn:hover { border-color: var(--gold-dim); color: var(--gold-bright); }
+  .tx-caption .panel-index { flex: 0 0 auto; }
+
+  /* ── MOVIES panel: chart label, shape pills, canvas chips ────────────── */
+  .topx-movies {
+    margin: 14px 16px 0;
+    background: var(--black2);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 13px 14px 14px;
   }
-  .style-caption span {
-    display: block;
-    font-size: 10px;
+  .topx-movies-label {
+    display: inline-block;
+    background: none;
+    border: none;
+    padding: 0 0 11px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 12.5px;
+    font-weight: 700;
+    letter-spacing: calc(0.24em * var(--track));
+    color: var(--text);
+    text-transform: uppercase;
+  }
+  .topx-movies-label:hover { color: var(--gold-bright); }
+  .topx-shape-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 11px;
+  }
+  .topx-shape-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 13px;
+    border-radius: 10px;
+    border: 1px solid transparent;
+    background: transparent;
     color: var(--text-muted);
-    letter-spacing: calc(0.06em * var(--track));
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: var(--mono, inherit);
+    letter-spacing: calc(0.03em * var(--track));
+    transition: all 0.15s;
+  }
+  .topx-shape-pill svg { width: 16px; height: 16px; flex: 0 0 auto; }
+  .topx-shape-pill:hover { color: var(--text); }
+  .topx-shape-pill.active {
+    border-color: var(--border);
+    color: var(--text);
+    background: var(--black3, #141419);
+  }
+  .topx-shape-divider { width: 1px; height: 22px; background: var(--border); flex: 0 0 auto; }
+  .topx-canvas-row { display: flex; flex-wrap: wrap; gap: 4px 8px; }
+  .topx-canvas-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 7px 11px;
+    border-radius: 10px;
+    border: 1px solid transparent;
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 11.5px;
+    font-weight: 500;
+    cursor: pointer;
+    font-family: var(--mono, inherit);
+    letter-spacing: calc(0.03em * var(--track));
+    transition: all 0.15s;
+  }
+  .topx-canvas-chip:hover { color: var(--text); }
+  .topx-canvas-chip.active {
+    border-color: var(--border);
+    color: var(--text);
+    background: var(--black3, #141419);
+  }
+  .txdot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    flex: 0 0 auto;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.14);
+  }
+  .txdot-transparent {
+    background:
+      linear-gradient(45deg, #555 25%, transparent 25%, transparent 75%, #555 75%),
+      linear-gradient(45deg, #555 25%, #999 25%, #999 75%, #555 75%);
+    background-size: 8px 8px;
+    background-position: 0 0, 4px 4px;
+  }
+
+  /* ── Zoom overlay: a card tap opens its render fullscreen ────────────── */
+  .tx-zoom {
+    position: fixed;
+    inset: 0;
+    z-index: 3500;
+    background: rgba(4, 4, 6, 0.93);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    cursor: zoom-out;
+    padding: 3vh;
+  }
+  .tx-zoom.show { display: flex; }
+  .tx-zoom img {
+    max-width: 96vw;
+    max-height: 94vh;
+    object-fit: contain;
+    border-radius: 8px;
+  }
+  html.light-mode .tx-zoom { background: rgba(240, 238, 230, 0.93); }
+  html.light-mode .topx-shape-pill.active,
+  html.light-mode .topx-canvas-chip.active {
+    background: rgba(16, 53, 120, 0.08);
   }
 
   .preview-poster,
@@ -4511,61 +4639,98 @@ try{if(localStorage.getItem('postersplus_theme')==='light')document.documentElem
     <div class="right-col">
       <div class="preview-panel panel">
         <div class="notch"></div>
-        <div class="panel-header">
-          <span class="panel-title">Live preview</span>
-          <div class="panel-header-actions">
-            <!-- Portrait / landscape preview.  The checkbox is the state — it
-                 rides through build() as shape=landscape, and so through the
-                 saved settings and Reset like every other tog- control; the
-                 button only mirrors it. -->
-            <input type="checkbox" id="tog-landscape" hidden>
-            <!-- Into the admin dashboard's artwork editor for this title.  Only
-                 when the operator turned it on there (off by default). -->
-            <!-- Report this poster to the operator (REPORTS_ENABLED). -->
-            <button type="button" class="icon-btn" id="report-poster" hidden
-                    aria-label="Report a problem with this poster"
-                    data-tip="Report a problem with this poster to whoever runs this instance: text on a textless poster, the wrong art or logo, wrong details."
-                    onclick="openReportModal()">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 20.5v-17"/><path d="M6.5 3.5h11l-2 4.25 2 4.25h-11"/></svg>
-            </button>
-            <a class="icon-btn" id="artwork-edit-link" hidden
-               aria-label="Edit this title's artwork in the admin dashboard"
-               data-tip="Choose this title's poster, logo and landscape art for everyone, in the admin dashboard.">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><g transform="translate(1.5 0)"><rect x="3" y="3" width="13" height="18" rx="2"/><path d="M3 15l4-4 4 4"/><path d="M14.5 13.5l6-6a1.4 1.4 0 0 0-2-2l-6 6-.8 2.8z"/></g></svg>
-            </a>
-            <button type="button" class="icon-btn" id="shape-toggle"
-                    aria-pressed="false"
-                    aria-label="Switch the preview between portrait and landscape"
-                    data-tip="Preview the 16:9 landscape poster. Copy config then copies the landscape URL, for clients with a landscape poster slot."
-                    onclick="toggleShape()">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M3 14h18"/></svg>
-            </button>
-            <!-- Opens #external-menu; hidden until a title is selected. -->
-            <button type="button" class="icon-btn" id="external-link" hidden
-                    aria-haspopup="true" aria-expanded="false"
-                    aria-label="Open this title on IMDB or TMDB"
-                    data-tip="Open this title on IMDB or TMDB."
-                    onclick="toggleExternalMenu(event)">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6"/><path d="M20 4l-8.5 8.5"/><path d="M19 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h5"/></svg>
-            </button>
-            <!-- Last, so it keeps a fixed spot at the panel edge while the
-                 external-link button appears and disappears to its left. -->
-            <button type="button" class="icon-btn" id="import-url-btn"
-                    aria-label="Import settings from a config URL"
-                    data-tip="Import settings from a config URL."
-                    onclick="toggleImportBar()">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1"/><path d="M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/></svg>
-            </button>
-            <span class="panel-index" id="preview-status" hidden>IDLE</span>
+        <!-- Portrait / landscape state.  The checkbox is the state — it rides
+             through build() as shape=landscape, and so through the saved
+             settings and Reset like every other tog- control; the MOVIES
+             shape pills below only mirror and flip it. -->
+        <input type="checkbox" id="tog-landscape" hidden>
+        <!-- Operator-only controls, parked hidden: the report button shows
+             when REPORTS_ENABLED is on, the artwork link when the admin
+             dashboard is.  Same wiring as before, a home off the new hero. -->
+        <div hidden>
+          <button type="button" class="icon-btn" id="report-poster" hidden
+                  aria-label="Report a problem with this poster"
+                  data-tip="Report a problem with this poster to whoever runs this instance: text on a textless poster, the wrong art or logo, wrong details."
+                  onclick="openReportModal()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 20.5v-17"/><path d="M6.5 3.5h11l-2 4.25 2 4.25h-11"/></svg>
+          </button>
+          <a class="icon-btn" id="artwork-edit-link" hidden
+             aria-label="Edit this title's artwork in the admin dashboard"
+             data-tip="Choose this title's poster, logo and landscape art for everyone, in the admin dashboard.">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><g transform="translate(1.5 0)"><rect x="3" y="3" width="13" height="18" rx="2"/><path d="M3 15l4-4 4 4"/><path d="M14.5 13.5l6-6a1.4 1.4 0 0 0-2-2l-6 6-.8 2.8z"/></g></svg>
+          </a>
+        </div>
+        <!-- The ranked hero — the TOPX site's opening pair, made live: the
+             chart's #1 and #2, each a real /poster render under the current
+             settings, the giant rank number and all.  Tapping a card zooms
+             it; every control below re-renders both. -->
+        <div class="preview-frame topx-hero" id="preview-frame">
+          <div class="topx-posters" id="topx-posters">
+            <figure class="topx-card" id="tx-card-a" role="button" tabindex="0"
+                    aria-label="Zoom the rank #1 poster">
+              <img id="tx-poster-a" alt="Chart rank #1" referrerpolicy="no-referrer">
+              <div class="tx-hint" id="tx-hint-a"><div class="preview-spinner"></div>Rendering…</div>
+            </figure>
+            <figure class="topx-card" id="tx-card-b" role="button" tabindex="0"
+                    aria-label="Zoom the rank #2 poster">
+              <img id="tx-poster-b" alt="Chart rank #2" referrerpolicy="no-referrer">
+              <div class="tx-hint" id="tx-hint-b"><div class="preview-spinner"></div>Rendering…</div>
+            </figure>
           </div>
         </div>
-        <!-- The style strip: every template's look at once, each tile a live
-             render of the selected title under the current settings — the
-             same strip of examples the TOPX site leads with.  Tapping a tile
-             applies that template & canvas; the ring marks the one in use.
-             Built and driven by buildStyleStrip / loadPreview. -->
-        <div class="preview-frame style-strip" id="preview-frame">
-          <div class="style-strip-grid" id="style-strip-grid"></div>
+        <!-- Caption + LIVE + the two link actions, one slim row under the
+             posters, reading like the addon's own catalog row. -->
+        <div class="tx-caption">
+          <span class="tx-caption-rank" id="tx-caption-rank">#1</span>
+          <span class="tx-caption-name" id="tx-caption-name">&nbsp;</span>
+          <span class="tx-caption-dim" id="tx-caption-dim"></span>
+          <span class="tx-live" id="tx-live"><i></i>LIVE</span>
+          <span class="panel-index" id="preview-status" hidden>IDLE</span>
+          <!-- Opens #external-menu; hidden until a chart row is showing. -->
+          <button type="button" class="icon-btn" id="external-link" hidden
+                  aria-haspopup="true" aria-expanded="false"
+                  aria-label="Open this title on IMDB or TMDB"
+                  data-tip="Open this title on IMDB or TMDB."
+                  onclick="toggleExternalMenu(event)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6"/><path d="M20 4l-8.5 8.5"/><path d="M19 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h5"/></svg>
+          </button>
+          <button type="button" class="icon-btn" id="import-url-btn"
+                  aria-label="Import settings from a config URL"
+                  data-tip="Import settings from a config URL."
+                  onclick="toggleImportBar()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1"/><path d="M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/></svg>
+          </button>
+        </div>
+        <!-- MOVIES: the chart the preview draws, the shape it draws in and
+             the canvas style, as on the TOPX site.  The label toggles the
+             chart between Movies and Series; the pills and chips write the
+             same controls the Core tab owns, so nothing here is a copy. -->
+        <div class="topx-movies">
+          <button type="button" class="topx-movies-label" id="tx-movies-label"
+                  data-tip="Preview the Movies chart or the Series one.">Movies</button>
+          <div class="topx-shape-row">
+            <button type="button" class="topx-shape-pill" data-qshape="landscape"
+                    data-tip="Preview the 16:9 landscape poster. Copy config then copies the landscape URL, for clients with a landscape poster slot.">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M3 14h18"/></svg>
+              Landscape&ensp;16:9</button>
+            <span class="topx-shape-divider"></span>
+            <button type="button" class="topx-shape-pill active" data-qshape="portrait"
+                    data-tip="Preview the 2:3 portrait poster.">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="2.5" width="10" height="19" rx="2"/><path d="M11 18.5h2"/></svg>
+              Poster&ensp;2:3</button>
+          </div>
+          <div class="topx-canvas-row" id="txCanvasRow">
+            <button type="button" class="topx-canvas-chip active" data-canvas="fresh"
+                    data-tip="Full-bleed fresh artwork behind the ranked cover."><span class="txdot" style="background:#4caf7d"></span>Fresh</button>
+            <button type="button" class="topx-canvas-chip" data-canvas="provider"
+                    data-tip="A glass gradient in the streamer's colours behind the ranked cover."><span class="txdot" style="background:#59b7ff"></span>Provider Glass</button>
+            <button type="button" class="topx-canvas-chip" data-canvas="transparent"
+                    data-tip="Transparent canvas — the ranked cover floats on the client's own background."><span class="txdot txdot-transparent"></span>Transparent</button>
+            <button type="button" class="topx-canvas-chip" data-canvas="stremio"
+                    data-tip="Stremio navy canvas."><span class="txdot" style="background:#8c75ff"></span>Stremio</button>
+            <button type="button" class="topx-canvas-chip" data-canvas="nuvio"
+                    data-tip="Solid black canvas."><span class="txdot" style="background:#1a1a1a"></span>Black</button>
+          </div>
         </div>
         <!-- Errors surface here, directly under where the poster renders. -->
         <div class="preview-error" id="preview-error" hidden></div>
@@ -4592,7 +4757,7 @@ try{if(localStorage.getItem('postersplus_theme')==='light')document.documentElem
 
 </div>
 
-<!-- Anchored to the preview header's link button, but parked at the end of the
+<!-- Anchored to the caption's link button, but parked at the end of the
      body: .preview-panel is overflow:hidden and would clip it. -->
 <div class="menu" id="external-menu" role="menu" hidden>
   <a class="menu-item" id="ext-imdb" href="#" target="_blank" rel="noopener" role="menuitem">IMDB</a>
@@ -4606,6 +4771,12 @@ try{if(localStorage.getItem('postersplus_theme')==='light')document.documentElem
 <!-- Filled from COPY_TEMPLATES at init so the client list lives in one place.
      Parked here for the same reason as the menu above. -->
 <div class="menu" id="copy-menu" role="menu" aria-label="Copy the poster URL for" hidden></div>
+
+<!-- Tapping a preview card zooms its render fullscreen; tap anywhere closes.
+     Parked at the end of the body for the same clipping reason as the menus. -->
+<div class="tx-zoom" id="tx-zoom" aria-hidden="true">
+  <img id="tx-zoom-img" alt="Zoomed preview" referrerpolicy="no-referrer">
+</div>
 <div class="menu" id="reset-menu" role="menu" aria-label="Reset" hidden>
   <button type="button" class="menu-item" role="menuitem" onclick="runResetMenu()">Reset to defaults</button>
   <button type="button" class="menu-item" id="reset-menu-import" role="menuitem" onclick="runResetMenu('import')" hidden>Reset to imported URL</button>
@@ -7291,9 +7462,14 @@ function build() {
 function updateExternalLink() {
   const btn = document.getElementById('external-link');
   if (!btn) return;
-  const imdb = vEl('cfg-imdb');
-  const tmdb = vEl('cfg-tmdb-resolved');
-  const type = vEl('cfg-media-type') === 'tv' ? 'tv' : 'movie';
+  // The preview draws the chart's #1, so its menu follows the chart row when
+  // there is one; a searched title's own ids stand in when the chart is
+  // unreachable, and nothing shows when neither answers.
+  const row = TX.rows[0];
+  const imdb = vEl('cfg-imdb') || (row ? (row.id || '') : '');
+  const tmdb = vEl('cfg-tmdb-resolved') || (row ? (row.tmdb_id || '') : '');
+  const type = (vEl('cfg-media-type') === 'tv' ? 'tv'
+                : (row ? (row.type || 'movie') : 'movie')) === 'tv' ? 'tv' : 'movie';
   const base = tmdb ? `https://www.themoviedb.org/${type}/${encodeURIComponent(tmdb)}` : '';
 
   const set = (id, href) => {
@@ -9187,9 +9363,7 @@ for (const done of ['pointerup', 'pointercancel']) {
 
 function queuePreviewReload() {
   clearTimeout(previewDebounce);
-  previewDebounce = setTimeout(() => {
-    if (resolvedTmdbId || resolvedImdbId || resolvedAnimeId) loadPreview();
-  }, 350);
+  previewDebounce = setTimeout(loadPreview, 350);
 }
 
 /** Failures print under the poster; anything else clears whatever was there.
@@ -9202,111 +9376,48 @@ function setStatus(msg, cls='') {
   else               { el.textContent = '';  el.hidden = true;  }
 }
 
-// ── The style strip ───────────────────────────────────────────────────────
-// The preview section is the TOPX example strip, made live: one row per
-// style, a landscape cover and a portrait cover side by side, each tile a
-// real /poster render of the selected title carrying every current setting.
-// Nothing is decorative here — the tiles ARE the preview, all templates at
-// once, so a settings change is visible on every template immediately.
-//
-// Tile URLs start from the same parameters the copied URL carries
-// (buildBaseParams with bothShapes, so each tile renders with its own
-// shape's settings — a landscape tile honours the landscape values, the
-// portrait tile the portrait ones — and full, so nothing sits at an omitted
-// default for the wrong shape), then override the three facts a tile is
-// about: template, canvas, shape.  Long parameter names win over the short
-// ones a copied URL uses (param_aliases.expand), so the overrides always
-// land.
-const STYLE_TILES = [
-  { tpl: 'topx',     canvas: 'fresh',       shape: 'landscape', name: 'Fresh',          sub: 'Landscape' },
-  { tpl: 'topx',     canvas: 'fresh',       shape: 'portrait',  name: 'Fresh',          sub: 'Poster' },
-  { tpl: 'topx',     canvas: 'provider',    shape: 'landscape', name: 'Provider Glass', sub: 'Landscape' },
-  { tpl: 'topx',     canvas: 'provider',    shape: 'portrait',  name: 'Provider Glass', sub: 'Poster' },
-  { tpl: 'topx',     canvas: 'stremio',     shape: 'landscape', name: 'Stremio',        sub: 'Landscape' },
-  { tpl: 'topx',     canvas: 'transparent', shape: 'portrait',  name: 'Transparent',    sub: 'Poster' },
-  { tpl: 'blvcktop', canvas: '',            shape: 'landscape', name: 'BLVCKTOP',       sub: 'Landscape' },
-  { tpl: 'blvcktop', canvas: '',            shape: 'portrait',  name: 'BLVCKTOP',       sub: 'Poster' },
-];
+// ── The ranked hero ───────────────────────────────────────────────────────
+// The preview is the TOPX site's opening pair, made live: the chart's #1 and
+// #2, each a real /poster render under the current settings.  Nothing here
+// needs a selected title — the chart IS the example — and every control in
+// the panel re-renders both cards through the same queuePreviewReload path
+// the rest of the page uses.
+const TX = { type: 'movie', rows: [], seq: 0 };
 
-function buildStyleStrip() {
-  const grid = document.getElementById('style-strip-grid');
-  if (!grid || grid.childElementCount) return;   // idempotent
-  let row = null;
-  STYLE_TILES.forEach((t, i) => {
-    if (i % 2 === 0) {
-      row = document.createElement('div');
-      row.className = 'style-row';
-      grid.appendChild(row);
-    }
-    const fig = document.createElement('figure');
-    fig.className = `style-tile ${t.shape === 'landscape' ? 'is-landscape' : 'is-portrait'}`;
-    fig.dataset.tpl = t.tpl;
-    fig.dataset.canvas = t.canvas;
-    fig.dataset.shape = t.shape;
-    fig.setAttribute('role', 'button');
-    fig.setAttribute('tabindex', '0');
-    fig.setAttribute('aria-label', `Preview and apply ${t.name} ${t.sub}`);
-    fig.innerHTML =
-      `<div class="tile-media">` +
-        `<img class="tile-img" alt="${t.name} ${t.sub} preview">` +
-        `<div class="tile-hint"><div class="preview-spinner"></div>Rendering…</div>` +
-      `</div>` +
-      `<figcaption class="style-caption"><b>${t.name}</b><span>${t.sub}</span></figcaption>`;
-    fig.addEventListener('click', () => applyTileStyle(fig));
-    fig.addEventListener('keydown', e => {
-      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); applyTileStyle(fig); }
-    });
-    if (row) row.appendChild(fig);
-  });
-  updateStripActive();
+function txWriteCaption(row) {
+  const rank = document.getElementById('tx-caption-rank');
+  const name = document.getElementById('tx-caption-name');
+  const dim  = document.getElementById('tx-caption-dim');
+  if (!rank || !name || !dim) return;
+  if (!row) { name.textContent = '\u00a0'; dim.textContent = ''; return; }
+  rank.textContent = '#' + (row.rank || 1);
+  name.textContent = row.name || '\u00a0';
+  const parts = [];
+  if (row.year)  parts.push(row.year);
+  if (row.genre) parts.push(row.genre);
+  if (row.rating) parts.push('★ ' + row.rating);
+  dim.textContent = parts.join(' · ');
 }
 
-function styleTileUrl(ds) {
+// One card's render URL: the copied URL's parameters (buildBaseParams, full
+// so each shape's own settings ride — the portrait card honours the portrait
+// set, the landscape card the landscape one), then the facts a card is about:
+// the chart row's ids, the template & canvas in use and the shape on screen.
+// Long parameter names win over the short ones a copied URL uses
+// (param_aliases.expand), so the overrides always land.
+function txCardUrl(row) {
   const override = _REWRITE_DOMAIN ? window.location.origin : null;
   const u = new URL(buildBaseParams({ usePlaceholders: false, domainOverride: override,
-                                      full: true, bothShapes: true }));
-  if (ds.tpl) u.searchParams.set('template', ds.tpl);
-  if (ds.canvas) u.searchParams.set('topx_canvas', ds.canvas);
-  if (ds.shape === 'landscape') u.searchParams.set('shape', 'landscape');
+                                      full: true }));
+  if (row.tmdb_id) u.searchParams.set('tmdb_id', row.tmdb_id);
+  if (row.id)      u.searchParams.set('imdb_id', row.id);
+  u.searchParams.set('type', row.type || (TX.type === 'series' ? 'series' : 'movie'));
+  const tpl = vEl('cfg-template');
+  if (tpl) u.searchParams.set('template', tpl);
+  if (tpl === 'topx') u.searchParams.set('topx_canvas', vEl('cfg-topx-canvas') || 'fresh');
+  if (c('tog-landscape')) u.searchParams.set('shape', 'landscape');
   else u.searchParams.delete('shape');
   return shortenUrl(u.toString());
-}
-
-// The tile whose template & canvas the configurator currently points at
-// carries the gold ring — both of a pair when a style shows in both shapes.
-function updateStripActive() {
-  const grid = document.getElementById('style-strip-grid');
-  if (!grid) return;
-  const tpl = vEl('cfg-template');
-  const canvas = vEl('cfg-topx-canvas') || 'fresh';
-  grid.querySelectorAll('.style-tile').forEach(tile => {
-    const ds = tile.dataset;
-    const match = ds.tpl === tpl && (ds.tpl !== 'topx' || (ds.canvas || 'fresh') === canvas);
-    tile.classList.toggle('active', !!match);
-  });
-}
-
-// Tapping a tile selects its template & canvas — the strip doubles as the
-// Template picker's visible face.  The shape stays whatever the toggle says:
-// the copied URL's shape is the toggle's job, the tiles always show both.
-function applyTileStyle(tile) {
-  const tplEl = document.getElementById('cfg-template');
-  if (!tplEl) return;
-  const ds = tile.dataset;
-  if (tplEl.value === ds.tpl
-      && (ds.tpl !== 'topx' || (vEl('cfg-topx-canvas') || 'fresh') === (ds.canvas || 'fresh'))) {
-    return;   // already the active style
-  }
-  tplEl.value = ds.tpl || '';
-  updateTemplateFields();
-  if (ds.tpl === 'topx' && ds.canvas) {
-    const cv = document.getElementById('cfg-topx-canvas');
-    if (cv) cv.value = ds.canvas;
-  }
-  syncSegmented();
-  updateStripActive();
-  build();   // rebuilds the URL, saves settings
-  queuePreviewReload();
 }
 
 async function loadPreview() {
@@ -9320,64 +9431,153 @@ async function loadPreview() {
     return;
   }
   if (imdbResolvePending) return;
-  if (!resolvedTmdbId && !resolvedImdbId && !resolvedAnimeId) { setStatus('Search and select a title first', 'err'); return; }
-  // Without a key the server renders from the IMDb id (Cinemeta); only a
-  // title known by TMDB id alone has nothing to render from.
-  if (!vEl('cfg-tmdb-key') && !serverCaps.tmdb_key_set && !resolvedImdbId) { setStatus('This instance has no server side TMDB key. Provide your own, or search again — key-less search picks titles by IMDb id, which renders without one.', 'err'); return; }
   previewLoading = true;
-  setStatus('', '');
-  document.getElementById('preview-status').textContent = 'LOADING';
-  const grid = document.getElementById('style-strip-grid');
-  if (!grid) { previewLoading = false; return; }
-  // One batch per load; a newer load supersedes the probes still in flight.
-  const batch = ++_stripBatch;
-  const tiles = Array.from(grid.querySelectorAll('.style-tile'));
-  let pending = tiles.length;
-  let anyArt  = false;
-  let anyFail = false;
+  const chip = document.getElementById('preview-status');
+  if (chip) chip.textContent = 'LOADING';
+  // One batch per load; a newer load supersedes the fetches still in flight.
+  const batch = ++TX.seq;
+  let rows = [];
+  try {
+    const base = _REWRITE_DOMAIN ? window.location.origin : '';
+    const key = encodeURIComponent(vEl('cfg-access-key') || '');
+    const res = await fetch(`${base}/trending-top?count=2&ctype=${TX.type}&access_key=${key}`);
+    if (!res.ok) throw new Error(`chart ${res.status}`);
+    const data = await res.json();
+    if (batch !== TX.seq) return;        // superseded — drop this load whole
+    rows = Array.isArray(data.rows) ? data.rows : [];
+    TX.rows = rows;
+  } catch (_) {
+    // The chart fetch failing is no reason to blank what is on screen: the
+    // cards keep their art, the chip settles, and the queued edits drain.
+    previewLoading = false;
+    if (chip) chip.textContent = 'ERROR';
+    if (_previewDirty) { _previewDirty = false; queuePreviewReload(); }
+    return;
+  }
+  // The caption lands with the fetch, not the image: the row is the fact.
+  txWriteCaption(rows[0]);
+  updateExternalLink();
+  let pending = 2, anyArt = false, anyFail = false;
   const settle = () => {
     pending -= 1;
-    if (pending > 0 || batch !== _stripBatch) return;
+    if (pending > 0 || batch !== TX.seq) return;
     previewLoading = false;
-    const chip = document.getElementById('preview-status');
-    if (chip) chip.textContent = anyArt || !anyFail ? 'OK' : 'ERROR';
-    if (_previewDirty) {
-      _previewDirty = false;
-      queuePreviewReload();   // the queued edits land now
-    }
+    if (chip) chip.textContent = anyArt ? 'OK' : (anyFail || rows.length ? 'ERROR' : 'OK');
+    if (anyArt) _previewLoaded();
+    if (_previewDirty) { _previewDirty = false; queuePreviewReload(); }
   };
-  // Staggered starts: eight renders per settings change is the strip's cost,
-  // and staggering keeps the render queue on a free instance from piling up.
-  tiles.forEach((tile, i) => {
-    const imgEl = tile.querySelector('img.tile-img');
-    const hint  = tile.querySelector('.tile-hint');
-    if (imgEl && imgEl.src) anyArt = true;   // stale art stays on screen
+  [['tx-poster-a', 'tx-hint-a', 0], ['tx-poster-b', 'tx-hint-b', 1]].forEach(([imgId, hintId, idx], i) => {
+    const img = document.getElementById(imgId);
+    const hint = document.getElementById(hintId);
+    const row = rows[idx];
+    if (img && img.src) anyArt = true;   // stale art stays on screen
     else if (hint) hint.classList.add('on');
-    const url = styleTileUrl(tile.dataset);
+    if (!row) { settle(); return; }      // a short chart keeps the old card
+    const url = txCardUrl(row);
     const probe = new Image();
     probe.onload = () => {
-      if (batch !== _stripBatch) return;   // superseded — drop this render
+      if (batch !== TX.seq) return;      // superseded — drop this render
       anyArt = true;
-      if (imgEl) { imgEl.src = url; imgEl.classList.add('on'); }
+      if (img) { img.src = url; img.classList.add('on'); }
       if (hint) hint.classList.remove('on');
-      // The chip settles to OK on the first tile rather than the last: a
-      // preset-import thumbnail captures then, and the strip visibly starts
-      // landing instead of sitting on LOADING for the whole batch.
-      const chip = document.getElementById('preview-status');
-      if (chip && chip.textContent === 'LOADING') chip.textContent = 'OK';
-      _previewLoaded();
       settle();
     };
     probe.onerror = () => {
-      if (batch !== _stripBatch) return;
+      if (batch !== TX.seq) return;
       anyFail = true;
-      // A tile with art on screen keeps it — a transient render failure must
-      // not blank the strip or print a red error over renders that were fine
-      // a second ago.  Only tiles that never loaded keep their hint.
+      // A card with art on screen keeps it — a transient render failure must
+      // not blank the preview or print a red error over renders that were
+      // fine a second ago.
       settle();
     };
-    setTimeout(() => { if (batch === _stripBatch) probe.src = url; }, i * 260);
+    // Staggered starts: two renders per settings change, the second a beat
+    // behind the first so a slow instance's queue stays flat.
+    setTimeout(() => { if (batch === TX.seq) probe.src = url; }, i * 300);
   });
+}
+
+// The chart label: Movies ↔ Series — which chart the preview draws.
+function txToggleCatalog() {
+  TX.type = TX.type === 'movie' ? 'series' : 'movie';
+  const lab = document.getElementById('tx-movies-label');
+  if (lab) lab.textContent = TX.type === 'movie' ? 'Movies' : 'Series';
+  queuePreviewReload();
+}
+
+// The shape pills mirror tog-landscape (the checkbox is the state; the pills
+// only flip and mirror it, like the header button they replace).
+function txSetShape(shape) {
+  const tog = document.getElementById('tog-landscape');
+  if (!tog || (tog.checked ? 'landscape' : 'portrait') === shape) return;
+  toggleShape();
+}
+function txShapeSync() {
+  const landscape = c('tog-landscape');
+  document.querySelectorAll('.topx-shape-pill').forEach(p =>
+    p.classList.toggle('active', (p.dataset.qshape === 'landscape') === landscape));
+}
+
+// The canvas chips are the Core tab's Canvas select, stood where the TOPX
+// site stands them: picking one points the template at topx and the canvas
+// at the chip.  Their active state follows the selects wherever the change
+// came from — chip, select or an imported URL.
+function txApplyCanvas(canvas) {
+  const tpl = document.getElementById('cfg-template');
+  if (!tpl) return;
+  if (tpl.value !== 'topx' || (vEl('cfg-topx-canvas') || 'fresh') !== canvas) {
+    tpl.value = 'topx';
+    const cv = document.getElementById('cfg-topx-canvas');
+    if (cv) cv.value = canvas;
+    updateTemplateFields();
+    syncSegmented();
+    build();                             // rebuilds the URL, saves settings
+  }
+  queuePreviewReload();
+}
+function txChipSync() {
+  const tpl = vEl('cfg-template');
+  const canvas = vEl('cfg-topx-canvas') || 'fresh';
+  document.querySelectorAll('#txCanvasRow .topx-canvas-chip').forEach(ch =>
+    ch.classList.toggle('active', tpl === 'topx' && (ch.dataset.canvas || '') === canvas));
+}
+
+// Zoom: a card tap opens its render fullscreen; any tap closes.
+function txZoomOpen(imgId) {
+  const img = document.getElementById(imgId);
+  const wrap = document.getElementById('tx-zoom');
+  const big = document.getElementById('tx-zoom-img');
+  if (!img || !img.src || !img.classList.contains('on') || !wrap || !big) return;
+  big.src = img.src;
+  wrap.classList.add('show');
+  wrap.setAttribute('aria-hidden', 'false');
+}
+function txZoomClose() {
+  const wrap = document.getElementById('tx-zoom');
+  if (!wrap) return;
+  wrap.classList.remove('show');
+  wrap.setAttribute('aria-hidden', 'true');
+}
+
+// The hero's listeners, once at init.
+function initTxHero() {
+  document.querySelectorAll('.topx-shape-pill').forEach(p =>
+    p.addEventListener('click', () => txSetShape(p.dataset.qshape)));
+  document.querySelectorAll('#txCanvasRow .topx-canvas-chip').forEach(ch =>
+    ch.addEventListener('click', () => txApplyCanvas(ch.dataset.canvas)));
+  const label = document.getElementById('tx-movies-label');
+  if (label) label.addEventListener('click', txToggleCatalog);
+  const zoom = document.getElementById('tx-zoom');
+  if (zoom) zoom.addEventListener('click', txZoomClose);
+  [['tx-card-a', 'tx-poster-a'], ['tx-card-b', 'tx-poster-b']].forEach(([card, img]) => {
+    const el = document.getElementById(card);
+    if (!el) return;
+    el.addEventListener('click', () => txZoomOpen(img));
+    el.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); txZoomOpen(img); }
+    });
+  });
+  txShapeSync();
+  txChipSync();
 }
 
 function updateSashBadgeFields() {
@@ -10020,8 +10220,7 @@ function toggleShape() {
 
 function updateShapeFields() {
   const landscape = c('tog-landscape');
-  const btn = document.getElementById('shape-toggle');
-  if (btn) btn.setAttribute('aria-pressed', landscape ? 'true' : 'false');
+  txShapeSync();
   const frame = document.getElementById('preview-frame');
   if (frame) frame.classList.toggle('is-landscape', landscape);
   const dim = document.getElementById('preview-placeholder-dim');
@@ -10148,9 +10347,10 @@ function updateTemplateFields() {
   document.getElementById('topx-canvas-field').style.display = isTopx ? '' : 'none';
   document.getElementById('topx-tint-row').style.display     = isTopx ? '' : 'none';
   document.getElementById('topx-badges-row').style.display   = isAny  ? '' : 'none';
-  // The strip's gold ring follows the template & canvas the configurator
-  // points at, wherever the change came from — tile tap, select or import.
-  updateStripActive();
+  // The canvas chips' active state follows the template & canvas the
+  // configurator points at, wherever the change came from — chip tap,
+  // select or import.
+  txChipSync();
 }
 
 // ── TOOLTIPS ─────────────────────────────────────────────────────────────────
@@ -10829,7 +11029,7 @@ function _buildUserPresetBar(grid, count) {
 // The preview as it stands, shrunk to a card picture.  Null when there isn't
 // one, or it came from another origin (a canvas it taints can't be read).
 function _capturePreviewThumb() {
-  const img = document.querySelector('#preview-frame img.tile-img');
+  const img = document.getElementById('tx-poster-a');
   if (!img || !img.complete || !img.naturalWidth
       || document.getElementById('preview-status').textContent !== 'OK') return null;
   try {
@@ -11801,9 +12001,9 @@ _loadShapeStash();
 restoreSettings();
 restoreTrendingOnly();
 restoreTrendingLandscape();
-// The strip builds before anything can ask it to load: fetchServerCaps's
-// then() below fires the first queuePreviewReload.
-buildStyleStrip();
+// The hero's listeners bind before anything can ask it to load:
+// fetchServerCaps's then() below fires the first queuePreviewReload.
+initTxHero();
 initSegmented();
 updateTrendingStyleFields();   // hides buttons the restored style doesn't offer
 buildLogoPriorityList();
