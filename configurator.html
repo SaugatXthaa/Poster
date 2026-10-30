@@ -1497,6 +1497,117 @@
     background: transparent;
   }
 
+  /* ── The style strip ─────────────────────────────────────────────────────
+     The preview leads the page the way the TOPX site's example strip does:
+     one row per style, a landscape cover and a portrait cover side by side,
+     every tile a live render of the selected title under the current
+     settings.  A tile ring marks the template & canvas in use; tapping a
+     tile applies its style. */
+  .preview-frame.style-strip {
+    display: block;
+    padding: 16px 18px 6px;
+    min-height: 0;
+    overflow-y: auto;
+  }
+  .style-strip-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    width: 100%;
+  }
+  .style-row {
+    display: grid;
+    /* minmax(0, …): a plain fr track is minmax(auto, 1fr), so the caption's
+       longest word would distort the split.  The landscape cover leads the
+       row and the portrait fills the rest, the way the TOPX strip lays out. */
+    grid-template-columns: minmax(0, 2.4fr) minmax(0, 1fr);
+    gap: 14px;
+    align-items: stretch;
+  }
+  .style-tile {
+    margin: 0;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .style-tile .tile-media {
+    position: relative;
+    width: 100%;
+    min-height: 88px;
+    border-radius: 14px;
+    overflow: hidden;
+    background:
+      radial-gradient(120% 90% at 50% 0%, rgba(212,175,55,0.05), transparent 60%),
+      #0c0c0f;
+    border: 1px solid var(--border);
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.45);
+    transition: border-color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
+  }
+  /* The landscape cover sizes the row: its height is its 16:9 from the
+     column width.  The portrait tile stretches to meet it. */
+  .style-tile.is-landscape .tile-media {
+    height: auto;
+    aspect-ratio: 16 / 9;
+  }
+  .style-tile.is-portrait .tile-media {
+    flex: 1 1 auto;
+    height: auto;
+    min-height: 88px;
+  }
+  .style-tile:hover .tile-media {
+    border-color: var(--gold-dim);
+    transform: translateY(-1px);
+  }
+  .style-tile.active .tile-media {
+    border-color: var(--gold);
+    box-shadow: 0 0 0 1px var(--gold), 0 10px 30px rgba(0, 0, 0, 0.55);
+  }
+  img.tile-img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    opacity: 0;
+    transition: opacity 0.25s ease;
+    background: #0c0c0f;
+  }
+  img.tile-img.on { opacity: 1; }
+  .tile-hint {
+    position: absolute;
+    inset: 0;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    color: var(--text-muted);
+    font-size: 9px;
+    letter-spacing: calc(0.1em * var(--track));
+  }
+  .tile-hint.on { display: flex; }
+  .tile-hint .preview-spinner { width: 14px; height: 14px; }
+  .style-caption {
+    text-align: center;
+    margin-top: 7px;
+    line-height: 1.45;
+    flex: 0 0 auto;
+  }
+  .style-caption b {
+    display: block;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--text);
+    letter-spacing: calc(0.02em * var(--track));
+  }
+  .style-caption span {
+    display: block;
+    font-size: 10px;
+    color: var(--text-muted);
+    letter-spacing: calc(0.06em * var(--track));
+  }
+
   .preview-poster,
   .preview-empty { position: relative; z-index: 1; }
 
@@ -4448,11 +4559,13 @@ try{if(localStorage.getItem('postersplus_theme')==='light')document.documentElem
             <span class="panel-index" id="preview-status" hidden>IDLE</span>
           </div>
         </div>
-        <div class="preview-frame" id="preview-frame">
-          <div class="preview-empty preview-placeholder" id="preview-empty">
-            <span class="preview-placeholder-title">Poster preview</span>
-            <span class="preview-placeholder-dim" id="preview-placeholder-dim">1000 &times; 1500</span>
-          </div>
+        <!-- The style strip: every template's look at once, each tile a live
+             render of the selected title under the current settings — the
+             same strip of examples the TOPX site leads with.  Tapping a tile
+             applies that template & canvas; the ring marks the one in use.
+             Built and driven by buildStyleStrip / loadPreview. -->
+        <div class="preview-frame style-strip" id="preview-frame">
+          <div class="style-strip-grid" id="style-strip-grid"></div>
         </div>
         <!-- Errors surface here, directly under where the poster renders. -->
         <div class="preview-error" id="preview-error" hidden></div>
@@ -4819,6 +4932,10 @@ let searchDebounce = null, previewDebounce = null, previewLoading = false, imdbR
 // Set when a setting changed while a preview render was in flight; the
 // in-flight load re-queues itself on settling so the edit is never dropped.
 let _previewDirty = false;
+// The style strip's batch counter: every loadPreview bumps it, so probes
+// from a superseded batch drop their renders instead of painting over the
+// newer batch's art.
+let _stripBatch = 0;
 
 const previewPanel = document.querySelector('.preview-panel');
 
@@ -7290,7 +7407,7 @@ function decodePlaceholders(url) {
 // filtered that way, or a reload in landscape view would forget every
 // portrait setting.  saveSettings() is the one caller that passes it.
 function buildBaseParams({ usePlaceholders = false, domainOverride = null, full = false,
-                           templateId = null } = {}) {
+                           templateId = null, bothShapes = false } = {}) {
   // Which ids the URL can carry is a fact about the client, not a preference —
   // see COPY_TEMPLATES.  An unrecognised id (or none, which is what the saved
   // settings and the concrete preview URL pass) falls back to the neutral
@@ -7320,11 +7437,11 @@ function buildBaseParams({ usePlaceholders = false, domainOverride = null, full 
   // a portrait one at once: the portrait-only settings have to ride along or
   // the 2:3 slot loses them, whichever way the preview happens to be pointing.
   const dualShape  = usePlaceholders && !!template.shapePlaceholder;
-  const emitAll    = full || !landscape || dualShape;   // portrait-only settings ride along
+  const emitAll    = full || bothShapes || !landscape || dualShape;   // portrait-only settings ride along
   // Settings kept per shape (_SHARED_PARAM) are read for each shape from its own
   // values, whichever one is on screen: the portrait set goes out under the
   // plain names, the landscape set under "landscape_"-prefixed ones.
-  const emitLandscape = landscape || dualShape;
+  const emitLandscape = landscape || dualShape || bothShapes;
   const pShared    = _sharedFor('portrait');
   const lShared    = _sharedFor('landscape');
   const sashMode   = pShared['cfg-sash-mode'] || 'sash';
@@ -9085,12 +9202,119 @@ function setStatus(msg, cls='') {
   else               { el.textContent = '';  el.hidden = true;  }
 }
 
+// ── The style strip ───────────────────────────────────────────────────────
+// The preview section is the TOPX example strip, made live: one row per
+// style, a landscape cover and a portrait cover side by side, each tile a
+// real /poster render of the selected title carrying every current setting.
+// Nothing is decorative here — the tiles ARE the preview, all templates at
+// once, so a settings change is visible on every template immediately.
+//
+// Tile URLs start from the same parameters the copied URL carries
+// (buildBaseParams with bothShapes, so each tile renders with its own
+// shape's settings — a landscape tile honours the landscape values, the
+// portrait tile the portrait ones — and full, so nothing sits at an omitted
+// default for the wrong shape), then override the three facts a tile is
+// about: template, canvas, shape.  Long parameter names win over the short
+// ones a copied URL uses (param_aliases.expand), so the overrides always
+// land.
+const STYLE_TILES = [
+  { tpl: 'topx',     canvas: 'fresh',       shape: 'landscape', name: 'Fresh',          sub: 'Landscape' },
+  { tpl: 'topx',     canvas: 'fresh',       shape: 'portrait',  name: 'Fresh',          sub: 'Poster' },
+  { tpl: 'topx',     canvas: 'provider',    shape: 'landscape', name: 'Provider Glass', sub: 'Landscape' },
+  { tpl: 'topx',     canvas: 'provider',    shape: 'portrait',  name: 'Provider Glass', sub: 'Poster' },
+  { tpl: 'topx',     canvas: 'stremio',     shape: 'landscape', name: 'Stremio',        sub: 'Landscape' },
+  { tpl: 'topx',     canvas: 'transparent', shape: 'portrait',  name: 'Transparent',    sub: 'Poster' },
+  { tpl: 'blvcktop', canvas: '',            shape: 'landscape', name: 'BLVCKTOP',       sub: 'Landscape' },
+  { tpl: 'blvcktop', canvas: '',            shape: 'portrait',  name: 'BLVCKTOP',       sub: 'Poster' },
+];
+
+function buildStyleStrip() {
+  const grid = document.getElementById('style-strip-grid');
+  if (!grid || grid.childElementCount) return;   // idempotent
+  let row = null;
+  STYLE_TILES.forEach((t, i) => {
+    if (i % 2 === 0) {
+      row = document.createElement('div');
+      row.className = 'style-row';
+      grid.appendChild(row);
+    }
+    const fig = document.createElement('figure');
+    fig.className = `style-tile ${t.shape === 'landscape' ? 'is-landscape' : 'is-portrait'}`;
+    fig.dataset.tpl = t.tpl;
+    fig.dataset.canvas = t.canvas;
+    fig.dataset.shape = t.shape;
+    fig.setAttribute('role', 'button');
+    fig.setAttribute('tabindex', '0');
+    fig.setAttribute('aria-label', `Preview and apply ${t.name} ${t.sub}`);
+    fig.innerHTML =
+      `<div class="tile-media">` +
+        `<img class="tile-img" alt="${t.name} ${t.sub} preview">` +
+        `<div class="tile-hint"><div class="preview-spinner"></div>Rendering…</div>` +
+      `</div>` +
+      `<figcaption class="style-caption"><b>${t.name}</b><span>${t.sub}</span></figcaption>`;
+    fig.addEventListener('click', () => applyTileStyle(fig));
+    fig.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); applyTileStyle(fig); }
+    });
+    if (row) row.appendChild(fig);
+  });
+  updateStripActive();
+}
+
+function styleTileUrl(ds) {
+  const override = _REWRITE_DOMAIN ? window.location.origin : null;
+  const u = new URL(buildBaseParams({ usePlaceholders: false, domainOverride: override,
+                                      full: true, bothShapes: true }));
+  if (ds.tpl) u.searchParams.set('template', ds.tpl);
+  if (ds.canvas) u.searchParams.set('topx_canvas', ds.canvas);
+  if (ds.shape === 'landscape') u.searchParams.set('shape', 'landscape');
+  else u.searchParams.delete('shape');
+  return shortenUrl(u.toString());
+}
+
+// The tile whose template & canvas the configurator currently points at
+// carries the gold ring — both of a pair when a style shows in both shapes.
+function updateStripActive() {
+  const grid = document.getElementById('style-strip-grid');
+  if (!grid) return;
+  const tpl = vEl('cfg-template');
+  const canvas = vEl('cfg-topx-canvas') || 'fresh';
+  grid.querySelectorAll('.style-tile').forEach(tile => {
+    const ds = tile.dataset;
+    const match = ds.tpl === tpl && (ds.tpl !== 'topx' || (ds.canvas || 'fresh') === canvas);
+    tile.classList.toggle('active', !!match);
+  });
+}
+
+// Tapping a tile selects its template & canvas — the strip doubles as the
+// Template picker's visible face.  The shape stays whatever the toggle says:
+// the copied URL's shape is the toggle's job, the tiles always show both.
+function applyTileStyle(tile) {
+  const tplEl = document.getElementById('cfg-template');
+  if (!tplEl) return;
+  const ds = tile.dataset;
+  if (tplEl.value === ds.tpl
+      && (ds.tpl !== 'topx' || (vEl('cfg-topx-canvas') || 'fresh') === (ds.canvas || 'fresh'))) {
+    return;   // already the active style
+  }
+  tplEl.value = ds.tpl || '';
+  updateTemplateFields();
+  if (ds.tpl === 'topx' && ds.canvas) {
+    const cv = document.getElementById('cfg-topx-canvas');
+    if (cv) cv.value = ds.canvas;
+  }
+  syncSegmented();
+  updateStripActive();
+  build();   // rebuilds the URL, saves settings
+  queuePreviewReload();
+}
+
 async function loadPreview() {
   if (previewLoading) {
     // A change landed while a render is in flight: don't drop it. Mark the
-    // preview dirty and re-queue the moment the in-flight load settles — on a
-    // slow instance a render can take seconds, and dropping the change here
-    // made the preview sit on stale art until the NEXT edit.
+    // preview dirty and re-queue the moment the batch settles — on a slow
+    // instance a render can take seconds, and dropping the change here made
+    // the preview sit on stale art until the NEXT edit.
     _previewDirty = true;
     clearTimeout(previewDebounce);
     return;
@@ -9101,54 +9325,59 @@ async function loadPreview() {
   // title known by TMDB id alone has nothing to render from.
   if (!vEl('cfg-tmdb-key') && !serverCaps.tmdb_key_set && !resolvedImdbId) { setStatus('This instance has no server side TMDB key. Provide your own, or search again — key-less search picks titles by IMDb id, which renders without one.', 'err'); return; }
   previewLoading = true;
+  setStatus('', '');
   document.getElementById('preview-status').textContent = 'LOADING';
-  const frame = document.getElementById('preview-frame');
-  const hasExisting = !!frame.querySelector('.preview-poster');
-  if (!hasExisting) {
-    frame.innerHTML = `<div class="preview-empty"><div class="preview-spinner"></div>Fetching poster…</div>`;
-  }
-  setStatus('fetching poster…', 'info');
-  // pp_ts: a name no setting's short name can be (param_aliases.py).
-  const previewUrl = buildPreviewUrl() + '&pp_ts=' + Date.now();
-  // Clean swap: the new render loads in a detached probe; the poster on
-  // screen stays at full opacity until the replacement is ready, then the
-  // frame swaps in one step. No dim-while-loading flicker, no double fetch
-  // on the visible img.
-  const _previewSettled = () => {
+  const grid = document.getElementById('style-strip-grid');
+  if (!grid) { previewLoading = false; return; }
+  // One batch per load; a newer load supersedes the probes still in flight.
+  const batch = ++_stripBatch;
+  const tiles = Array.from(grid.querySelectorAll('.style-tile'));
+  let pending = tiles.length;
+  let anyArt  = false;
+  let anyFail = false;
+  const settle = () => {
+    pending -= 1;
+    if (pending > 0 || batch !== _stripBatch) return;
     previewLoading = false;
+    const chip = document.getElementById('preview-status');
+    if (chip) chip.textContent = anyArt || !anyFail ? 'OK' : 'ERROR';
     if (_previewDirty) {
       _previewDirty = false;
       queuePreviewReload();   // the queued edits land now
     }
   };
-  const img = new Image();
-  img.onload = () => {
-    if (frame.querySelector('.preview-poster') || hasExisting) {
-      frame.innerHTML = '';
-    }
-    img.className = 'preview-poster';
-    frame.appendChild(img);
-    setStatus('');   // success: clear any previous failure
-    document.getElementById('preview-status').textContent = 'OK';
-    _previewSettled();
-    _previewLoaded();
-  };
-  img.onerror = () => {
-    // A poster already on screen stays — a transient render failure (a cold
-    // server, one bad title) must not blank the preview or print a red error
-    // over a render that was fine a second ago. Only a first load that
-    // failed shows the empty state and the failure text.
-    if (!hasExisting) {
-      frame.innerHTML = `<div class="preview-empty"><span class="preview-empty-icon" style="font-size:28px">✕</span>Poster fetch failed<br><span style="margin-top:8px;display:block;font-size:9px;">check access key / instance URL</span></div>`;
-      setStatus('Error: check access key / instance URL', 'err');
-      document.getElementById('preview-status').textContent = 'ERROR';
-    } else {
-      document.getElementById('preview-status').textContent = 'OK';
-    }
-    _importThumbPending = false;
-    _previewSettled();
-  };
-  img.src = previewUrl;
+  // Staggered starts: eight renders per settings change is the strip's cost,
+  // and staggering keeps the render queue on a free instance from piling up.
+  tiles.forEach((tile, i) => {
+    const imgEl = tile.querySelector('img.tile-img');
+    const hint  = tile.querySelector('.tile-hint');
+    if (imgEl && imgEl.src) anyArt = true;   // stale art stays on screen
+    else if (hint) hint.classList.add('on');
+    const url = styleTileUrl(tile.dataset);
+    const probe = new Image();
+    probe.onload = () => {
+      if (batch !== _stripBatch) return;   // superseded — drop this render
+      anyArt = true;
+      if (imgEl) { imgEl.src = url; imgEl.classList.add('on'); }
+      if (hint) hint.classList.remove('on');
+      // The chip settles to OK on the first tile rather than the last: a
+      // preset-import thumbnail captures then, and the strip visibly starts
+      // landing instead of sitting on LOADING for the whole batch.
+      const chip = document.getElementById('preview-status');
+      if (chip && chip.textContent === 'LOADING') chip.textContent = 'OK';
+      _previewLoaded();
+      settle();
+    };
+    probe.onerror = () => {
+      if (batch !== _stripBatch) return;
+      anyFail = true;
+      // A tile with art on screen keeps it — a transient render failure must
+      // not blank the strip or print a red error over renders that were fine
+      // a second ago.  Only tiles that never loaded keep their hint.
+      settle();
+    };
+    setTimeout(() => { if (batch === _stripBatch) probe.src = url; }, i * 260);
+  });
 }
 
 function updateSashBadgeFields() {
@@ -9919,6 +10148,9 @@ function updateTemplateFields() {
   document.getElementById('topx-canvas-field').style.display = isTopx ? '' : 'none';
   document.getElementById('topx-tint-row').style.display     = isTopx ? '' : 'none';
   document.getElementById('topx-badges-row').style.display   = isAny  ? '' : 'none';
+  // The strip's gold ring follows the template & canvas the configurator
+  // points at, wherever the change came from — tile tap, select or import.
+  updateStripActive();
 }
 
 // ── TOOLTIPS ─────────────────────────────────────────────────────────────────
@@ -10597,7 +10829,7 @@ function _buildUserPresetBar(grid, count) {
 // The preview as it stands, shrunk to a card picture.  Null when there isn't
 // one, or it came from another origin (a canvas it taints can't be read).
 function _capturePreviewThumb() {
-  const img = document.querySelector('#preview-frame .preview-poster');
+  const img = document.querySelector('#preview-frame img.tile-img');
   if (!img || !img.complete || !img.naturalWidth
       || document.getElementById('preview-status').textContent !== 'OK') return null;
   try {
@@ -11569,7 +11801,9 @@ _loadShapeStash();
 restoreSettings();
 restoreTrendingOnly();
 restoreTrendingLandscape();
-// After restore, so the buttons paint the persisted value straight away.
+// The strip builds before anything can ask it to load: fetchServerCaps's
+// then() below fires the first queuePreviewReload.
+buildStyleStrip();
 initSegmented();
 updateTrendingStyleFields();   // hides buttons the restored style doesn't offer
 buildLogoPriorityList();
