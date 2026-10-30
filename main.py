@@ -7652,10 +7652,19 @@ _WEBP_METHOD = 2
 
 
 def _encode_poster(img: Image.Image) -> bytes:
-    """Encode a finished composite in the configured output format."""
+    """Encode a finished composite in the configured output format.
+
+    RGBA images (the transparent canvas, anything with an alpha channel) go
+    out as lossless WebP so the alpha survives — lossy WebP (VP8) flattens
+    transparency onto black, which made the 'transparent' canvas render
+    identically to the solid-black 'nuvio' canvas.
+    """
     buf = io.BytesIO()
     if _cfg.IMAGE_FORMAT == "webp":
-        img.convert("RGB").save(buf, format="WEBP", quality=_cfg.WEBP_QUALITY, method=_WEBP_METHOD)
+        if img.mode == "RGBA":
+            img.save(buf, format="WEBP", lossless=True, quality=100, method=_WEBP_METHOD)
+        else:
+            img.convert("RGB").save(buf, format="WEBP", quality=_cfg.WEBP_QUALITY, method=_WEBP_METHOD)
     else:
         img.convert("RGB").save(buf, format=_cfg.IMAGE_FORMAT.upper(), quality=_cfg.JPEG_QUALITY)
     return buf.getvalue()

@@ -9363,7 +9363,7 @@ for (const done of ['pointerup', 'pointercancel']) {
 
 function queuePreviewReload() {
   clearTimeout(previewDebounce);
-  previewDebounce = setTimeout(loadPreview, 350);
+  previewDebounce = setTimeout(loadPreview, 120);
 }
 
 /** Failures print under the poster; anything else clears whatever was there.
@@ -9492,7 +9492,7 @@ async function loadPreview() {
     };
     // Staggered starts: two renders per settings change, the second a beat
     // behind the first so a slow instance's queue stays flat.
-    setTimeout(() => { if (batch === TX.seq) probe.src = url; }, i * 300);
+    setTimeout(() => { if (batch === TX.seq) probe.src = url; }, i * 80);
   });
 }
 
