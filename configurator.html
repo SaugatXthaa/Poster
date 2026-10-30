@@ -4816,6 +4816,9 @@ const POSTER_SOURCE_IDS = POSTER_SOURCE_KINDS.map(k => `cfg-poster-source-${k}`)
 // Landscape's backdrop source, likewise (landscape_art_source_movie / _tv / _anime).
 const LANDSCAPE_SOURCE_IDS = POSTER_SOURCE_KINDS.map(k => `cfg-landscape-art-source-${k}`);
 let searchDebounce = null, previewDebounce = null, previewLoading = false, imdbResolvePending = false;
+// Set when a setting changed while a preview render was in flight; the
+// in-flight load re-queues itself on settling so the edit is never dropped.
+let _previewDirty = false;
 
 const previewPanel = document.querySelector('.preview-panel');
 
@@ -9083,7 +9086,15 @@ function setStatus(msg, cls='') {
 }
 
 async function loadPreview() {
-  if (previewLoading) { clearTimeout(previewDebounce); return; }
+  if (previewLoading) {
+    // A change landed while a render is in flight: don't drop it. Mark the
+    // preview dirty and re-queue the moment the in-flight load settles — on a
+    // slow instance a render can take seconds, and dropping the change here
+    // made the preview sit on stale art until the NEXT edit.
+    _previewDirty = true;
+    clearTimeout(previewDebounce);
+    return;
+  }
   if (imdbResolvePending) return;
   if (!resolvedTmdbId && !resolvedImdbId && !resolvedAnimeId) { setStatus('Search and select a title first', 'err'); return; }
   // Without a key the server renders from the IMDb id (Cinemeta); only a
@@ -9099,43 +9110,45 @@ async function loadPreview() {
   setStatus('fetching poster…', 'info');
   // pp_ts: a name no setting's short name can be (param_aliases.py).
   const previewUrl = buildPreviewUrl() + '&pp_ts=' + Date.now();
-  const existingImg = frame.querySelector('.preview-poster');
-  if (existingImg) {
-    existingImg.style.opacity = '0.3';
-    const img = new Image();
-    img.onload = () => {
-      existingImg.src = img.src; existingImg.style.opacity = '1';
-      setStatus('');   // success: clear any previous failure
-      document.getElementById('preview-status').textContent = 'OK';
-      previewLoading = false;
-      _previewLoaded();
-    };
-    img.onerror = () => {
-      existingImg.style.opacity = '1';
-      setStatus('Error: poster endpoint returned an error — check access key / instance URL', 'err');
-      document.getElementById('preview-status').textContent = 'ERROR';
-      previewLoading = false;
-      _importThumbPending = false;
-    };
-    img.src = previewUrl;
-  } else {
-    const img = new Image();
-    img.onload = () => {
-      frame.innerHTML = ''; img.className = 'preview-poster'; frame.appendChild(img);
-      setStatus('');   // success: clear any previous failure
-      document.getElementById('preview-status').textContent = 'OK';
-      previewLoading = false;
-      _previewLoaded();
-    };
-    img.onerror = () => {
+  // Clean swap: the new render loads in a detached probe; the poster on
+  // screen stays at full opacity until the replacement is ready, then the
+  // frame swaps in one step. No dim-while-loading flicker, no double fetch
+  // on the visible img.
+  const _previewSettled = () => {
+    previewLoading = false;
+    if (_previewDirty) {
+      _previewDirty = false;
+      queuePreviewReload();   // the queued edits land now
+    }
+  };
+  const img = new Image();
+  img.onload = () => {
+    if (frame.querySelector('.preview-poster') || hasExisting) {
+      frame.innerHTML = '';
+    }
+    img.className = 'preview-poster';
+    frame.appendChild(img);
+    setStatus('');   // success: clear any previous failure
+    document.getElementById('preview-status').textContent = 'OK';
+    _previewSettled();
+    _previewLoaded();
+  };
+  img.onerror = () => {
+    // A poster already on screen stays — a transient render failure (a cold
+    // server, one bad title) must not blank the preview or print a red error
+    // over a render that was fine a second ago. Only a first load that
+    // failed shows the empty state and the failure text.
+    if (!hasExisting) {
       frame.innerHTML = `<div class="preview-empty"><span class="preview-empty-icon" style="font-size:28px">✕</span>Poster fetch failed<br><span style="margin-top:8px;display:block;font-size:9px;">check access key / instance URL</span></div>`;
       setStatus('Error: check access key / instance URL', 'err');
       document.getElementById('preview-status').textContent = 'ERROR';
-      previewLoading = false;
-      _importThumbPending = false;
-    };
-    img.src = previewUrl;
-  }
+    } else {
+      document.getElementById('preview-status').textContent = 'OK';
+    }
+    _importThumbPending = false;
+    _previewSettled();
+  };
+  img.src = previewUrl;
 }
 
 function updateSashBadgeFields() {

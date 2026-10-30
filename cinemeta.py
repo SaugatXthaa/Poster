@@ -158,6 +158,12 @@ def _blank_tmdb_data() -> dict:
         "number_of_episodes":   None,
         "tmdb_status":          None,
         "vote_count":           None,
+        # The spine's own score. Cinemeta's document carries IMDb's aggregated
+        # rating; normalise() fills it from there. main.py's
+        # _merge_direct_tmdb_rating reads vote_average and rescales ×10, so a
+        # key-less (Cinemeta-spined) instance still has a rating to print
+        # instead of scoring N/A for ever.
+        "vote_average":         None,
         "text_backdrop_path":   None,
         "alt_poster_path":      None,
         "original_poster_path": None,
@@ -279,6 +285,17 @@ def normalise(meta: dict, imdb_id: str) -> tuple:
     tmdb_data["tmdb_release_date"] = release_date
     tmdb_data["runtime"]           = _parse_runtime(meta.get("runtime"))
     tmdb_data["cinemeta_source"]   = "cinemeta"
+    # IMDb's aggregated rating, on the 0-10 scale TMDB's vote_average speaks:
+    # _merge_direct_tmdb_rating reads it (×10 to the 0-100 score scale) so a
+    # key-less instance's posters still carry a score. vote_count stays None,
+    # which skips that merge's vote-floor gate — Cinemeta has no votes count
+    # to apply it against.
+    try:
+        _imdb_rating = float(meta.get("imdbRating"))
+        if _imdb_rating > 0:
+            tmdb_data["vote_average"] = _imdb_rating
+    except (TypeError, ValueError):
+        pass
     # A movie's theatrical and disc dates, for the release-status sash when
     # TMDB's /release_dates is out of reach (no key).  Digital availability
     # comes from the r/movieleaks cache, which is IMDb-keyed already.

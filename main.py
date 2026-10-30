@@ -973,6 +973,7 @@ from quality import (
 from ratings import (
     CustomScorePalette,
     MDBLIST_QUOTA,
+    SCORE_NORMALISERS,
     calculate_weighted_score,
     bar_fill_color,
     draw_frosted_bar,
@@ -1265,6 +1266,12 @@ def _merge_imdb_dataset_rating(
     if not isinstance(ratings_dict, dict):
         return ratings_dict
     mode = rcfg.imdb_rating_source
+    # A no-key instance degrades: "mdblist" names a source it cannot reach,
+    # so on one the IMDb dataset stands in (when enabled) instead of the
+    # request scoring N/A for ever. Instances with a key keep the strict
+    # mode — MDBList remains the sole provider of "imdb" there.
+    if mode == "mdblist" and not _cfg.SERVER_MDBLIST_KEYS:
+        mode = "fallback"
     if mode not in ("dataset", "fallback"):
         return ratings_dict
     if mode == "fallback" and ratings_dict.get("imdb") is not None:
@@ -1480,6 +1487,14 @@ def _merge_direct_tmdb_rating(ratings_dict, tmdb_data: dict, rcfg: "RequestConfi
     if not isinstance(ratings_dict, dict):
         return ratings_dict
     mode = rcfg.tmdb_rating_source
+    # A no-key instance degrades: the default "mdblist" mode is a no-op by
+    # design (TMDB's own vote must not fight MDBList's), but on an instance
+    # with no MDBList key configured that no-op means every poster scores
+    # N/A for ever. There the TMDB vote_average stands in — free, already
+    # in hand, and the same thing the "fallback" mode exists to cover.
+    # Instances with a key keep the strict default.
+    if mode == "mdblist" and not _cfg.SERVER_MDBLIST_KEYS:
+        mode = "fallback"
     if mode not in ("direct", "fallback"):
         return ratings_dict
     if mode == "fallback" and ratings_dict.get("tmdb") is not None:
@@ -12459,6 +12474,23 @@ async def get_poster(
                 fallback_to_imdb=rcfg.fallback_to_imdb,
                 fallback_source=anime_namespace if is_anime else None,
             )
+            # Rescue: the weights name only MDBList-side sources (the
+            # configurator's defaults) while this instance has no MDBList key,
+            # so nothing present carries a weight and the score reads N/A for
+            # ever. When the merges above did land something (TMDB's vote, the
+            # IMDb dataset, an anime provider score), score from what IS here
+            # — equal weights over the present sources, renormalised inside
+            # calculate_weighted_score — instead of printing N/A. A request
+            # that opted out of fallbacks (fallback_to_imdb off) is left
+            # strictly alone.
+            if score == "N/A" and ratings_dict and rcfg.fallback_to_imdb:
+                _rescue_weights = {s: 1.0 for s, v in ratings_dict.items()
+                                   if v is not None and s in SCORE_NORMALISERS}
+                if _rescue_weights:
+                    score = calculate_weighted_score(
+                        ratings_dict, _rescue_weights, fallback_to_imdb=True,
+                        fallback_source=anime_namespace if is_anime else None,
+                    )
             keywords         = []
             award_wins       = cached_award_wins
             award_noms       = cached_award_noms
@@ -12537,6 +12569,18 @@ async def get_poster(
                     # Giving anilist/kitsu a real weight overrides this.
                     fallback_source=anime_namespace if is_anime else None,
                 )
+                # Same rescue as the failure path: weights that name none of
+                # the sources present (an MDBList-centric set that came back
+                # empty for this title) must not pin the score at N/A when
+                # something else did land.
+                if score == "N/A" and ratings_dict and rcfg.fallback_to_imdb:
+                    _rescue_weights = {s: 1.0 for s, v in ratings_dict.items()
+                                       if v is not None and s in SCORE_NORMALISERS}
+                    if _rescue_weights:
+                        score = calculate_weighted_score(
+                            ratings_dict, _rescue_weights, fallback_to_imdb=True,
+                            fallback_source=anime_namespace if is_anime else None,
+                        )
             else:
                 score = ratings_dict
                 rating_weights = None
@@ -13201,8 +13245,12 @@ async def get_poster(
             # The TOPX / BLVCKTOP templates replace the classic render whole:
             # topx_poster draws the ranked cover from the same facts this
             # pipeline gathered, portrait and landscape by the canvas aspect.
+            # The meta line's label follows the same font scope the classic
+            # render draws in, so the Label Font setting reaches these
+            # templates too.
             if getattr(_render_cfg, "template", "") in ("topx", "blvcktop"):
-                result = topx_poster.build_topx(image, score, genre, _render_cfg, **_bp_args)
+                with fonts.label_font_scope(_render_cfg.label_font, _render_cfg.label_lang):
+                    result = topx_poster.build_topx(image, score, genre, _render_cfg, **_bp_args)
             else:
                 _render = build_landscape if _is_landscape else build_poster
                 result = _render(image, score, genre, _render_cfg, **_bp_args)

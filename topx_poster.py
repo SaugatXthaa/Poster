@@ -190,7 +190,16 @@ def _shadow(w: int, h: int, radius: int, blur: int, alpha: int = 170) -> Image.I
 
 
 def _load_font(size: int) -> ImageFont.FreeTypeFont:
-    return ImageFont.truetype(_INTER_BOLD, max(8, size))
+    """The render's label font — the same resolver the classic pipeline uses,
+    so the configurator's Label Font setting reaches the topx meta line (and
+    the language fallback / shaping rules apply identically). Falls back to
+    the template's Inter when the fonts module isn't reachable (standalone
+    use)."""
+    try:
+        import fonts as _fonts
+        return _fonts.label_font(max(8, size))
+    except Exception:
+        return ImageFont.truetype(_INTER_BOLD, max(8, size))
 
 
 def _text_w(draw: ImageDraw.ImageDraw, text: str, font) -> float:
@@ -432,13 +441,20 @@ def _score_text(score, cfg) -> str:
 
     An empty weighted score (no key, no rating) prints nothing: the topx
     line drops the rating instead of carrying an empty stub.
+
+    The weighted score travels on the 0-100 scale every normaliser lands on
+    (SCORE_NORMALISERS), but the topx look prints it out of ten — "★ 7.6",
+    the way the topx covers do — so a numeric score always divides by ten
+    here, whatever the classic modes' score_out_of_10 says. That switch
+    stays meaningful for the classic templates; the ranked cover has its
+    own presentation.
     """
     if isinstance(score, str):
         s = score.strip()
         if not s or s in ("N/A", "—", "-"):
             return ""
         return s
-    if cfg.score_out_of_10 and isinstance(score, (int, float)):
+    if isinstance(score, (int, float)):
         return f"{score / 10:.1f}"
     return str(score)
 
